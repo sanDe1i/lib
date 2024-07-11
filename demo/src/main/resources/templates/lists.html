@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File List</title>
+</head>
+<body>
+<h1>Files</h1>
+<form method="GET" action="/files">
+    <input type="text" name="keyword" placeholder="Search...">
+    <button type="submit">Search</button>
+</form>
+
+<ul>
+    <li th:each="file : ${files}">
+        <span th:text="${file.filename}"></span>
+
+        <form th:action="@{/download/{fileID}(fileID=${file.objectId})}" method="POST" style="display:inline;">
+            <button type="submit">Download</button>
+        </form>
+        <form th:action="@{/delete/{fileID}(fileID=${file.objectId})}" method="POST" style="display:inline;">
+            <button type="submit">Delete</button>
+        </form>
+    </li>
+</ul>
+<h5>My Book Collection</h5>
+<div th:if="${Collections != null}">
+    <ul>
+        <li th:each="book : ${Collections}">
+            <span th:text="${book.isbn}">Book</span>
+            <!-- Remove button form -->
+            <form th:action="@{/removeCollection}" method="POST" style="display:inline;">
+                <input type="hidden" name="bookId" th:value="${book.isbn}"/>
+                <button type="submit">Remove</button>
+            </form>
+        </li>
+    </ul>
+</div>
+
+<div>
+    <a href="/test">Upload More Files</a>
+</div>
+
+<div>
+    <h3>Messages:</h3>
+    <p th:text="${message}"></p>
+</div>
+</body>
+</html>

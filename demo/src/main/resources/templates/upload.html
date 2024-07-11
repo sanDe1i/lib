@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>File Upload</title>
+</head>
+<body>
+<h1>Upload Files</h1>
+<form method="POST" enctype="multipart/form-data" action="/uploadMarc">
+  <input type="file" name="file" multiple>
+  <button type="submit">Upload</button>
+</form>
+
+<div>
+  <a href="/files">View Files</a>
+</div>
+
+<div>
+  <h3>Messages:</h3>
+  <p th:text="${message}"></p>
+</div>
+</body>
+</html>

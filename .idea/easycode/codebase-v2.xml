@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="com.obiscr.chatgpt.settings.EasyCodeState">
+    <option name="projectFiles" value="$PROJECT_DIR$/demo/src/main/java/com/example/lm/Config/MongoConfig.java;D:/Lib_Project/demo/src/main/java/com/example/lm/Controller/MainController.java;D:/Lib_Project/demo/src/main/java/com/example/lm/Dao/FileDao.java;D:/Lib_Project/demo/src/main/java/com/example/lm/Model/File.java;D:/Lib_Project/demo/src/main/java/com/example/lm/Service/FileService.java;D:/Lib_Project/demo/src/main/java/com/example/lm/LmApplication.java;D:/Lib_Project/demo/src/main/resources/templates/lists.html;D:/Lib_Project/demo/src/main/resources/templates/upload.html;D:/Lib_Project/demo/src/test/java/com/example/lm/LmApplicationTests.java;D:/Lib_Project/demo/pom.xml" />
+  </component>
+</project>
