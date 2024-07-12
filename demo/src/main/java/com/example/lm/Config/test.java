@@ -39,8 +39,13 @@ public class test {
 
                             for (Subfield subfield : dataField.getSubfields()) {
                                 char subfieldCode = subfield.getCode();
-                                String subfieldData = subfield.getData().replaceAll("[/,:]", "").trim();
-
+                                String subfieldData = subfield.getData();
+                                // 仅对非856字段进行字符替换和修剪
+                                if (!"856".equals(fieldNum)) {
+                                    subfieldData = subfieldData.replaceAll("[/,:]", "").trim();
+                                } else {
+                                    subfieldData = subfieldData.trim();
+                                }
                                 subfieldsMap.computeIfAbsent(subfieldCode, k -> new ArrayList<>()).add(subfieldData);
                             }
                         }
