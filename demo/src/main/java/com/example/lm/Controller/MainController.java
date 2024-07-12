@@ -85,11 +85,10 @@ public class MainController {
     }
 
     @PostMapping("/uploadPDF")
-    public ResponseEntity<Map<Boolean,List<String>>> handlePDFUpload(@RequestParam int folderId, @RequestParam("files") List<MultipartFile> files) throws IOException {
+    public ResponseEntity<?> handlePDFUpload(@RequestParam int folderId, @RequestParam("files") List<MultipartFile> files) throws IOException {
         List<String> invalidFiles = fileService.savePDFs(folderId, files);
-        boolean success = invalidFiles.isEmpty();
-        Map<Boolean,List<String>> map = new HashMap<>();
-        map.put(success, invalidFiles);
+        Map<String, List<String>> map = new HashMap<>();
+        map.put("invalid", invalidFiles);
         return ResponseEntity.ok(map);
     }
 
@@ -97,7 +96,6 @@ public class MainController {
     // 处理文件下载请求
     @PostMapping("/download/{fileID}")
     public ResponseEntity<InputStreamResource> downloadFile(@PathVariable("fileID") String fileID) throws IOException {
-        System.out.println(fileID);
         GridFSFile file = fileService.getFileById(fileID);
         if (file == null) {
             return ResponseEntity.notFound().build();

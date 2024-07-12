@@ -195,13 +195,21 @@ public class FileService {
                         if (data.length() > 0) {
                             data.append(" ");
                         }
-                        data.append(subfield.getData().replaceAll("[/,:]", "").trim());
+                        String subfieldData = subfield.getData();
+                        // 仅对非856字段进行字符替换和修剪
+                        if (!"856".equals(fieldNum)) {
+                            subfieldData = subfieldData.replaceAll("[/,:]", "").trim();
+                        } else {
+                            subfieldData = subfieldData.trim();
+                        }
+                        data.append(subfieldData);
                     }
                 }
             }
         }
         return data.toString();
     }
+
 
     private static String getFieldData(Record record, String[] fieldNums, char... subfieldCodes) {
         StringBuilder data = new StringBuilder();
