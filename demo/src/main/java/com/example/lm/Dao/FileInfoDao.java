@@ -12,8 +12,8 @@ import java.util.List;
 public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
     FileInfo save(FileInfo fi);
 
-    @Query("SELECT f FROM FileInfo f WHERE f.isbn LIKE %:isbn%")
-    List<FileInfo> findByIsbnContaining(@Param("isbn") String isbn);
+    @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.isbn LIKE %:isbn%")
+    List<FileInfo> findByResourcesIdAndIsbnContaining(@Param("folderId") int folderId, @Param("isbn") String isbn);
 
     List<FileInfo> findByResourcesId(int resourcesId);
 

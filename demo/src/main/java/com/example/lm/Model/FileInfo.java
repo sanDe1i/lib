@@ -22,7 +22,7 @@ public class FileInfo {
     @Column(name="display")
     private int display;
 
-    @Column(name = "resourcesId")
+    @Column(name = "book_databases_id")
     private int resourcesId;
 
     @Column(name = "authors")
