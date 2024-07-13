@@ -4,8 +4,10 @@ package com.example.lm.Service;
 import com.example.lm.Dao.FavourDao;
 import com.example.lm.Dao.FileInfoDao;
 import com.example.lm.Dao.UserInfoRepository;
+import com.example.lm.Dao.UserRepository;
 import com.example.lm.Model.Favour;
 import com.example.lm.Model.FileInfo;
+import com.example.lm.Model.User;
 import com.example.lm.Model.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,10 +30,12 @@ public class UserService {
     @Autowired
     private FavourDao userBookRepository;
 
-    public boolean authenticate(String username, String password) {
-        UserInfo user = userRepository.findByUsername(username);
+    @Autowired
+    private UserRepository userRepositoryForLogin;
 
-        return user != null && user.getPassword().equals(password);
+    public User authenticate(String username) {
+        User user = userRepositoryForLogin.findByUsername(username);
+        return user;
     }
 
     public void addBookToUserCollection(String username, String bookisbn) {

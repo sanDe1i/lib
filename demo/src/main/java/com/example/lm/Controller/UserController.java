@@ -1,8 +1,13 @@
 package com.example.lm.Controller;
 
 import com.example.lm.Model.FileInfo;
+import com.example.lm.Model.User;
 import com.example.lm.Model.UserInfo;
+import com.example.lm.Service.TokenService;
 import com.example.lm.Service.UserService;
+import com.example.lm.utils.Result;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,20 +15,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@Controller
+@RestController
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TokenService tokenService;
 
     @GetMapping("/")
     public String index(HttpSession session, Model model) {
@@ -54,30 +59,7 @@ public class UserController {
         return "login";
     }
 
-    @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password, Model model, HttpServletRequest request) {
-        boolean authenticated = userService.authenticate(username, password);
-        if (authenticated) {
-            model.addAttribute("message", "Login successful!");
-            HttpSession session = request.getSession();
-            session.setAttribute("username", username);
-            return "redirect:/";
-        } else {
-            model.addAttribute("message", "Login failed!");
-            return "redirect:/login.html"; // 如果登录失败，重新跳转到登录页面
-        }
-    }
 
-
-    //    @PostMapping("/addBookToCollection")
-//    public String addBookToCollection(@RequestParam String username, @RequestParam String bookId) {
-//        try {
-//            userService.addBookToUserCollection(username, bookId);
-//            return "Book added to collection!";
-//        } catch (IllegalArgumentException e) {
-//            return e.getMessage();
-//        }
-//    }
     @PostMapping("/addBookToCollection")
     public String addBookToCollection(HttpSession session, @RequestParam String bookisbn, Model model) {
         String username = (String) session.getAttribute("username");
@@ -122,44 +104,40 @@ public class UserController {
         }
     }
 
-    @PostMapping("/api/user/login")
-    public ResponseEntity<?> loginUser(@RequestBody UserInfo user) {
-        UserInfo user1 = userService.userLogin(user.getUsername());
-        System.out.println(user1.getPassword());
-        if (user1 != null) {
-            if (user1.getPassword().equals(user.getPassword())) {
-                System.out.println("Password is correct");
-                // 返回一个包含 success 和 token 的 JSON 对象
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", true);
-                response.put("data", Collections.singletonMap("token", "dummy-token"));
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Password is incorrect", HttpStatus.BAD_REQUEST);
-            }
-        } else {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+    @PostMapping("/api/login")
+    public Result login(@RequestBody String json) {
+        System.out.println("Received JSON: " + json);
+
+        // 解析 JSON
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, String> map = null;
+        try {
+            map = mapper.readValue(json, Map.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
-    }
 
-    @PostMapping("/api/user/staff/login")
-    public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password) {
+        // 获取用户名和密码
+        String username = map.get("username");
+        String password = map.get("password");
 
-        UserInfo user1 = userService.userLogin(username);
-        System.out.println(user1.getPassword());
-        if (user1 != null) {
-            if (user1.getPassword().equals(password)) {
-                System.out.println("Password is correct");
-                // 返回一个包含 success 和 token 的 JSON 对象
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", true);
-                response.put("data", Collections.singletonMap("token", "dummy-token"));
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Password is incorrect", HttpStatus.BAD_REQUEST);
+        // 验证用户名和密码
+        User user = userService.authenticate(username);
+        if (user != null) {
+            if (user.getPassword().equals(password)){
+
+                Map<String,String> message = new HashMap<>();
+                String token = tokenService.generateTempToken(String.valueOf(user.getId()));
+                System.out.println("success token: " + token);
+                message.put("token", token);
+                message.put("id", String.valueOf(user.getId()));
+                message.put("name", user.getUsername());
+                return Result.ok().data(message);
+            }else {
+                return Result.error().data("error", "password error");
             }
-        } else {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }else {
+            return Result.error().data("error", "user not found");
         }
     }
 
