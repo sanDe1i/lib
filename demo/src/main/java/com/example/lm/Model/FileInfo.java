@@ -3,7 +3,7 @@ package com.example.lm.Model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "file")
+@Table(name = "books")
 public class FileInfo {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -12,6 +12,12 @@ public class FileInfo {
 
     @Column(name="title")
     private String title;
+
+    @Column(name="alternative_title")
+    private String alternativeTitle;
+
+    @Column(name="source_type")
+    private String sourceType;
 
     @Column(name="display")
     private int display;
@@ -46,6 +52,12 @@ public class FileInfo {
     @Column(name = "copyright_year")
     private String copyrightYear;
 
+    @Column(name="copyright_declaration")
+    private String copyrightDeclaration;
+
+    @Column(name="status")
+    private String status;
+
     @Column(name = "url")
     private String url;
 
@@ -60,6 +72,18 @@ public class FileInfo {
 
     @Column(name = "chapters")
     private String chapters;
+
+    @Column(name = "original_source")
+    private String originalSource;
+
+    @Column(name = "contributing_institution")
+    private String contributingInstitution;
+
+    @Column(name = "digitization_explanation")
+    private String digitizationExplanation;
+
+    @Column(name = "loan_label")
+    private String loanLabel;
 
     public int getId() {
         return id;
@@ -203,6 +227,70 @@ public class FileInfo {
 
     public void setChapters(String chapters) {
         this.chapters = chapters;
+    }
+
+    public String getAlternativeTitle() {
+        return alternativeTitle;
+    }
+
+    public void setAlternativeTitle(String alternativeTitle) {
+        this.alternativeTitle = alternativeTitle;
+    }
+
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public String getCopyrightDeclaration() {
+        return copyrightDeclaration;
+    }
+
+    public void setCopyrightDeclaration(String copyrightDeclaration) {
+        this.copyrightDeclaration = copyrightDeclaration;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getOriginalSource() {
+        return originalSource;
+    }
+
+    public void setOriginalSource(String originalSource) {
+        this.originalSource = originalSource;
+    }
+
+    public String getContributingInstitution() {
+        return contributingInstitution;
+    }
+
+    public void setContributingInstitution(String contributingInstitution) {
+        this.contributingInstitution = contributingInstitution;
+    }
+
+    public String getDigitizationExplanation() {
+        return digitizationExplanation;
+    }
+
+    public void setDigitizationExplanation(String digitizationExplanation) {
+        this.digitizationExplanation = digitizationExplanation;
+    }
+
+    public String getLoanLabel() {
+        return loanLabel;
+    }
+
+    public void setLoanLabel(String loanLabel) {
+        this.loanLabel = loanLabel;
     }
 
     @Override
