@@ -48,9 +48,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/payment/**","/api/login","/api/user/register","/api/email/**"
+                        .requestMatchers("/payment/**","/api/user/login","/api/user/register","/api/email/**"
                         ,"/token/generate_long_token","/token/generate_temp_token","/token/decode"
-                                ,"/token/validate","/test/**", "/oauth/**","/token/info1","api/staff/login","token/refresh_token"
+                                ,"/token/validate","/test/**", "/oauth/**","/token/info1","api/staff/login","token/refresh_token","/keyword/**"
                                 ).permitAll()
                         .anyRequest().authenticated()
                 )

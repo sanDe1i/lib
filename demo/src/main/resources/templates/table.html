@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Marc Details Table</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            position: sticky;
+            top: 0;
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+
+<table id="marcDetailsTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Alternate Title</th>
+        <th>Source Type</th>
+        <th>Resources ID</th>
+        <th>Authors</th>
+        <th>Editors</th>
+        <th>Series</th>
+        <th>Language</th>
+        <th>ISBN</th>
+        <th>Publisher</th>
+        <th>Published</th>
+        <th>Edition</th>
+        <th>Copyright Year</th>
+        <th>Copyright Declaration</th>
+        <th>Status</th>
+        <th>URL</th>
+        <th>Pages</th>
+        <th>Subjects</th>
+        <th>Description</th>
+        <th>Chapters</th>
+        <th>Original Source</th>
+        <th>Contributing Institution</th>
+        <th>Digitization Explanation</th>
+        <th>Loan Period</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- 动态生成的行会插入在这里 -->
+    </tbody>
+</table>
+
+<button id="saveButton">保存</button>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const folderId = urlParams.get('folderId');
+        if (folderId) {
+            fetchMarcDetails(folderId);
+        }
+    });
+
+    function fetchMarcDetails(folderId) {
+        fetch(`/marcDetails?folderId=${folderId}`)
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('marcDetailsTable').querySelector('tbody');
+                tableBody.innerHTML = ''; // 清空表格
+                console.log(data);
+                data.forEach(detail => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${detail.id}</td>
+                        <td contenteditable="true">${detail.title}</td>
+                        <td contenteditable="true">${detail.alternativeTitle}</td>
+                        <td contenteditable="true">${detail.sourceType}</td>
+                        <td contenteditable="true">${detail.resourcesId}</td>
+                        <td contenteditable="true">${detail.authors}</td>
+                        <td contenteditable="true">${detail.editors}</td>
+                        <td contenteditable="true">${detail.series}</td>
+                        <td contenteditable="true">${detail.language}</td>
+                        <td contenteditable="true">${detail.isbn}</td>
+                        <td contenteditable="true">${detail.publisher}</td>
+                        <td contenteditable="true">${detail.published}</td>
+                        <td contenteditable="true">${detail.edition}</td>
+                        <td contenteditable="true">${detail.copyrightYear}</td>
+                        <td contenteditable="true">${detail.copyrightDeclaration}</td>
+                        <td contenteditable="true">${detail.status}</td>
+                        <td contenteditable="true">${detail.url}</td>
+                        <td contenteditable="true">${detail.pages}</td>
+                        <td contenteditable="true">${detail.subjects}</td>
+                        <td contenteditable="true">${detail.description}</td>
+                        <td contenteditable="true">${detail.chapters}</td>
+                        <td contenteditable="true">${detail.originalSource}</td>
+                        <td contenteditable="true">${detail.contributingInstitution}</td>
+                        <td contenteditable="true">${detail.digitizationExplanation}</td>
+                        <td contenteditable="true">${detail.loanLabel}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    document.getElementById("saveButton").addEventListener("click", function() {
+        const tableBody = document.getElementById('marcDetailsTable').querySelector('tbody');
+        const rows = tableBody.querySelectorAll('tr');
+        const data = [];
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const rowData = {
+                id: cells[0].innerText,
+                title: cells[1].innerText,
+                alternativeTitle: cells[2].innerText,
+                sourceType: cells[3].innerText,
+                resourcesId: cells[4].innerText,
+                authors: cells[5].innerText,
+                editors: cells[6].innerText,
+                series: cells[7].innerText,
+                language: cells[8].innerText,
+                isbn: cells[9].innerText,
+                publisher: cells[10].innerText,
+                published: cells[11].innerText,
+                edition: cells[12].innerText,
+                copyrightYear: cells[13].innerText,
+                copyrightDeclaration: cells[14].innerText,
+                status: cells[15].innerText,
+                url: cells[16].innerText,
+                pages: cells[17].innerText,
+                subjects: cells[18].innerText,
+                description: cells[19].innerText,
+                chapters: cells[20].innerText,
+                originalSource: cells[21].innerText,
+                contributingInstitution: cells[22].innerText,
+                digitizationExplanation: cells[23].innerText,
+                loanLabel: cells[24].innerText
+            };
+            data.push(rowData);
+        });
+
+        fetch('/saveTable', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(result => {
+                alert("保存成功！");
+            })
+            .catch(error => {
+                console.error("错误:", error);
+            });
+    });
+</script>
+
+</body>
+</html>

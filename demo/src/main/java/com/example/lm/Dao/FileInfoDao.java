@@ -1,6 +1,8 @@
 package com.example.lm.Dao;
 
 import com.example.lm.Model.FileInfo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,8 +14,8 @@ import java.util.List;
 public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
     FileInfo save(FileInfo fi);
 
-    @Query("SELECT f FROM FileInfo f WHERE f.isbn LIKE %:isbn%")
-    List<FileInfo> findByIsbnContaining(@Param("isbn") String isbn);
+    @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.isbn LIKE %:isbn%")
+    List<FileInfo> findByResourcesIdAndIsbnContaining(@Param("folderId") int folderId, @Param("isbn") String isbn);
 
     List<FileInfo> findByResourcesId(int resourcesId);
 
@@ -54,4 +56,6 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
 
     @Query("SELECT DISTINCT f.resourcesId FROM FileInfo f")
     List<Integer> findAllDistinctDatabaseId();
+    Page<FileInfo> findByTitleContaining(String keyword, Pageable pageable);
+
  }

@@ -2,8 +2,10 @@ package com.example.lm.Service;
 
 import com.example.lm.Dao.FileDao;
 import com.example.lm.Dao.FileInfoDao;
+import com.example.lm.Dao.PDFService;
 import com.example.lm.Model.File;
 import com.example.lm.Model.FileInfo;
+import com.example.lm.Model.PDFs;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -11,7 +13,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.bson.types.ObjectId;
 import org.marc4j.MarcReader;
 import org.marc4j.MarcStreamReader;
 import org.marc4j.marc.DataField;
@@ -20,6 +21,9 @@ import org.marc4j.marc.Subfield;
 import org.marc4j.marc.VariableField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -31,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 @Service
@@ -47,8 +52,14 @@ public class FileService {
     @Autowired
     private GridFSBucket gridFSBucket;
 
-    @Value("${uploadPathImg}")
-    private String uploadPathImg;
+    @Autowired
+    private PDFService pdfService;
+
+    @Value("${MarcUploadPath}")
+    private String MarcUploadPath;
+
+    @Value("${PDFUploadPath}")
+    private String PDFUploadPath;
 
     @Autowired
     private EntityManager entityManager;
@@ -58,13 +69,14 @@ public class FileService {
         List<String> invalidFiles = new ArrayList<>();
 
         for (MultipartFile file : files) {
+
             String PDFName = file.getOriginalFilename();
             if (PDFName != null && PDFName.toLowerCase().endsWith(".pdf")) {
                 PDFName = PDFName.substring(0, PDFName.length() - 4);
             }
 
-            if (fileInfoDao.findByIsbnContaining(PDFName) != null) {
-                ObjectId gridFsId = gridFsTemplate.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
+            if (fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName).size() > 0) {
+                /*ObjectId gridFsId = gridFsTemplate.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
                 String content = extractPdfText(file.getInputStream());
 
                 File newFile = new File();
@@ -74,7 +86,23 @@ public class FileService {
                 newFile.setGridFsId(gridFsId.toString());
                 newFile.setContent(content);
                 newFile.setResourcesId(folderId);
-                fileDao.save(newFile);
+                fileDao.save(newFile);*/
+                String uploadPDFPath = PDFUploadPath;
+                java.io.File uploadFile = new java.io.File(uploadPDFPath);
+                if (!uploadFile.exists()) {
+                    uploadFile.mkdirs();
+                }
+                java.io.File targetFile = new java.io.File(uploadFile.getAbsolutePath() + "/" + PDFName);
+                try {
+                    file.transferTo(targetFile);
+                    PDFs pdf = new PDFs();
+                    pdf.setName(file.getOriginalFilename());
+                    pdf.setAddress(targetFile.getAbsolutePath());
+                    pdf.setResourcesId(folderId);
+                    pdfService.save(pdf);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else {
                 invalidFiles.add(PDFName);
             }
@@ -119,15 +147,15 @@ public class FileService {
     public void uploadMARCFile(int folderId, MultipartFile marc){
         if(marc != null) {
             String fileName = marc.getOriginalFilename();
-            String uploadFilePath = uploadPathImg;
-            java.io.File uploadFile = new java.io.File(uploadFilePath);
+            String uploadMarcPath = MarcUploadPath;
+            java.io.File uploadFile = new java.io.File(uploadMarcPath);
             if (!uploadFile.exists()) {
                 uploadFile.mkdirs();
             }
             java.io.File targetFile = new java.io.File(uploadFile.getAbsolutePath() + "/" + fileName);
             try {
                 marc.transferTo(targetFile);
-                //System.out.println(targetFile.getAbsoluteFile());
+                System.out.println(targetFile.getAbsoluteFile());
                 saveMarcData(folderId, targetFile);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -135,6 +163,11 @@ public class FileService {
         }
     }
 
+    /**
+     *
+     * displayCode: 0: Hidden; 1: Published
+     *
+     */
     private void saveMarcData(int folderId, java.io.File marc) {
         try {
             String marcFilePath = marc.getAbsolutePath();
@@ -166,6 +199,7 @@ public class FileService {
                 fileInfo.setDescription(getFieldData(record, "520", 'a'));
                 fileInfo.setChapters(getFieldData(record, "505", 'a'));
                 fileInfo.setResourcesId(folderId);
+                fileInfo.setDisplay(0);
                 fileInfoDao.save(fileInfo);
             }
         } catch (Exception e) {
@@ -229,12 +263,60 @@ public class FileService {
         return fileInfoDao.findByResourcesId(resourcesID);
     }
 
-    public List<FileInfo> keywordSearch(String keyword) {
-        String searchPattern = keyword + "%";
+    public Page<FileInfo> keywordSearch(String keyword, Pageable pageable) {
+        String searchPattern = "%" + keyword + "%"; // 在关键字前后加上百分号
         String jpql = "SELECT f FROM FileInfo f WHERE f.title LIKE :keyword";
+
         TypedQuery<FileInfo> query = entityManager.createQuery(jpql, FileInfo.class);
         query.setParameter("keyword", searchPattern);
-        return query.getResultList();
+
+        // 获取总记录数
+        String countJpql = "SELECT COUNT(f) FROM FileInfo f WHERE f.title LIKE :keyword";
+        TypedQuery<Long> countQuery = entityManager.createQuery(countJpql, Long.class);
+        countQuery.setParameter("keyword", searchPattern);
+        long total = countQuery.getSingleResult();
+
+        // 设置分页
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
+        List<FileInfo> fileList = query.getResultList();
+
+        return new PageImpl<>(fileList, pageable, total);
+    }
+
+
+    public void saveMarcDetails(List<Map<String, String>> tableData) {
+        for (Map<String, String> row : tableData) {
+            FileInfo marcDetail = new FileInfo();
+            marcDetail.setId(Integer.parseInt(row.get("id")));
+            marcDetail.setTitle(row.get("title"));
+            marcDetail.setAlternativeTitle(row.get("alternativeTitle"));
+            marcDetail.setSourceType(row.get("sourceType"));
+            marcDetail.setResourcesId(Integer.parseInt(row.get("resourcesId")));
+            marcDetail.setAuthors(row.get("authors"));
+            marcDetail.setEditors(row.get("editors"));
+            marcDetail.setSeries(row.get("series"));
+            marcDetail.setLanguage(row.get("language"));
+            marcDetail.setIsbn(row.get("isbn"));
+            marcDetail.setPublisher(row.get("publisher"));
+            marcDetail.setPublished(row.get("published"));
+            marcDetail.setEdition(row.get("edition"));
+            marcDetail.setCopyrightYear(row.get("copyrightYear"));
+            marcDetail.setCopyrightDeclaration(row.get("copyrightDeclaration"));
+            marcDetail.setStatus(row.get("status"));
+            marcDetail.setUrl(row.get("url"));
+            marcDetail.setPages(row.get("pages"));
+            marcDetail.setSubjects(row.get("subjects"));
+            marcDetail.setDescription(row.get("description"));
+            marcDetail.setChapters(row.get("chapters"));
+            marcDetail.setOriginalSource(row.get("originalSource"));
+            marcDetail.setContributingInstitution(row.get("contributingInstitution"));
+            marcDetail.setDigitizationExplanation(row.get("digitizationExplanation"));
+            marcDetail.setLoanLabel(row.get("loanLabel"));
+
+            fileInfoDao.save(marcDetail);
+        }
     }
 
     public List<FileInfo> searchByTitle(String title) {

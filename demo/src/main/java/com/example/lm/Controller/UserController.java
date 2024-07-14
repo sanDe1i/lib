@@ -104,7 +104,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/api/login")
+    @PostMapping("/api/user/login")
     public Result login(@RequestBody String json) {
         System.out.println("Received JSON: " + json);
 
