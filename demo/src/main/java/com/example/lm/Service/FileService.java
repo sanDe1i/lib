@@ -21,6 +21,9 @@ import org.marc4j.marc.Subfield;
 import org.marc4j.marc.VariableField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -260,13 +263,28 @@ public class FileService {
         return fileInfoDao.findByResourcesId(resourcesID);
     }
 
-    public List<FileInfo> keywordSearch(String keyword) {
-        String searchPattern = keyword + "%";
+    public Page<FileInfo> keywordSearch(String keyword, Pageable pageable) {
+        String searchPattern = "%" + keyword + "%"; // 在关键字前后加上百分号
         String jpql = "SELECT f FROM FileInfo f WHERE f.title LIKE :keyword";
+
         TypedQuery<FileInfo> query = entityManager.createQuery(jpql, FileInfo.class);
         query.setParameter("keyword", searchPattern);
-        return query.getResultList();
+
+        // 获取总记录数
+        String countJpql = "SELECT COUNT(f) FROM FileInfo f WHERE f.title LIKE :keyword";
+        TypedQuery<Long> countQuery = entityManager.createQuery(countJpql, Long.class);
+        countQuery.setParameter("keyword", searchPattern);
+        long total = countQuery.getSingleResult();
+
+        // 设置分页
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
+        List<FileInfo> fileList = query.getResultList();
+
+        return new PageImpl<>(fileList, pageable, total);
     }
+
 
     public void saveMarcDetails(List<Map<String, String>> tableData) {
         for (Map<String, String> row : tableData) {

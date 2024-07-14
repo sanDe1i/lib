@@ -5,10 +5,15 @@ import com.example.lm.Model.FileInfo;
 import com.example.lm.Model.ResourcesLib;
 import com.example.lm.Service.FileService;
 import com.example.lm.Service.ResourcesLibService;
+
+import com.example.lm.utils.SearchResult;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -126,20 +132,22 @@ public class MainController {
         return ResponseEntity.ok(marcDetails);
     }
 
-    @GetMapping("/fileview/pdf/keyword/{keyword}")
+    @GetMapping("/keyword/{keyword}")
     @ResponseBody
-    public List<FileInfo> getPDFByKeyword(@PathVariable String keyword) {
-        System.out.println(keyword);
-        List<FileInfo> files = fileService.keywordSearch(keyword);
-        if (files == null || files.isEmpty()) {
+    public SearchResult<FileInfo> getPDFByKeyword(@PathVariable String keyword,
+                                                  @RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page-1, 5);
+        Page<FileInfo> files = fileService.keywordSearch(keyword, pageable);
+        System.out.println(page);
+        if (files.isEmpty()) {
             System.out.println("No files found for the given keyword.");
         } else {
-            for (FileInfo file : files) {
-                System.out.println("Found file: " + file.getId());
-            }
+            files.forEach(file -> System.out.println("Found file: " + file.getId()));
         }
-        return files;
+
+        return new SearchResult<>(files.getContent(), files.getTotalElements());
     }
+
 
     @PostMapping("/saveTable")
     public ResponseEntity<String> saveTable(@RequestBody List<Map<String, String>> tableData) {
