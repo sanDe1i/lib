@@ -19,4 +19,39 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
 
     FileInfo findByisbn(String ISBN);
 
+    List<FileInfo> findByTitleContaining(String title);
+
+    @Query("SELECT f FROM FileInfo f WHERE " +
+            "(:title IS NULL OR f.title LIKE %:title%) " +
+            "AND (:status IS NULL OR f.status = :status) " +
+            "AND (:publisher IS NULL OR f.publisher = :publisher) " +
+            "AND (:sourceType IS NULL OR f.sourceType = :sourceType) " +
+            "AND (:language IS NULL OR f.language = :language) " +
+            "AND (:published IS NULL OR f.published = :published) " +
+            "AND (:databaseId IS NULL OR f.resourcesId = :databaseId)")
+    List<FileInfo> searchBooks(@Param("title") String title,
+                               @Param("status") String status,
+                               @Param("publisher") String publisher,
+                               @Param("sourceType") String sourceType,
+                               @Param("language") String language,
+                               @Param("published") String published,
+                               @Param("databaseId") Integer databaseId);
+
+    @Query("SELECT DISTINCT f.publisher FROM FileInfo f")
+    List<String> findAllDistinctPublishers();
+
+    @Query("SELECT DISTINCT f.published FROM FileInfo f")
+    List<String> findAllDistinctPublished();
+
+    @Query("SELECT DISTINCT f.sourceType FROM FileInfo f")
+    List<String> findAllDistinctSourceType();
+
+    @Query("SELECT DISTINCT f.language FROM FileInfo f")
+    List<String> findAllDistinctLanguage();
+
+    @Query("SELECT DISTINCT f.status FROM FileInfo f")
+    List<String> findAllDistinctStatus();
+
+    @Query("SELECT DISTINCT f.resourcesId FROM FileInfo f")
+    List<Integer> findAllDistinctDatabaseId();
  }

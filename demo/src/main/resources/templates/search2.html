@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图书搜索</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+  <h1>图书搜索</h1>
+  <form action="/test/search2" method="get">
+    <div class="form-group">
+      <label for="title">书名</label>
+      <input type="text" id="title" name="title" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="publisher">出版社</label>
+      <input type="text" id="publisher" name="publisher" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="sourceType">来源类型</label>
+      <input type="text" id="sourceType" name="sourceType" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="language">语言</label>
+      <input type="text" id="language" name="language" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="published">出版日期</label>
+      <input type="text" id="published" name="published" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="status">状态</label>
+      <input type="text" id="status" name="status" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="databaseId">数据库ID</label>
+      <input type="number" id="databaseId" name="databaseId" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">搜索</button>
+  </form>
+</div>
+</body>
+</html>

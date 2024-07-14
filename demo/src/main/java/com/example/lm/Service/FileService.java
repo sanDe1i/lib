@@ -236,4 +236,41 @@ public class FileService {
         query.setParameter("keyword", searchPattern);
         return query.getResultList();
     }
+
+    public List<FileInfo> searchByTitle(String title) {
+        return fileInfoDao.findByTitleContaining(title);
+    }
+
+    public List<FileInfo> searchBooks(String title, String status, String publisher,
+                                      String sourceType, String language, String published,
+                                      Integer databaseId) {
+        // 处理空字符串，将其转换为 null
+        title = (title != null && title.isEmpty()) ? null : title;
+        status = (status != null && status.isEmpty()) ? null : status;
+        publisher = (publisher != null && publisher.isEmpty()) ? null : publisher;
+        sourceType = (sourceType != null && sourceType.isEmpty()) ? null : sourceType;
+        language = (language != null && language.isEmpty()) ? null : language;
+        published = (published != null && published.isEmpty()) ? null : published;
+
+        return fileInfoDao.searchBooks(title, status, publisher, sourceType, language, published, databaseId);
+    }
+
+    public List<String> getAllDistinctPublishers() {
+        return fileInfoDao.findAllDistinctPublishers();
+    }
+
+    public List<String> getAllDistinctPublished() {
+        return fileInfoDao.findAllDistinctPublished();
+    }
+
+    public List<String> getAllDistinctSourceType(){return fileInfoDao.findAllDistinctSourceType();}
+
+    public List<String> getAllDistinctLanguage(){return fileInfoDao.findAllDistinctLanguage();}
+
+    public List<String> getAllDistinctStatus(){return fileInfoDao.findAllDistinctStatus();}
+
+    public List<Integer> getAllDistinctDatabaseId(){return fileInfoDao.findAllDistinctDatabaseId();}
+
+
+
 }
