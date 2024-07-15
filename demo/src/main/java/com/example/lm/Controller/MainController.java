@@ -148,6 +148,45 @@ public class MainController {
         return new SearchResult<>(files.getContent(), files.getTotalElements());
     }
 
+    @GetMapping("/keyword/test/{keyword}")
+    @ResponseBody
+    public SearchResult<FileInfo> searchFiles(
+            @PathVariable String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String originalSource,
+            @RequestParam(required = false) String language) {
+        if ("undefined".equals(originalSource)) {
+            originalSource = null;
+        }
+        if ("undefined".equals(language)) {
+            language = null;
+        }
+
+        System.out.println("page: " + page);
+
+        Pageable pageable = PageRequest.of(page-1, 5);
+        Page<FileInfo> files = fileService.keywordSearch(keyword, originalSource, language, pageable);
+        System.out.println(page);
+        if (files.isEmpty()) {
+            System.out.println("No files found for the given keyword.");
+        } else {
+            files.forEach(file -> System.out.println("Found file: " + file.getId()));
+        }
+
+        return new SearchResult<>(files.getContent(), files.getTotalElements());
+    }
+
+    @GetMapping("/book/{id}")
+    public ResponseEntity<FileInfo> getBookById(@PathVariable Integer id) {
+        FileInfo fileInfo = fileService.getBookById(id);
+        if (fileInfo != null) {
+            return ResponseEntity.ok(fileInfo);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
 
     @PostMapping("/saveTable")
     public ResponseEntity<String> saveTable(@RequestBody List<Map<String, String>> tableData) {

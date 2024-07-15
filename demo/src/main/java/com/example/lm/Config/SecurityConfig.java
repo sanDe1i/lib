@@ -47,12 +47,12 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(withDefaults())
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/payment/**","/api/user/login","/api/user/register","/api/email/**"
-                        ,"/token/generate_long_token","/token/generate_temp_token","/token/decode"
-                                ,"/token/validate","/test/**", "/oauth/**","/token/info1","api/staff/login","token/refresh_token","/keyword/**"
-                                ).permitAll()
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll()
+//                        .requestMatchers("/payment/**","/api/user/login","/api/user/register","/api/email/**"
+//                        ,"/token/generate_long_token","/token/generate_temp_token","/token/decode"
+//                                ,"/token/validate","/test/**", "/oauth/**","/token/info1","api/staff/login","token/refresh_token","/keyword/**","/resourcesLib",
+//                                ).permitAll()
+//                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2
                         .jwt(Customizer.withDefaults())

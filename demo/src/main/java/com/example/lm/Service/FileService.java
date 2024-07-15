@@ -11,6 +11,7 @@ import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.Predicate;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.marc4j.MarcReader;
@@ -44,7 +45,7 @@ public class FileService {
     private FileDao fileDao;
 
     @Autowired
-    private FileInfoDao fileInfoDao;
+    private static FileInfoDao fileInfoDao;
 
     @Autowired
     private GridFsTemplate gridFsTemplate;
@@ -63,6 +64,10 @@ public class FileService {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private FileInfoDao fileInfoDao2;
+
 
 
     public List<String> savePDFs(int folderId, List<MultipartFile> files) throws IOException {
@@ -285,6 +290,53 @@ public class FileService {
         return new PageImpl<>(fileList, pageable, total);
     }
 
+    public Page<FileInfo> keywordSearch(String keyword, String sourceType, String language, Pageable pageable) {
+        System.out.println(sourceType);
+        String searchPattern = "%" + keyword + "%"; // 在关键字前后加上百分号
+        String jpql = "SELECT f FROM FileInfo f WHERE f.title LIKE :keyword";
+        String countJpql = "SELECT COUNT(f) FROM FileInfo f WHERE f.title LIKE :keyword";
+
+        if (sourceType != null && !sourceType.isEmpty()) {
+            jpql += " AND f.sourceType = :sourceType";
+            countJpql += " AND f.sourceType = :sourceType";
+        }
+
+        if (language != null && !language.isEmpty()) {
+            jpql += " AND f.language = :language";
+            countJpql += " AND f.language = :language";
+        }
+
+        TypedQuery<FileInfo> query = entityManager.createQuery(jpql, FileInfo.class);
+        query.setParameter("keyword", searchPattern);
+
+        TypedQuery<Long> countQuery = entityManager.createQuery(countJpql, Long.class);
+        countQuery.setParameter("keyword", searchPattern);
+
+        if (sourceType != null && !sourceType.isEmpty()) {
+            query.setParameter("sourceType", sourceType);
+            countQuery.setParameter("sourceType", sourceType);
+        }
+
+        if (language != null && !language.isEmpty()) {
+            query.setParameter("language", language);
+            countQuery.setParameter("language", language);
+        }
+
+        // 获取总记录数
+        long total = countQuery.getSingleResult();
+
+        // 设置分页
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
+        List<FileInfo> fileList = query.getResultList();
+
+        return new PageImpl<>(fileList, pageable, total);
+    }
+
+
+
+
 
     public void saveMarcDetails(List<Map<String, String>> tableData) {
         for (Map<String, String> row : tableData) {
@@ -337,6 +389,9 @@ public class FileService {
         return fileInfoDao.searchBooks(title, status, publisher, sourceType, language, published, databaseId);
     }
 
+    public FileInfo getBookById(Integer id) {
+        return fileInfoDao2.findById(id).orElse(null);
+    }
     public List<String> getAllDistinctPublishers() {
         return fileInfoDao.findAllDistinctPublishers();
     }

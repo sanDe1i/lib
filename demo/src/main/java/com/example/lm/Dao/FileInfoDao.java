@@ -58,4 +58,8 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
     List<Integer> findAllDistinctDatabaseId();
     Page<FileInfo> findByTitleContaining(String keyword, Pageable pageable);
 
- }
+    FileInfo findById(int id);
+
+
+
+}
