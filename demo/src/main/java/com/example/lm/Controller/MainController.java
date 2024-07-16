@@ -11,6 +11,8 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +47,8 @@ public class MainController {
 
     @Autowired
     private ResourcesLibService resourcesLibService;
+
+    private final Path fileStorageLocation = Paths.get("pdf").toAbsolutePath().normalize();
 
     @GetMapping("test")
     public String upload() {
@@ -195,6 +202,26 @@ public class MainController {
             return ResponseEntity.ok("保存成功！");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("保存失败！");
+        }
+    }
+
+    @GetMapping("/downloadfiles/{fileId}")
+    public ResponseEntity<Resource> downloadFileMysql(@PathVariable String fileId) {
+        System.out.println("Downloading file with id: " + fileId);
+        try {
+            Path filePath = this.fileStorageLocation.resolve(fileId + ".pdf").normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_PDF)
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (MalformedURLException ex) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }

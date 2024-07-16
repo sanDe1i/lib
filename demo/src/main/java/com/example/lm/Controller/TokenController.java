@@ -39,6 +39,7 @@ public class TokenController {
     public String refreshToken(String token){
         return tokenService.refreshToken(token);
     }
+
     @PostMapping("/generate_long_token")
     public String longToken(@RequestParam(required = false,name = "days",defaultValue = "7") int days,
                             @RequestParam("token") String token) {

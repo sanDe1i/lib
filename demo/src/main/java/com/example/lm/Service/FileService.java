@@ -45,7 +45,7 @@ public class FileService {
     private FileDao fileDao;
 
     @Autowired
-    private static FileInfoDao fileInfoDao;
+    private  FileInfoDao fileInfoDao;
 
     @Autowired
     private GridFsTemplate gridFsTemplate;
@@ -65,8 +65,7 @@ public class FileService {
     @Autowired
     private EntityManager entityManager;
 
-    @Autowired
-    private FileInfoDao fileInfoDao2;
+
 
 
 
@@ -390,7 +389,7 @@ public class FileService {
     }
 
     public FileInfo getBookById(Integer id) {
-        return fileInfoDao2.findById(id).orElse(null);
+        return fileInfoDao.findById(id).orElse(null);
     }
     public List<String> getAllDistinctPublishers() {
         return fileInfoDao.findAllDistinctPublishers();
