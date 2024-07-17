@@ -11,6 +11,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -122,23 +125,52 @@ public class UserController {
         String password = map.get("password");
 
         // 验证用户名和密码
-        User user = userService.authenticate(username);
-        if (user != null) {
-            if (user.getPassword().equals(password)){
+        User user = null;
+        try {
+            user = userService.authenticate(username);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("User is banned until") || e.getMessage().contains("User not found")) {
+                return Result.error().data("error", e.getMessage());
+            }
+            return Result.error().data("error", "Authentication failed.");
+        }
 
-                Map<String,String> message = new HashMap<>();
+        if (user != null) {
+            if (user.getPassword().equals(password)) {
+                Map<String, String> message = new HashMap<>();
                 String token = tokenService.generateTempToken(String.valueOf(user.getId()));
                 System.out.println("success token: " + token);
                 message.put("token", token);
                 message.put("id", String.valueOf(user.getId()));
                 message.put("name", user.getUsername());
                 return Result.ok().data(message);
-            }else {
+            } else {
                 return Result.error().data("error", "password error");
             }
-        }else {
+        } else {
             return Result.error().data("error", "user not found");
         }
     }
 
+    @GetMapping("/api/users/search")
+    public Page<User> searchUsers(Pageable pageable) {
+        System.out.println("Fetching users with pageable: " + pageable);
+
+        // Use default pageable if null
+        if (pageable == null) {
+            pageable = PageRequest.of(0, 20);
+        }
+
+        Page<User> users = userService.findAll(pageable);
+        System.out.println("Page content: " + users.getContent());
+        System.out.println("Found " + users.getTotalElements() + " users");
+
+        if (users.hasContent()) {
+            users.forEach(user -> System.out.println("User: " + user.getUsername() + ", Email: " + user.getPassword()));
+        } else {
+            System.out.println("No users found in the content part of the Page object.");
+        }
+
+        return users;
+    }
 }

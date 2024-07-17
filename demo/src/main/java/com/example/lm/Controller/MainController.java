@@ -210,6 +210,7 @@ public class MainController {
         System.out.println("Downloading file with id: " + fileId);
         try {
             Path filePath = this.fileStorageLocation.resolve(fileId + ".pdf").normalize();
+            System.out.println(filePath.toString());
             Resource resource = new UrlResource(filePath.toUri());
 
             if (resource.exists()) {

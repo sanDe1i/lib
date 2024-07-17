@@ -10,9 +10,13 @@ import com.example.lm.Model.FileInfo;
 import com.example.lm.Model.User;
 import com.example.lm.Model.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -34,9 +38,31 @@ public class UserService {
     private UserRepository userRepositoryForLogin;
 
     public User authenticate(String username) {
-        User user = userRepositoryForLogin.findByUsername(username);
-        return user;
+        try {
+            User user = userRepositoryForLogin.findByUsername(username);
+
+            if (user == null) {
+                System.out.println("User not found: " + username);
+                throw new RuntimeException("User not found: " + username);
+            }
+
+            System.out.println("User unban time: " + user.getUnbanTime());
+
+            if (user.getUnbanTime() != null && user.getUnbanTime().after(new Timestamp(System.currentTimeMillis()))) {
+                System.out.println("User is banned until " + user.getUnbanTime());
+                throw new RuntimeException("User is banned until " + user.getUnbanTime());
+            }
+
+            return user;
+        } catch (NullPointerException e) {
+            System.out.println("NullPointerException caught: " + e.getMessage());
+            throw new RuntimeException("An error occurred while authenticating the user.");
+        } catch (Exception e) {
+            System.out.println("Exception caught: " + e.getMessage());
+            throw new RuntimeException("An unexpected error occurred while authenticating the user.");
+        }
     }
+
 
     public void addBookToUserCollection(String username, String bookisbn) {
         UserInfo user = userRepository.findByUsername(username);
@@ -99,5 +125,12 @@ public class UserService {
 
     public UserInfo userLogin(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public Page<User> findAll(Pageable pageable) {
+        System.out.println("Querying database with pageable: " + pageable);
+        Page<User> result = userRepositoryForLogin.findAll(pageable);
+        System.out.println("Query result: " + result.getContent());
+        return result;
     }
 }
