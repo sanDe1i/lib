@@ -4,6 +4,7 @@ import com.example.lm.Model.FileInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -56,9 +57,21 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
 
     @Query("SELECT DISTINCT f.resourcesId FROM FileInfo f")
     List<Integer> findAllDistinctDatabaseId();
+
+    @Modifying
+    @Query(value = "UPDATE books SET status = :status WHERE id = :id", nativeQuery = true)
+    int updateStatusById(@Param("id") int id, @Param("status") String status);
+
+    @Modifying
+    @Query(value = "UPDATE books SET loan = :loan WHERE id = :id", nativeQuery = true)
+    int updateLoanById(@Param("id") int id, @Param("loan") String loan);
+
+
     Page<FileInfo> findByTitleContaining(String keyword, Pageable pageable);
 
     FileInfo findById(int id);
+
+    void deleteById(int id);
 
 
 

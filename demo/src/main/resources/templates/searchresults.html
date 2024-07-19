@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>搜索结果</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    .table {
+      font-size: 12px; /* 调整表格字体大小 */
+    }
+    .btn-spacing {
+      margin-right: 10px; /* 调整按钮之间的间距 */
+    }
+  </style>
 </head>
 <body>
 <div class="container mt-5">
@@ -12,7 +20,7 @@
 
   <!-- 显示搜索结果的条数 -->
   <div class="mb-4">
-    <h2> <span th:text="${resultCount}">0</span> results found</h2>
+    <h2><span th:text="${resultCount}">0</span> results found</h2>
   </div>
 
   <!-- 搜索表单 -->
@@ -87,6 +95,7 @@
     </form>
   </div>
 
+
   <!-- 搜索结果表格 -->
   <table class="table table-striped">
     <thead>
@@ -101,6 +110,9 @@
       <th>Status</th>
       <th>Database</th>
       <th>Loan</th>
+      <th>Loaned</th>
+      <th>Url</th>
+      <th>Operate</th>
     </tr>
     </thead>
     <tbody>
@@ -112,15 +124,95 @@
       <td th:text="${book.isbn}">ISBN</td>
       <td th:text="${book.publisher}">Publisher</td>
       <td th:text="${book.published}">Published</td>
-      <td th:text="${book.status}">Status</td>
+      <td>
+        <span th:text="${book.status}">Status</span>
+        <button class="btn btn-link edit-button"
+                th:attr="data-id=${book.id}, data-type='status', data-value=${book.status}"
+                onclick="showEditModal(this)">edit</button>
+      </td>
       <td th:text="${book.resourcesId}">Resources ID</td>
-      <td th:text="${book.loanLabel}">Loan Label</td>
+      <td>
+        <span th:text="${book.loanLabel}">Loan Label</span>
+        <button class="btn btn-link edit-button"
+                th:attr="data-id=${book.id}, data-type='loan', data-value=${book.loanLabel}"
+                onclick="showEditModal(this)">edit</button>
+      </td>
+      <td th:text="${book.loaned}">Loaned</td>
+      <td>
+        <a th:href="${book.url}" th:text="${book.url}">Url</a>
+      </td>
+      <td>
+        <form th:action="@{/test/deleteList/{fileID}(fileID=${book.id})}" method="post" style="display:inline;">
+          <input type="hidden" name="title" th:value="${title}">
+          <input type="hidden" name="publisher" th:value="${publisher}">
+          <input type="hidden" name="sourceType" th:value="${sourceType}">
+          <input type="hidden" name="language" th:value="${language}">
+          <input type="hidden" name="published" th:value="${published}">
+          <input type="hidden" name="status" th:value="${status}">
+          <input type="hidden" name="databaseId" th:value="${databaseId}">
+          <button type="submit" class="btn btn-danger btn-spacing">delete</button>
+        </form>
+        <form th:action="@{book/{fileID}(fileID=${book.id})}" method="get" style="display:inline;">
+          <input type="hidden" name="title" th:value="${title}">
+          <input type="hidden" name="publisher" th:value="${publisher}">
+          <input type="hidden" name="sourceType" th:value="${sourceType}">
+          <input type="hidden" name="language" th:value="${language}">
+          <input type="hidden" name="published" th:value="${published}">
+          <input type="hidden" name="status" th:value="${status}">
+          <input type="hidden" name="databaseId" th:value="${databaseId}">
+          <button type="submit" class="btn btn-success btn-spacing">edit</button>
+        </form>
+      </td>
     </tr>
     </tbody>
   </table>
 
   <!-- 返回搜索页面的链接 -->
   <a href="/test/searchPage" class="btn btn-secondary mt-3">返回搜索页面</a>
+
+  <!-- 模态框 -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">编辑</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="editForm" method="post" th:action="@{/test/updateField}">
+            <input type="hidden" id="editId" name="id">
+            <input type="hidden" id="editType" name="editType">
+            <div class="form-group">
+              <label for="editField">Value</label>
+              <input type="text" class="form-control" id="editField" name="editField">
+            </div>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <!-- 自定义JS -->
+  <script>
+    function showEditModal(button) {
+      var id = button.getAttribute('data-id');
+      var type = button.getAttribute('data-type');
+      var value = button.getAttribute('data-value');
+
+      $('#editId').val(id);
+      $('#editType').val(type);
+      $('#editField').val(value);
+      $('#editModal').modal('show');
+    }
+  </script>
 </div>
 </body>
 </html>

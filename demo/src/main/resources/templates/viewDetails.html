@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Details</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+  <h1>Book Details</h1>
+
+  <!-- 显示书籍详细信息 -->
+  <div class="mb-4">
+    <h2 th:text="${book.title}">Title</h2>
+    <p><strong>Alternate Title:</strong> <span th:text="${book.alternativeTitle}">Alternate Title</span></p>
+    <p><strong>Source Type:</strong> <span th:text="${book.sourceType}">Source Type</span></p>
+    <p><strong>Authors:</strong> <span th:text="${book.authors}">Authors</span></p>
+    <p><strong>ISBN:</strong> <span th:text="${book.isbn}">ISBN</span></p>
+    <p><strong>Publisher:</strong> <span th:text="${book.publisher}">Publisher</span></p>
+    <p><strong>Published:</strong> <span th:text="${book.published}">Published</span></p>
+    <p><strong>Status:</strong> <span th:text="${book.status}">Status</span></p>
+  </div>
+
+  <!-- 编辑表单 -->
+  <div class="mb-4">
+    <h3>Edit Book Details</h3>
+    <form action="/book/update" method="post">
+      <!-- 隐藏域用于存储书籍ID -->
+      <input type="hidden" name="id" th:value="${book.id}"/>
+
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" class="form-control" th:value="${book.title}">
+      </div>
+
+      <div class="form-group">
+        <label for="alternativeTitle">Alternative Title</label>
+        <input type="text" id="alternativeTitle" name="alternativeTitle" class="form-control" th:value="${book.alternativeTitle}">
+      </div>
+
+      <div class="form-group">
+        <label for="sourceType">Source Type</label>
+        <input type="text" id="sourceType" name="sourceType" class="form-control" th:value="${book.sourceType}">
+      </div>
+
+      <div class="form-group">
+        <label for="authors">Authors</label>
+        <input type="text" id="authors" name="authors" class="form-control" th:value="${book.authors}">
+      </div>
+
+      <div class="form-group">
+        <label for="isbn">ISBN</label>
+        <input type="text" id="isbn" name="isbn" class="form-control" th:value="${book.isbn}">
+      </div>
+
+      <div class="form-group">
+        <label for="publisher">Publisher</label>
+        <input type="text" id="publisher" name="publisher" class="form-control" th:value="${book.publisher}">
+      </div>
+
+      <div class="form-group">
+        <label for="published">Published</label>
+        <input type="text" id="published" name="published" class="form-control" th:value="${book.published}">
+      </div>
+
+      <div class="form-group">
+        <label for="status">Status</label>
+        <input type="text" id="status" name="status" class="form-control" th:value="${book.status}">
+      </div>
+
+      <div class="form-group">
+        <label for="resourcesId">Database</label>
+        <input type="text" id="resourcesId" name="resourcesId" class="form-control" th:value="${book.resourcesId}">
+      </div>
+
+      <div class="form-group">
+        <label for="url">URL</label>
+        <input type="text" id="url" name="url" class="form-control" th:value="${book.url}">
+      </div>
+
+      <div class="form-group">
+        <label for="pages">Pages</label>
+        <input type="text" id="pages" name="pages" class="form-control" th:value="${book.pages}">
+      </div>
+
+      <div class="form-group">
+        <label for="subjects">Subjects</label>
+        <input type="text" id="subjects" name="subjects" class="form-control" th:value="${book.subjects}">
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" class="form-control" rows="3" th:text="${book.description}"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="chapters">Chapters</label>
+        <textarea id="chapters" name="chapters" class="form-control" rows="3" th:text="${book.chapters}"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="originalSource">Original Source</label>
+        <input type="text" id="originalSource" name="originalSource" class="form-control" th:value="${book.originalSource}">
+      </div>
+
+      <input type="hidden" name="titleSearched" th:value="${title}">
+      <input type="hidden" name="publisherSearched" th:value="${publisher}">
+      <input type="hidden" name="sourceTypeSearched" th:value="${sourceType}">
+      <input type="hidden" name="languageSearched" th:value="${language}">
+      <input type="hidden" name="publishedSearched" th:value="${published}">
+      <input type="hidden" name="statusSearched" th:value="${status}">
+      <input type="hidden" name="databaseIdSearched" th:value="${databaseId}">
+      <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+  </div>
+
+  <!-- 返回搜索页面的链接 -->
+  <a th:href="@{/test/search2(title=${title}, publisher=${publisher}, sourceType=${sourceType}, language=${language}, published=${published}, status=${status}, databaseId=${databaseId})}" class="btn btn-secondary mt-3">返回搜索页面</a>
+
+</div>
+</body>
+</html>
