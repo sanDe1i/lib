@@ -31,9 +31,9 @@ public class ResourcesLibService {
         ResourcesLib rl = new ResourcesLib();
         rl.setName(name);
         rl.setType(type);
-        rl.setTitle_en(title_en);
-        rl.setTitle_cn(title_cn);
-        rl.setDescription_cn(description_cn);
+//        rl.setTitle_en(title_en);
+//        rl.setTitle_cn(title_cn);
+//        rl.setDescription_cn(description_cn);
         rl.setDescription_en(description_en);
         rl.setDisplay(hidden);
         resourcesLibDao.save(rl);
@@ -57,5 +57,9 @@ public class ResourcesLibService {
 
     public void saveNewDatabases(ResourcesLib rl) {
         resourcesLibDao.save(rl);
+    }
+
+    public ResourcesLib findResourcesLibById(Integer id){
+        return resourcesLibDao.findResourcesLibById(id);
     }
 }

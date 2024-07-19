@@ -1,7 +1,9 @@
 package com.example.lm.Controller;
 
 import com.example.lm.Model.FileInfo;
+import com.example.lm.Model.ResourcesLib;
 import com.example.lm.Service.FileService;
+import com.example.lm.Service.ResourcesLibService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +24,13 @@ public class ListBookController {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private ResourcesLibService resourcesLibService;
+
     // 显示查询页面
     @GetMapping("/test/searchPage")
     public String showSearchPage() {
-        return "search2";  // 返回视图名称 (searchPage.html)
+        return "search2";
     }
 
     @GetMapping("test/search2")
@@ -50,11 +55,19 @@ public class ListBookController {
                     result.put("publisher", fileInfo.getPublisher());
                     result.put("published", fileInfo.getPublished());
                     result.put("status", fileInfo.getStatus());
-                    result.put("resourcesId", fileInfo.getResourcesId());
+                    // 获取 ResourcesLib 对象
+                    ResourcesLib resourcesLib = resourcesLibService.findResourcesLibById(fileInfo.getResourcesId());
+                    String resourcesLibName = (resourcesLib != null) ? resourcesLib.getName() : "";
+                    result.put("resourcesId", resourcesLibName);
+//                    ResourcesLib resourcesLib = resourcesLibService.findResourcesLibById(fileInfo.getResourcesId());
+//                    result.put("resourcesId", fileInfo.getResourcesId());
+
+
                     result.put("loanLabel", fileInfo.getLoanLabel());
-                    result.put("loaned", fileService.isBookBorrowed(fileInfo.getId()));
-                    result.put("url", fileInfo.getUrl());
-                    result.put("id", fileInfo.getId());
+                    int id = fileInfo.getId();
+                    result.put("loaned", fileService.isBookBorrowed(id));
+//                    result.put("url", fileInfo.getUrl());
+                    result.put("id", id);
                     return result;
                 }).toList();  // Collect into a Set to remove duplicates
         List<Map<String, Object>> resultList = new ArrayList<>(resultSet);
@@ -76,12 +89,27 @@ public class ListBookController {
         List<String> languages = fileService.getAllDistinctLanguage();
         List<String> statuses =fileService.getAllDistinctStatus();
         List<Integer> databaseIds = fileService.getAllDistinctDatabaseId();
+        Map<Integer, String> databaseInfoMap = new HashMap<>();
+
+        for (Integer id : databaseIds) {
+            ResourcesLib resourcesLib = resourcesLibService.findResourcesLibById(id);
+
+            if (resourcesLib != null) {
+                databaseInfoMap.put(id, resourcesLib.getName());
+            } else {
+                databaseInfoMap.put(id, "Unknown Database");
+            }
+        }
+
+        model.addAttribute("databaseInfoMap", databaseInfoMap);
         model.addAttribute("publishers", publishers);
         model.addAttribute("publisheds", publisheds);
         model.addAttribute("SourceTypes", SourceTypes);
         model.addAttribute("languages", languages);
         model.addAttribute("statuses", statuses);
-        model.addAttribute("databaseIds", databaseIds);
+//        model.addAttribute("databaseIds", databaseIds);
+//        model.addAttribute("databaseNames", databaseNames);
+        model.addAttribute("databaseMap", databaseInfoMap);
 
         return "searchresults";  // 返回视图名称
     }
@@ -128,14 +156,6 @@ public class ListBookController {
             return "redirect:/test/searchresults";  // 如果找不到书籍，重定向回搜索结果页面
         }
     }
-
-//    @PostMapping("/book/update")
-//    public String updateBook(@ModelAttribute FileInfo fileInfo) {
-//        fileService.updateBook(fileInfo);
-//
-////        return "redirect:" + redirectUrl;
-//        return "redirect:/book/" + fileInfo.getId();
-//    }
 
     @PostMapping("/book/update")
     public String updateBook(@ModelAttribute FileInfo fileInfo,

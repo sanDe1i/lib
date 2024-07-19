@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface ResourcesLibDao extends JpaRepository<ResourcesLib, Integer> {
    ResourcesLib save(ResourcesLib rl);
 
-   ResourcesLib findResourcesLibById(int id);
+   ResourcesLib findResourcesLibById(Integer id);
 }

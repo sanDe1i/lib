@@ -85,8 +85,8 @@
         <label for="databaseId">Database</label>
         <select id="databaseId" name="databaseId" class="form-control">
           <option value="" th:selected="${databaseId == null}">All kinds</option>
-          <th:block th:each="dbId : ${databaseIds}">
-            <option th:value="${dbId}" th:text="${dbId}" th:selected="${dbId == databaseId}"></option>
+          <th:block th:each="entry : ${databaseMap}">
+            <option th:value="${entry.key}" th:text="${entry.value}" th:selected="${entry.key == databaseId}"></option>
           </th:block>
         </select>
       </div>
@@ -111,7 +111,7 @@
       <th>Database</th>
       <th>Loan</th>
       <th>Loaned</th>
-      <th>Url</th>
+<!--      <th>Url</th>-->
       <th>Operate</th>
     </tr>
     </thead>
@@ -138,9 +138,9 @@
                 onclick="showEditModal(this)">edit</button>
       </td>
       <td th:text="${book.loaned}">Loaned</td>
-      <td>
-        <a th:href="${book.url}" th:text="${book.url}">Url</a>
-      </td>
+<!--      <td>-->
+<!--        <a th:href="${book.url}" th:text="${book.url}">Url</a>-->
+<!--      </td>-->
       <td>
         <form th:action="@{/test/deleteList/{fileID}(fileID=${book.id})}" method="post" style="display:inline;">
           <input type="hidden" name="title" th:value="${title}">

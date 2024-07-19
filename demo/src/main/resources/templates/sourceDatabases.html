@@ -35,7 +35,8 @@
                                     <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#renameFolderModal" th:attr="data-id=${folder.id}">Edit Databases details</a>
                                     <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#uploadMarcModal" th:attr="data-id=${folder.id}">Upload Marc</a>
                                     <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#uploadPdfModal" th:attr="data-id=${folder.id}">Upload PDF</a>
-                                    <a href="/test/searchPage" class="btn btn-sm btn-primary" th:attr="data-id=${folder.id}">Edit Book Info</a>
+<!--                                    <a href="/test/search2" class="btn btn-sm btn-primary" th:attr="data-id=${folder.id}">Edit Book Info</a>-->
+                                    <a th:href="@{/test/search2(databaseId=${folder.id})}" class="btn btn-sm btn-primary">Edit Book Info</a>
                                     <a th:href="@{/table(folderId=${folder.id})}" class="btn btn-sm btn-primary edit-marc-info">Edit Marc Info</a>
                                     <div th:if="${invalidFiles != null and folderIdWithInvalidFiles != null and folderIdWithInvalidFiles == folder.id}">
                                         <h6 class="text-danger">Invalid Files:</h6>
