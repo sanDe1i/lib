@@ -19,6 +19,21 @@ public class PDFs {
     @Column(name = "databases_id")
     private int resourcesId;
 
+    @Column(name = "download")
+    private String download;
+
+    @Column(name = "view")
+    private String view;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "borrow")
+    private String borrow;
+
+    @Column(name = "borrow_period")
+    private String borrowPeriod;
+
     public int getId() {
         return id;
     }
@@ -49,5 +64,45 @@ public class PDFs {
 
     public void setResourcesId(int resourcesId) {
         this.resourcesId = resourcesId;
+    }
+
+    public String getDownload() {
+        return download;
+    }
+
+    public void setDownload(String download) {
+        this.download = download;
+    }
+
+    public String getView() {
+        return view;
+    }
+
+    public void setView(String view) {
+        this.view = view;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getBorrow() {
+        return borrow;
+    }
+
+    public void setBorrow(String borrow) {
+        this.borrow = borrow;
+    }
+
+    public String getBorrowPeriod() {
+        return borrowPeriod;
+    }
+
+    public void setBorrowPeriod(String borrowPeriod) {
+        this.borrowPeriod = borrowPeriod;
     }
 }

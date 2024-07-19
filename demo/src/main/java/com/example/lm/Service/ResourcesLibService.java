@@ -24,7 +24,7 @@ public class ResourcesLibService {
      * displayCode: 0: Hidden; 1: Published
      *
      */
-    public void createResourcesLib(String name, String type, String title_en,
+    /*public void createResourcesLib(String name, String type, String title_en,
                                    String description_en, String title_cn,
                                    String description_cn) {
         int hidden = 0;
@@ -37,7 +37,7 @@ public class ResourcesLibService {
         rl.setDescription_en(description_en);
         rl.setDisplay(hidden);
         resourcesLibDao.save(rl);
-    }
+    }*/
 
     public List<ResourcesLib> getAllPackages() {
         return resourcesLibDao.findAll();
@@ -52,6 +52,10 @@ public class ResourcesLibService {
     public void renameFolder(int folderId, String newName) {
         ResourcesLib rl = resourcesLibDao.findResourcesLibById(folderId);
         rl.setName(newName);
+        resourcesLibDao.save(rl);
+    }
+
+    public void saveNewDatabases(ResourcesLib rl) {
         resourcesLibDao.save(rl);
     }
 }

@@ -14,23 +14,17 @@ public class ResourcesLib {
     @Column(name="name")
     private String name;
 
+    @Column(name="alternate_name")
+    private String alternateName;
+
     @Column(name="type")
     private String type;
 
-    @Column(name="title_en")
-    private String title_en;
-
-    @Column(name="title_cn")
-    private String title_cn;
-
-    @Column(name="description_en")
-    private String description_en;
-
-    @Column(name="description_cn")
-    private String description_cn;
+    @Column(name="description")
+    private String description;
 
     @Column(name="display")
-    private int display;
+    private String display;
 
     public int getId() {
         return id;
@@ -48,6 +42,14 @@ public class ResourcesLib {
         this.name = name;
     }
 
+    public String getAlternateName() {
+        return alternateName;
+    }
+
+    public void setAlternateName(String alternateName) {
+        this.alternateName = alternateName;
+    }
+
     public String getType() {
         return type;
     }
@@ -56,43 +58,19 @@ public class ResourcesLib {
         this.type = type;
     }
 
-    public String getTitle_en() {
-        return title_en;
+    public String getDescription() {
+        return description;
     }
 
-    public void setTitle_en(String title_en) {
-        this.title_en = title_en;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getDescription_en() {
-        return description_en;
-    }
-
-    public void setDescription_en(String description_en) {
-        this.description_en = description_en;
-    }
-
-    public String getDescription_cn() {
-        return description_cn;
-    }
-
-    public void setDescription_cn(String description_cn) {
-        this.description_cn = description_cn;
-    }
-
-    public String getTitle_cn() {
-        return title_cn;
-    }
-
-    public void setTitle_cn(String title_cn) {
-        this.title_cn = title_cn;
-    }
-
-    public int getDisplay() {
+    public String getDisplay(String display) {
         return display;
     }
 
-    public void setDisplay(int display) {
+    public void setDisplay(String display) {
         this.display = display;
     }
 }

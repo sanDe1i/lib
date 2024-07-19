@@ -3,7 +3,7 @@ package com.example.lm.Service;
 import com.example.lm.Dao.BorrowRepository;
 import com.example.lm.Dao.FileDao;
 import com.example.lm.Dao.FileInfoDao;
-import com.example.lm.Dao.PDFService;
+import com.example.lm.Dao.PDFDao;
 import com.example.lm.Model.File;
 import com.example.lm.Model.FileInfo;
 import com.example.lm.Model.PDFs;
@@ -57,7 +57,7 @@ public class FileService {
     private GridFSBucket gridFSBucket;
 
     @Autowired
-    private PDFService pdfService;
+    private PDFDao pdfDao;
 
     @Autowired
     private BorrowRepository borrowRepository;
@@ -109,7 +109,7 @@ public class FileService {
                     pdf.setName(file.getOriginalFilename());
                     pdf.setAddress(targetFile.getAbsolutePath());
                     pdf.setResourcesId(folderId);
-                    pdfService.save(pdf);
+                    pdfDao.save(pdf);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -265,12 +265,20 @@ public class FileService {
     }
 
     public List<File> getPDFsByLib(int resourcesID) {
-        List<File> PDFsList = fileDao.findFilenamesByResourcesId(resourcesID);
-        return PDFsList;
+        return fileDao.findFilenamesByResourcesId(resourcesID);
+    }
+
+    public void savePDF(PDFs pdf){
+        pdfDao.save(pdf);
+        return;
     }
 
     public List<FileInfo> getMarcDetailByID(int resourcesID) {
         return fileInfoDao.findByResourcesId(resourcesID);
+    }
+
+    public List<PDFs> getPDFByID(int resourcesID) {
+        return pdfDao.findByResourcesId(resourcesID);
     }
 
     public Page<FileInfo> keywordSearch(String keyword, Pageable pageable) {
