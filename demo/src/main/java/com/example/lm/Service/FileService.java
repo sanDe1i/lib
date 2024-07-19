@@ -1,5 +1,6 @@
 package com.example.lm.Service;
 
+import com.example.lm.Dao.BorrowRepository;
 import com.example.lm.Dao.FileDao;
 import com.example.lm.Dao.FileInfoDao;
 import com.example.lm.Dao.PDFService;
@@ -10,8 +11,10 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.transaction.Transactional;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.marc4j.MarcReader;
@@ -55,6 +58,9 @@ public class FileService {
 
     @Autowired
     private PDFService pdfService;
+
+    @Autowired
+    private BorrowRepository borrowRepository;
 
     @Value("${MarcUploadPath}")
     private String MarcUploadPath;
@@ -374,6 +380,45 @@ public class FileService {
         return fileInfoDao.findByTitleContaining(title);
     }
 
+
+    public void deleteBook(int id) {
+        fileInfoDao.deleteById(id);
+    }
+
+    public void updateBook(FileInfo fileInfo) {
+        // 检查是否存在
+        if (fileInfoDao.existsById(fileInfo.getId())) {
+            // 更新
+            fileInfoDao.save(fileInfo);
+        } else {
+            throw new EntityNotFoundException("Book with ID " + fileInfo.getId() + " not found.");
+        }
+    }
+
+    @Transactional
+    public void updateStatus(int id, String newStatus) {
+        fileInfoDao.updateStatusById(id, newStatus);
+    }
+
+    @Transactional
+    public void updateLoan(int id, String newLoan) {
+        fileInfoDao.updateLoanById(id, newLoan);
+    }
+    @Transactional
+    public void updateField(int id, String editType, String editField) {
+        FileInfo book = fileInfoDao.findById(id);
+        if (book != null) {
+            if ("status".equals(editType)) {
+                book.setStatus(editField);
+            } else if ("loan".equals(editType)) {
+                book.setLoanLabel(editField);
+            }
+            fileInfoDao.save(book);
+        } else {
+            throw new RuntimeException("Book not found");
+        }
+    }
+
     public List<FileInfo> searchBooks(String title, String status, String publisher,
                                       String sourceType, String language, String published,
                                       Integer databaseId) {
@@ -406,6 +451,10 @@ public class FileService {
     public List<String> getAllDistinctStatus(){return fileInfoDao.findAllDistinctStatus();}
 
     public List<Integer> getAllDistinctDatabaseId(){return fileInfoDao.findAllDistinctDatabaseId();}
+
+    public boolean isBookBorrowed(Integer bookId) {
+        return borrowRepository.findByBookId(bookId).isPresent();
+    }
 
 
 
