@@ -2,6 +2,7 @@ package com.example.lm.Controller;
 
 import com.example.lm.Model.File;
 import com.example.lm.Model.FileInfo;
+import com.example.lm.Model.PDFs;
 import com.example.lm.Model.ResourcesLib;
 import com.example.lm.Service.FileService;
 import com.example.lm.Service.ResourcesLibService;
@@ -82,12 +83,35 @@ public class MainController {
         return "sourceDatabases";
     }
 
-
     @PostMapping("/addDatabases")
-    public String addFolder(@RequestParam String folderName) {
-        resourcesLibService.addFolder(folderName);
+    public String addDatabase(
+            @RequestParam("databaseName") String databaseName,
+            @RequestParam("alternateNames") String alternateNames,
+            @RequestParam("typeSelection") String typeSelection,
+            @RequestParam("databaseDescription") String databaseDescription,
+            @RequestParam("status") String status,
+            @RequestParam("file") MultipartFile marcFile,
+            @RequestParam("files") List<MultipartFile> pdfFiles,
+            RedirectAttributes redirectAttributes) throws IOException {
+
+        // Your logic to handle the request
+        ResourcesLib resourcesLib = new ResourcesLib();
+        resourcesLib.setName(databaseName);
+        resourcesLib.setAlternateName(alternateNames);
+        resourcesLib.setDescription(databaseDescription);
+        resourcesLib.setType(typeSelection);
+        resourcesLib.setDisplay(status);
+        resourcesLibService.saveNewDatabases(resourcesLib);
+        fileService.uploadMARCFile(resourcesLib.getId(), marcFile);
+        List<String> invalidFiles = fileService.savePDFs(resourcesLib.getId(), pdfFiles);
+        if (!invalidFiles.isEmpty()) {
+            redirectAttributes.addFlashAttribute("invalidFiles", invalidFiles);
+            redirectAttributes.addFlashAttribute("folderIdWithInvalidFiles", resourcesLib.getId());
+        }
+
         return "redirect:/resourcesLib";
     }
+
 
     @PostMapping("/rename-folder")
     public String renameFolder(@RequestParam("folderId") int folderId, @RequestParam String newName) {
@@ -111,6 +135,94 @@ public class MainController {
         return "redirect:/resourcesLib";
     }
 
+    @PostMapping("/hideBook")
+    public ResponseEntity<?> hideBooks(@RequestParam("folderId") int libId) {
+        List<PDFs> list = fileService.getPDFByID(libId);
+        for(PDFs pdf : list) {
+            pdf.setStatus("Hide");
+            fileService.savePDF(pdf);
+        }
+        return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/showBook")
+    public ResponseEntity<?> showBooks(@RequestParam("folderId") int libId) {
+        List<PDFs> list = fileService.getPDFByID(libId);
+        for(PDFs pdf : list) {
+            pdf.setStatus("Published");
+            fileService.savePDF(pdf);
+        }
+        return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/cancelView")
+    public ResponseEntity<?> cancelViewBooks(@RequestParam("folderId") int libId) {
+        List<PDFs> list = fileService.getPDFByID(libId);
+        for(PDFs pdf : list) {
+            pdf.setView("Hide");
+            fileService.savePDF(pdf);
+        }
+        return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/AbleView")
+    public ResponseEntity<?> ableViewBooks(@RequestParam("folderId") int libId) {
+        List<PDFs> list = fileService.getPDFByID(libId);
+        for(PDFs pdf : list) {
+            pdf.setView("View");
+            fileService.savePDF(pdf);
+        }
+        return ResponseEntity.ok(list);
+    }
+
+    /**
+     *
+     * @param libId
+     * @return
+     *
+     * Disable: 不允许下载
+     * Able: 允许下载
+     */
+    @PostMapping("/cancelDownload")
+    public ResponseEntity<?> cancelDownloadBooks(@RequestParam("folderId") int libId) {
+        List<PDFs> list = fileService.getPDFByID(libId);
+        for(PDFs pdf : list) {
+            pdf.setDownload("Disable");
+            fileService.savePDF(pdf);
+        }
+        return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/ableDownload")
+    public ResponseEntity<?> ableDownloadBooks(@RequestParam("folderId") int libId) {
+        List<PDFs> list = fileService.getPDFByID(libId);
+        for(PDFs pdf : list) {
+            pdf.setDownload("Able");
+            fileService.savePDF(pdf);
+        }
+        return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/cancelBorrow")
+    public ResponseEntity<?> cancelBorrowBooks(@RequestParam("folderId") int libId) {
+        List<PDFs> list = fileService.getPDFByID(libId);
+        for(PDFs pdf : list) {
+            pdf.setDownload("Disable");
+            fileService.savePDF(pdf);
+        }
+        return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/ableBorrow")
+    public ResponseEntity<?> ableBorrowBooks(@RequestParam("folderId") int libId, @RequestParam("borrow_period") String period) {
+        List<PDFs> list = fileService.getPDFByID(libId);
+        for(PDFs pdf : list) {
+            pdf.setDownload("Able");
+            pdf.setBorrowPeriod(period);
+            fileService.savePDF(pdf);
+        }
+        return ResponseEntity.ok(list);
+    }
 
     // 处理文件下载请求
     @PostMapping("/download/{fileID}")

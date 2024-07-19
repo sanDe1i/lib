@@ -30,11 +30,12 @@
                             <div class="card p-4">
                                 <div class="card-body">
                                     <h5 class="heading heading-5 strong-600" th:text="${folder.name}">Folder Title</h5>
-                                    <h6 class="text-muted mb-4" th:text="${folder.description_en}">Folder Description</h6>
-                                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                                    <h6 class="text-muted mb-4" th:text="${folder.alternateName}">Folder AlternateName</h6>
+                                    <p class="card-text" th:text="${folder.description}">Folder Description</p>
+                                    <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#renameFolderModal" th:attr="data-id=${folder.id}">Edit Databases details</a>
                                     <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#uploadMarcModal" th:attr="data-id=${folder.id}">Upload Marc</a>
-                                    <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#renameFolderModal" th:attr="data-id=${folder.id}">Rename</a>
                                     <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#uploadPdfModal" th:attr="data-id=${folder.id}">Upload PDF</a>
+                                    <a href="/test/searchPage" class="btn btn-sm btn-primary" th:attr="data-id=${folder.id}">Edit Book Info</a>
                                     <a th:href="@{/table(folderId=${folder.id})}" class="btn btn-sm btn-primary edit-marc-info">Edit Marc Info</a>
                                     <div th:if="${invalidFiles != null and folderIdWithInvalidFiles != null and folderIdWithInvalidFiles == folder.id}">
                                         <h6 class="text-danger">Invalid Files:</h6>
@@ -56,7 +57,7 @@
 <div class="modal fade" id="addFolderModal" tabindex="-1" role="dialog" aria-labelledby="addFolderModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form th:action="@{/addDatabases}" method="post">
+            <form id="addFolderForm" th:action="@{/addDatabases}" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addFolderModalLabel">Add New Folder</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -64,19 +65,61 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="folderName">Folder Name</label>
-                        <input type="text" class="form-control" id="folderName" name="folderName" required>
+                    <div class="form-step form-step-active">
+                        <div class="form-group">
+                            <label for="databaseName">Database Name</label>
+                            <input type="text" class="form-control" id="databaseName" name="databaseName" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="alternateNames">Alternate Names</label>
+                            <input type="text" class="form-control" id="alternateNames" name="alternateNames" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="typeSelection">Database Type</label>
+                            <select class="form-control" id="typeSelection" name="typeSelection" required>
+                                <option value="" disabled selected>Select a type</option>
+                                <option value="Digitized eBook">Digitized eBook</option>
+                                <option value="Raw eBook">Raw eBook</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="databaseDescription">Database Description</label>
+                            <textarea class="form-control" id="databaseDescription" name="databaseDescription" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status (Published or Hidden)</label>
+                            <select class="form-control" id="status" name="status" required>
+                                <option value="" disabled selected>Select the status</option>
+                                <option value="Published">Published</option>
+                                <option value="Hidden">Hidden</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-step">
+                        <div class="form-group">
+                            <label for="marcFile">Choose Marc File</label>
+                            <input type="file" class="form-control" id="marcFile" name="file" required />
+                            <input type="hidden" id="uploadMarcFolderId" name="folderId" />
+                        </div>
+                    </div>
+                    <div class="form-step">
+                        <div class="form-group">
+                            <label for="pdfFiles">Choose PDF File(s)</label>
+                            <input type="file" class="form-control" id="pdfFiles" name="files" multiple required />
+                            <input type="hidden" id="uploadPdfFolderId" name="folderId" />
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Add Folder</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+
 
 <!-- Rename Folder Modal -->
 <div class="modal fade" id="renameFolderModal" tabindex="-1" role="dialog" aria-labelledby="renameFolderModalLabel" aria-hidden="true">
@@ -90,7 +133,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
+                    <div class="input-group1">
                         <label for="newFolderName">New Folder Name</label>
                         <input type="text" class="form-control" id="newFolderName" name="newName" required>
                         <input type="hidden" id="renameFolderId" name="folderId">
@@ -117,10 +160,10 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="marcFile">Choose Marc File</label>
-                        <input type="file" class="form-control" id="marcFile" name="file" required>
-                        <input type="hidden" id="uploadMarcFolderId" name="folderId">
+                    <div class="input-group1">
+                        <label for="marcFile1">Choose Marc File</label>
+                        <input type="file" class="form-control" id="marcFile1" name="file" required>
+                        <input type="hidden" id="uploadMarcFolderId1" name="folderId">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -144,10 +187,10 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="pdfFiles">Choose PDF File(s)</label>
-                        <input type="file" class="form-control" id="pdfFiles" name="files" multiple required>
-                        <input type="hidden" id="uploadPdfFolderId" name="folderId">
+                    <div class="input-group1">
+                        <label for="pdfFiles1">Choose PDF File(s)</label>
+                        <input type="file" class="form-control" id="pdfFiles1" name="files" multiple required>
+                        <input type="hidden" id="uploadPdfFolderId1" name="folderId">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -182,7 +225,7 @@
             var button = $(event.relatedTarget);
             var folderId = button.data('id');
             var modal = $(this);
-            modal.find('#uploadMarcFolderId').val(folderId);
+            modal.find('#uploadMarcFolderId1').val(folderId);
         });
 
         $('#renameFolderModal').on('show.bs.modal', function (event) {
@@ -196,7 +239,30 @@
             var button = $(event.relatedTarget);
             var folderId = button.data('id');
             var modal = $(this);
-            modal.find('#uploadPdfFolderId').val(folderId);
+            modal.find('#uploadPdfFolderId1').val(folderId);
+        });
+
+        // Handle form submission
+        $('#addFolderForm').on('submit', function (event) {
+            event.preventDefault();
+
+            var form = $(this);
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    window.location.href = "/resourcesLib";
+                },
+                error: function (error) {
+                    alert("Error submitting the form");
+                    console.error("Error:", error);
+                }
+            });
         });
     });
 </script>
