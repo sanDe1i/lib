@@ -31,6 +31,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -137,8 +138,8 @@ public class MainController {
 
     @PostMapping("/hideBook")
     public ResponseEntity<?> hideBooks(@RequestParam("folderId") int libId) {
-        List<PDFs> list = fileService.getPDFByID(libId);
-        for(PDFs pdf : list) {
+        List<FileInfo> list = fileService.getMarcDetailByID(libId);
+        for(FileInfo pdf : list) {
             pdf.setStatus("Hide");
             fileService.savePDF(pdf);
         }
@@ -147,8 +148,8 @@ public class MainController {
 
     @PostMapping("/showBook")
     public ResponseEntity<?> showBooks(@RequestParam("folderId") int libId) {
-        List<PDFs> list = fileService.getPDFByID(libId);
-        for(PDFs pdf : list) {
+        List<FileInfo> list = fileService.getMarcDetailByID(libId);
+        for(FileInfo pdf : list) {
             pdf.setStatus("Published");
             fileService.savePDF(pdf);
         }
@@ -157,8 +158,8 @@ public class MainController {
 
     @PostMapping("/cancelView")
     public ResponseEntity<?> cancelViewBooks(@RequestParam("folderId") int libId) {
-        List<PDFs> list = fileService.getPDFByID(libId);
-        for(PDFs pdf : list) {
+        List<FileInfo> list = fileService.getMarcDetailByID(libId);
+        for(FileInfo pdf : list) {
             pdf.setView("Hide");
             fileService.savePDF(pdf);
         }
@@ -167,8 +168,8 @@ public class MainController {
 
     @PostMapping("/AbleView")
     public ResponseEntity<?> ableViewBooks(@RequestParam("folderId") int libId) {
-        List<PDFs> list = fileService.getPDFByID(libId);
-        for(PDFs pdf : list) {
+        List<FileInfo> list = fileService.getMarcDetailByID(libId);
+        for(FileInfo pdf : list) {
             pdf.setView("View");
             fileService.savePDF(pdf);
         }
@@ -185,8 +186,8 @@ public class MainController {
      */
     @PostMapping("/cancelDownload")
     public ResponseEntity<?> cancelDownloadBooks(@RequestParam("folderId") int libId) {
-        List<PDFs> list = fileService.getPDFByID(libId);
-        for(PDFs pdf : list) {
+        List<FileInfo> list = fileService.getMarcDetailByID(libId);
+        for(FileInfo pdf : list) {
             pdf.setDownload("Disable");
             fileService.savePDF(pdf);
         }
@@ -195,8 +196,8 @@ public class MainController {
 
     @PostMapping("/ableDownload")
     public ResponseEntity<?> ableDownloadBooks(@RequestParam("folderId") int libId) {
-        List<PDFs> list = fileService.getPDFByID(libId);
-        for(PDFs pdf : list) {
+        List<FileInfo> list = fileService.getMarcDetailByID(libId);
+        for(FileInfo pdf : list) {
             pdf.setDownload("Able");
             fileService.savePDF(pdf);
         }
@@ -205,19 +206,19 @@ public class MainController {
 
     @PostMapping("/cancelBorrow")
     public ResponseEntity<?> cancelBorrowBooks(@RequestParam("folderId") int libId) {
-        List<PDFs> list = fileService.getPDFByID(libId);
-        for(PDFs pdf : list) {
-            pdf.setDownload("Disable");
+        List<FileInfo> list = fileService.getMarcDetailByID(libId);
+        for(FileInfo pdf : list) {
+            pdf.setLoanLabel("no");
             fileService.savePDF(pdf);
         }
         return ResponseEntity.ok(list);
     }
 
     @PostMapping("/ableBorrow")
-    public ResponseEntity<?> ableBorrowBooks(@RequestParam("folderId") int libId, @RequestParam("borrow_period") String period) {
-        List<PDFs> list = fileService.getPDFByID(libId);
-        for(PDFs pdf : list) {
-            pdf.setDownload("Able");
+    public ResponseEntity<?> ableBorrowBooks(@RequestParam("folderId") int libId, @RequestParam("borrow_period") int period) {
+        List<FileInfo> list = fileService.getMarcDetailByID(libId);
+        for(FileInfo pdf : list) {
+            pdf.setLoanLabel("yes");
             pdf.setBorrowPeriod(period);
             fileService.savePDF(pdf);
         }

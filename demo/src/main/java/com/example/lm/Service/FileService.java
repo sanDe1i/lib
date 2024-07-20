@@ -175,7 +175,7 @@ public class FileService {
 
     /**
      *
-     * displayCode: 0: Hidden; 1: Published
+     *
      *
      */
     private void saveMarcData(int folderId, java.io.File marc) {
@@ -209,7 +209,7 @@ public class FileService {
                 fileInfo.setDescription(getFieldData(record, "520", 'a'));
                 fileInfo.setChapters(getFieldData(record, "505", 'a'));
                 fileInfo.setResourcesId(folderId);
-                fileInfo.setDisplay(0);
+                fileInfo.setStatus("Hide");
                 fileInfoDao.save(fileInfo);
             }
         } catch (Exception e) {
@@ -268,8 +268,8 @@ public class FileService {
         return fileDao.findFilenamesByResourcesId(resourcesID);
     }
 
-    public void savePDF(PDFs pdf){
-        pdfDao.save(pdf);
+    public void savePDF(FileInfo pdf){
+        fileInfoDao.save(pdf);
         return;
     }
 
@@ -277,9 +277,6 @@ public class FileService {
         return fileInfoDao.findByResourcesId(resourcesID);
     }
 
-    public List<PDFs> getPDFByID(int resourcesID) {
-        return pdfDao.findByResourcesId(resourcesID);
-    }
 
     public Page<FileInfo> keywordSearch(String keyword, Pageable pageable) {
         String searchPattern = "%" + keyword + "%"; // 在关键字前后加上百分号
