@@ -35,9 +35,19 @@
                                     <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#renameFolderModal" th:attr="data-id=${folder.id}">Edit Databases details</a>
                                     <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#uploadMarcModal" th:attr="data-id=${folder.id}">Upload Marc</a>
                                     <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#uploadPdfModal" th:attr="data-id=${folder.id}">Upload PDF</a>
-<!--                                    <a href="/test/search2" class="btn btn-sm btn-primary" th:attr="data-id=${folder.id}">Edit Book Info</a>-->
                                     <a th:href="@{/test/search2(databaseId=${folder.id})}" class="btn btn-sm btn-primary">Edit Book Info</a>
                                     <a th:href="@{/table(folderId=${folder.id})}" class="btn btn-sm btn-primary edit-marc-info">Edit Marc Info</a>
+
+                                    <!-- New Buttons -->
+                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'hideBook\', ' + ${folder.id} + ')'">Hide Books</button>
+                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'showBook\', ' + ${folder.id} + ')'">Show Books</button>
+                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'cancelView\', ' + ${folder.id} + ')'">Cancel View</button>
+                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'ableView\', ' + ${folder.id} + ')'">Enable View</button>
+                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'cancelDownload\', ' + ${folder.id} + ')'">Disable Download</button>
+                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'ableDownload\', ' + ${folder.id} + ')'">Enable Download</button>
+                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'cancelBorrow\', ' + ${folder.id} + ')'">Disable Borrow</button>
+                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'ableBorrow\', ' + ${folder.id} + ')'">Enable Borrow</button>
+
                                     <div th:if="${invalidFiles != null and folderIdWithInvalidFiles != null and folderIdWithInvalidFiles == folder.id}">
                                         <h6 class="text-danger">Invalid Files:</h6>
                                         <ul>
@@ -53,6 +63,7 @@
         </div>
     </section>
 </main>
+
 
 <!-- Add Folder Modal -->
 <div class="modal fade" id="addFolderModal" tabindex="-1" role="dialog" aria-labelledby="addFolderModalLabel" aria-hidden="true">
@@ -267,5 +278,55 @@
         });
     });
 </script>
+<script>
+    function performAction(action, folderId) {
+        let urlMap = {
+            'hideBook': '/hideBook',
+            'showBook': '/showBook',
+            'cancelView': '/cancelView',
+            'ableView': '/AbleView',
+            'cancelDownload': '/cancelDownload',
+            'ableDownload': '/ableDownload',
+            'cancelBorrow': '/cancelBorrow',
+            'ableBorrow': '/ableBorrow'
+        };
+
+        let url = urlMap[action];
+        if (!url) {
+            console.error('Invalid action:', action);
+            return;
+        }
+
+        let data = new URLSearchParams();
+        data.append('folderId', folderId);
+
+        if (action === 'ableBorrow') {
+            let period = prompt("Please enter the borrow period (days):", "30");
+            if (period != null) {
+                data.append('borrow_period', period);
+            } else {
+                return; // User cancelled the prompt
+            }
+        }
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: data
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                alert('Operation successful');
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Operation failed');
+            });
+    }
+</script>
+
 </body>
 </html>

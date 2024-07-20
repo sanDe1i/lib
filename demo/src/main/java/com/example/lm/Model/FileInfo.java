@@ -19,9 +19,6 @@ public class FileInfo {
     @Column(name="source_type")
     private String sourceType;
 
-    @Column(name="display")
-    private int display;
-
     @Column(name = "book_databases_id")
     private int resourcesId;
 
@@ -85,6 +82,15 @@ public class FileInfo {
     @Column(name = "loan_label")
     private String loanLabel;
 
+    @Column(name = "download")
+    private String download;
+
+    @Column(name = "view")
+    private String view;
+
+    @Column(name = "borrow_period")
+    private int borrowPeriod;
+
     public int getId() {
         return id;
     }
@@ -99,14 +105,6 @@ public class FileInfo {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public int getDisplay() {
-        return display;
-    }
-
-    public void setDisplay(int display) {
-        this.display = display;
     }
 
     public int getResourcesId() {
@@ -291,6 +289,30 @@ public class FileInfo {
 
     public void setLoanLabel(String loanLabel) {
         this.loanLabel = loanLabel;
+    }
+
+    public String getDownload() {
+        return download;
+    }
+
+    public void setDownload(String download) {
+        this.download = download;
+    }
+
+    public String getView() {
+        return view;
+    }
+
+    public void setView(String view) {
+        this.view = view;
+    }
+
+    public int getBorrowPeriod() {
+        return borrowPeriod;
+    }
+
+    public void setBorrowPeriod(int borrowPeriod) {
+        this.borrowPeriod = borrowPeriod;
     }
 
     @Override
