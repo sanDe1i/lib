@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface PDFDao extends JpaRepository<PDFs, Integer> {
     List<PDFs> findByResourcesId(int resourcesID);
+    boolean existsByName(String name);
+
 }

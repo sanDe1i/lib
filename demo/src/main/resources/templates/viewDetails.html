@@ -20,6 +20,19 @@
     <p><strong>Publisher:</strong> <span th:text="${book.publisher}">Publisher</span></p>
     <p><strong>Published:</strong> <span th:text="${book.published}">Published</span></p>
     <p><strong>Status:</strong> <span th:text="${book.status}">Status</span></p>
+    <p><strong>Edition:</strong> <span th:text="${book.edition}">Edition</span></p>
+    <p><strong>Copyright Year:</strong> <span th:text="${book.copyrightYear}">Copyright Year</span></p>
+    <p><strong>Copyright Declaration:</strong> <span th:text="${book.copyrightDeclaration}">Copyright Declaration</span></p>
+    <p><strong>URL:</strong> <a th:href="${book.url}" th:text="${book.url}" target="_blank">Link</a></p>
+    <p><strong>Database:</strong> <span th:text="${book.resourcesId}">Database</span></p>
+    <p><strong>Pages:</strong> <span th:text="${book.pages}">Pages</span></p>
+    <p><strong>Subjects:</strong> <span th:text="${book.subjects}">Subjects</span></p>
+    <p><strong>Description:</strong> <span th:text="${book.description}">Description</span></p>
+    <p><strong>Chapters:</strong> <span th:text="${book.chapters}">Chapters</span></p>
+    <p><strong>Original Source:</strong> <span th:text="${book.originalSource}">Original Source</span></p>
+    <p><strong>Contributing Institution:</strong> <span th:text="${book.contributingInstitution}">Contributing Institution</span></p>
+    <p><strong>Digitization Explanation:</strong> <span th:text="${book.digitizationExplanation}">Digitization Explanation</span></p>
+    <p><strong>Loan Period:</strong> <span th:text="${book.borrowPeriod}">Loan Period</span></p>
   </div>
 
   <!-- 编辑表单 -->
@@ -35,7 +48,7 @@
       </div>
 
       <div class="form-group">
-        <label for="alternativeTitle">Alternative Title</label>
+        <label for="alternativeTitle">Alternate Title</label>
         <input type="text" id="alternativeTitle" name="alternativeTitle" class="form-control" th:value="${book.alternativeTitle}">
       </div>
 
@@ -47,6 +60,21 @@
       <div class="form-group">
         <label for="authors">Authors</label>
         <input type="text" id="authors" name="authors" class="form-control" th:value="${book.authors}">
+      </div>
+
+      <div class="form-group">
+        <label for="editors">Editors</label>
+        <input type="text" id="editors" name="editors" class="form-control" th:value="${book.editors}">
+      </div>
+
+      <div class="form-group">
+        <label for="series">Series</label>
+        <input type="text" id="series" name="series" class="form-control" th:value="${book.series}">
+      </div>
+
+      <div class="form-group">
+        <label for="language">Language</label>
+        <input type="text" id="language" name="language" class="form-control" th:value="${book.language}">
       </div>
 
       <div class="form-group">
@@ -65,18 +93,28 @@
       </div>
 
       <div class="form-group">
-        <label for="status">Status</label>
-        <input type="text" id="status" name="status" class="form-control" th:value="${book.status}">
+        <label for="edition">Edition</label>
+        <input type="text" id="edition" name="edition" class="form-control" th:value="${book.edition}">
       </div>
 
       <div class="form-group">
-        <label for="resourcesId">Database</label>
-        <input type="text" id="resourcesId" name="resourcesId" class="form-control" th:value="${book.resourcesId}">
+        <label for="copyrightYear">Copyright Year</label>
+        <input type="text" id="copyrightYear" name="copyrightYear" class="form-control" th:value="${book.copyrightYear}">
+      </div>
+
+      <div class="form-group">
+        <label for="copyrightDeclaration">Copyright Declaration</label>
+        <input type="text" id="copyrightDeclaration" name="copyrightDeclaration" class="form-control" th:value="${book.copyrightDeclaration}">
       </div>
 
       <div class="form-group">
         <label for="url">URL</label>
         <input type="text" id="url" name="url" class="form-control" th:value="${book.url}">
+      </div>
+
+      <div class="form-group">
+        <label for="resourcesId">Database</label>
+        <input type="text" id="resourcesId" name="resourcesId" class="form-control" th:value="${book.resourcesId}">
       </div>
 
       <div class="form-group">
@@ -104,6 +142,21 @@
         <input type="text" id="originalSource" name="originalSource" class="form-control" th:value="${book.originalSource}">
       </div>
 
+      <div class="form-group">
+        <label for="contributingInstitution">Contributing Institution</label>
+        <input type="text" id="contributingInstitution" name="contributingInstitution" class="form-control" th:value="${book.contributingInstitution}">
+      </div>
+
+      <div class="form-group">
+        <label for="digitizationExplanation">Digitization Explanation</label>
+        <input type="text" id="digitizationExplanation" name="digitizationExplanation" class="form-control" th:value="${book.digitizationExplanation}">
+      </div>
+
+      <div class="form-group">
+        <label for="borrowPeriod">Loan Period</label>
+        <input type="text" id="borrowPeriod" name="borrowPeriod" class="form-control" th:value="${book.borrowPeriod}">
+      </div>
+
       <input type="hidden" name="titleSearched" th:value="${title}">
       <input type="hidden" name="publisherSearched" th:value="${publisher}">
       <input type="hidden" name="sourceTypeSearched" th:value="${sourceType}">
@@ -116,7 +169,7 @@
   </div>
 
   <!-- 返回搜索页面的链接 -->
-  <a th:href="@{/test/search2(title=${title}, publisher=${publisher}, sourceType=${sourceType}, language=${language}, published=${published}, status=${status}, databaseId=${databaseId})}" class="btn btn-secondary mt-3">返回搜索页面</a>
+<!--  <a th:href="@{/test/search2(title=${title}, publisher=${publisher}, sourceType=${sourceType}, language=${language}, published=${published}, status=${status}, databaseId=${databaseId})}" class="btn btn-secondary mt-3">返回搜索页面</a>-->
 
 </div>
 </body>

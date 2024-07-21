@@ -91,6 +91,28 @@ public class FileInfo {
     @Column(name = "borrow_period")
     private int borrowPeriod;
 
+    @Column(name = "downloadLink")
+    private String downloadLink;
+
+//    @Column(name = "downloadable")
+//    private boolean downloadable;
+
+//    public boolean isDownloadable() {
+//        return downloadable;
+//    }
+//
+//    public void setDownloadable(boolean downloadable) {
+//        this.downloadable = downloadable;
+//    }
+
+    public String getDownloadLink() {
+        return downloadLink;
+    }
+
+    public void setDownloadLink(String downloadLink) {
+        this.downloadLink = downloadLink;
+    }
+
     public int getId() {
         return id;
     }

@@ -38,9 +38,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Service
 public class FileService {
@@ -72,37 +74,68 @@ public class FileService {
     private EntityManager entityManager;
 
 
-
-
+//    public List<String> savePDFs(int folderId, List<MultipartFile> files) throws IOException {
+//        List<String> invalidFiles = new ArrayList<>();
+//
+//        for (MultipartFile file : files) {
+//
+//            String PDFName = file.getOriginalFilename();
+//            if (PDFName != null && PDFName.toLowerCase().endsWith(".pdf")) {
+//                PDFName = PDFName.substring(0, PDFName.length() - 4);
+//            }
+//
+//            if (fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName).size() > 0) {
+//                /*ObjectId gridFsId = gridFsTemplate.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
+//                String content = extractPdfText(file.getInputStream());
+//
+//                File newFile = new File();
+//                newFile.setFilename(file.getOriginalFilename());
+//                newFile.setContentType(file.getContentType());
+//                newFile.setSize(file.getSize());
+//                newFile.setGridFsId(gridFsId.toString());
+//                newFile.setContent(content);
+//                newFile.setResourcesId(folderId);
+//                fileDao.save(newFile);*/
+//                String uploadPDFPath = PDFUploadPath;
+//                java.io.File uploadFile = new java.io.File(uploadPDFPath);
+//                if (!uploadFile.exists()) {
+//                    uploadFile.mkdirs();
+//                }
+//                java.io.File targetFile = new java.io.File(uploadFile.getAbsolutePath() + "/" + PDFName);
+//                try {
+//                    file.transferTo(targetFile);
+//                    PDFs pdf = new PDFs();
+//                    pdf.setName(file.getOriginalFilename());
+//                    pdf.setAddress(targetFile.getAbsolutePath());
+//                    pdf.setResourcesId(folderId);
+//                    pdfDao.save(pdf);
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            } else {
+//                invalidFiles.add(PDFName);
+//            }
+//        }
+//
+//        return invalidFiles;
+//    }
 
     public List<String> savePDFs(int folderId, List<MultipartFile> files) throws IOException {
         List<String> invalidFiles = new ArrayList<>();
 
         for (MultipartFile file : files) {
-
             String PDFName = file.getOriginalFilename();
             if (PDFName != null && PDFName.toLowerCase().endsWith(".pdf")) {
                 PDFName = PDFName.substring(0, PDFName.length() - 4);
             }
 
             if (fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName).size() > 0) {
-                /*ObjectId gridFsId = gridFsTemplate.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
-                String content = extractPdfText(file.getInputStream());
-
-                File newFile = new File();
-                newFile.setFilename(file.getOriginalFilename());
-                newFile.setContentType(file.getContentType());
-                newFile.setSize(file.getSize());
-                newFile.setGridFsId(gridFsId.toString());
-                newFile.setContent(content);
-                newFile.setResourcesId(folderId);
-                fileDao.save(newFile);*/
                 String uploadPDFPath = PDFUploadPath;
                 java.io.File uploadFile = new java.io.File(uploadPDFPath);
                 if (!uploadFile.exists()) {
                     uploadFile.mkdirs();
                 }
-                java.io.File targetFile = new java.io.File(uploadFile.getAbsolutePath() + "/" + PDFName);
+                java.io.File targetFile = new java.io.File(uploadFile.getAbsolutePath() + "/" + PDFName + ".pdf");
                 try {
                     file.transferTo(targetFile);
                     PDFs pdf = new PDFs();
@@ -110,6 +143,13 @@ public class FileService {
                     pdf.setAddress(targetFile.getAbsolutePath());
                     pdf.setResourcesId(folderId);
                     pdfDao.save(pdf);
+
+                    // Update the FileInfo table with the download link
+                    List<FileInfo> fileInfos = fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName);
+                    for (FileInfo fileInfo : fileInfos) {
+                        fileInfo.setDownloadLink(targetFile.getAbsolutePath());
+                        fileInfoDao.save(fileInfo);
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -117,9 +157,9 @@ public class FileService {
                 invalidFiles.add(PDFName);
             }
         }
-
         return invalidFiles;
     }
+
 
 
 
@@ -417,6 +457,10 @@ public class FileService {
                 book.setStatus(editField);
             } else if ("loan".equals(editType)) {
                 book.setLoanLabel(editField);
+            }else if ("download".equals(editType)) {
+                book.setDownload(editField);
+            }else if ("view".equals(editType)) {
+                book.setView(editField);
             }
             fileInfoDao.save(book);
         } else {

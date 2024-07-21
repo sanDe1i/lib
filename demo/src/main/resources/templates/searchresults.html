@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
     .table {
-      font-size: 12px; /* 调整表格字体大小 */
+      font-size: 10px; /* 调整表格字体大小 */
     }
     .btn-spacing {
       margin-right: 10px; /* 调整按钮之间的间距 */
@@ -111,7 +111,9 @@
       <th>Database</th>
       <th>Loan</th>
       <th>Loaned</th>
-<!--      <th>Url</th>-->
+      <th>Downloadable</th>
+      <th>Viewable</th>
+      <th>Pdf</th>
       <th>Operate</th>
     </tr>
     </thead>
@@ -138,9 +140,22 @@
                 onclick="showEditModal(this)">edit</button>
       </td>
       <td th:text="${book.loaned}">Loaned</td>
-<!--      <td>-->
-<!--        <a th:href="${book.url}" th:text="${book.url}">Url</a>-->
-<!--      </td>-->
+      <td>
+        <span th:text="${book.download}">Download</span>
+        <button class="btn btn-link edit-button"
+                th:attr="data-id=${book.id}, data-type='download', data-value=${book.download}"
+                onclick="showEditModal(this)">edit</button>
+      </td>
+      <td>
+        <span th:text="${book.view}">View</span>
+        <button class="btn btn-link edit-button"
+                th:attr="data-id=${book.id}, data-type='view', data-value=${book.view}"
+                onclick="showEditModal(this)">edit</button>
+      </td>
+      <td>
+        <a th:if="${book.downloadLink != null && !book.downloadLink.isEmpty()}" th:href="@{/downloadFromList/{bookId}(bookId=${book.id})}">Download</a>
+        <span th:if="${book.downloadLink == null || book.downloadLink.isEmpty()}">Not available</span>
+      </td>
       <td>
         <form th:action="@{/test/deleteList/{fileID}(fileID=${book.id})}" method="post" style="display:inline;">
           <input type="hidden" name="title" th:value="${title}">

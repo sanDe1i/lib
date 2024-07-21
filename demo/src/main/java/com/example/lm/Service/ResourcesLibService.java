@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class ResourcesLibService {
@@ -61,5 +65,10 @@ public class ResourcesLibService {
 
     public ResourcesLib findResourcesLibById(Integer id){
         return resourcesLibDao.findResourcesLibById(id);
+    }
+
+    public Map<Integer, ResourcesLib> findResourcesLibByIds(Set<Integer> ids) {
+        List<ResourcesLib> resourcesLibs = resourcesLibDao.findByIdIn(ids);
+        return resourcesLibs.stream().collect(Collectors.toMap(ResourcesLib::getId, Function.identity()));
     }
 }

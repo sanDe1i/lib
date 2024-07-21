@@ -1,22 +1,29 @@
 package com.example.lm.Controller;
 
+import com.example.lm.Dao.PDFDao;
 import com.example.lm.Model.FileInfo;
 import com.example.lm.Model.ResourcesLib;
 import com.example.lm.Service.FileService;
 import com.example.lm.Service.ResourcesLibService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.ArrayList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class ListBookController {
@@ -27,11 +34,11 @@ public class ListBookController {
     @Autowired
     private ResourcesLibService resourcesLibService;
 
-    // 显示查询页面
-    @GetMapping("/test/searchPage")
-    public String showSearchPage() {
-        return "search2";
-    }
+    @Autowired
+    private PDFDao pdfRepository;
+
+    @Value("${PDFUploadPath}")
+    private String PDFUploadPath;
 
     @GetMapping("test/search2")
     public String searchBooks(@RequestParam(required = false) String title,
@@ -44,6 +51,14 @@ public class ListBookController {
                               Model model) {
         List<FileInfo> fileInfos = fileService.searchBooks(title, status, publisher, sourceType, language, published, databaseId);
 
+        // Collect all resource IDs
+        Set<Integer> resourceIds = fileInfos.stream()
+                .map(FileInfo::getResourcesId)
+                .collect(Collectors.toSet());
+
+        // Fetch all ResourcesLib objects in one batch
+        Map<Integer, ResourcesLib> resourcesLibMap = resourcesLibService.findResourcesLibByIds(resourceIds);
+
         List<Map<String, Object>> resultSet = fileInfos.stream()
                 .map(fileInfo -> {
                     Map<String, Object> result = new HashMap<>();
@@ -55,26 +70,28 @@ public class ListBookController {
                     result.put("publisher", fileInfo.getPublisher());
                     result.put("published", fileInfo.getPublished());
                     result.put("status", fileInfo.getStatus());
-                    // 获取 ResourcesLib 对象
-                    ResourcesLib resourcesLib = resourcesLibService.findResourcesLibById(fileInfo.getResourcesId());
+                    result.put("view", fileInfo.getView());
+                    result.put("download", fileInfo.getDownload());
+                    result.put("downloadLink", fileInfo.getDownloadLink());
+
+                    // Get ResourcesLib object from the map
+                    ResourcesLib resourcesLib = resourcesLibMap.get(fileInfo.getResourcesId());
                     String resourcesLibName = (resourcesLib != null) ? resourcesLib.getName() : "";
                     result.put("resourcesId", resourcesLibName);
-//                    ResourcesLib resourcesLib = resourcesLibService.findResourcesLibById(fileInfo.getResourcesId());
-//                    result.put("resourcesId", fileInfo.getResourcesId());
-
 
                     result.put("loanLabel", fileInfo.getLoanLabel());
                     int id = fileInfo.getId();
                     result.put("loaned", fileService.isBookBorrowed(id));
-//                    result.put("url", fileInfo.getUrl());
                     result.put("id", id);
                     return result;
                 }).toList();  // Collect into a Set to remove duplicates
+
         List<Map<String, Object>> resultList = new ArrayList<>(resultSet);
         int resultCount = resultList.size();
         model.addAttribute("books", new ArrayList<>(resultSet));
         model.addAttribute("resultCount", resultCount);
-        // 同时将搜索参数传递给视图
+
+        // Pass search parameters to the view
         model.addAttribute("title", title);
         model.addAttribute("publisher", publisher);
         model.addAttribute("sourceType", sourceType);
@@ -82,36 +99,29 @@ public class ListBookController {
         model.addAttribute("published", published);
         model.addAttribute("status", status);
         model.addAttribute("databaseId", databaseId);
-        // 将出版社列表传递到视图
+
+        // Fetch distinct values once
         List<String> publishers = fileService.getAllDistinctPublishers();
         List<String> publisheds = fileService.getAllDistinctPublished();
-        List<String> SourceTypes = fileService.getAllDistinctSourceType();
+        List<String> sourceTypes = fileService.getAllDistinctSourceType();
         List<String> languages = fileService.getAllDistinctLanguage();
-        List<String> statuses =fileService.getAllDistinctStatus();
+        List<String> statuses = fileService.getAllDistinctStatus();
         List<Integer> databaseIds = fileService.getAllDistinctDatabaseId();
-        Map<Integer, String> databaseInfoMap = new HashMap<>();
-
-        for (Integer id : databaseIds) {
-            ResourcesLib resourcesLib = resourcesLibService.findResourcesLibById(id);
-
-            if (resourcesLib != null) {
-                databaseInfoMap.put(id, resourcesLib.getName());
-            } else {
-                databaseInfoMap.put(id, "Unknown Database");
-            }
-        }
+        Map<Integer, String> databaseInfoMap = databaseIds.stream()
+                .collect(Collectors.toMap(id -> id, id -> {
+                    ResourcesLib resourcesLib = resourcesLibService.findResourcesLibById(id);
+                    return (resourcesLib != null) ? resourcesLib.getName() : "Unknown Database";
+                }));
 
         model.addAttribute("databaseInfoMap", databaseInfoMap);
         model.addAttribute("publishers", publishers);
         model.addAttribute("publisheds", publisheds);
-        model.addAttribute("SourceTypes", SourceTypes);
+        model.addAttribute("sourceTypes", sourceTypes);
         model.addAttribute("languages", languages);
         model.addAttribute("statuses", statuses);
-//        model.addAttribute("databaseIds", databaseIds);
-//        model.addAttribute("databaseNames", databaseNames);
         model.addAttribute("databaseMap", databaseInfoMap);
 
-        return "searchresults";  // 返回视图名称
+        return "searchresults";  // Return view name
     }
 
     @PostMapping("test/deleteList/{fileID}")
@@ -212,6 +222,42 @@ public class ListBookController {
         }
     }
 
+    @GetMapping("/downloadFromList/{bookId}")
+    public ResponseEntity<Resource> downloadFile2(@PathVariable int bookId) {
+        FileInfo f = fileService.getBookById(bookId);
+
+        // Use regex to split by spaces and parentheses, removing non-digit parts
+        String[] parts = f.getIsbn().replaceAll("[^\\d\\s]", "").split("\\s+");
+
+        List<String> resultList = new ArrayList<>(Arrays.asList(parts));
+        for (String part : parts) {
+            resultList.add(part + ".pdf");
+        }
+
+        for (String fileName : resultList) {
+            if (pdfRepository.existsByName(fileName)) {
+                System.out.println("Downloading file with name: " + fileName);
+                try {
+                    Path filePath = Paths.get(PDFUploadPath).resolve(fileName).normalize();
+                    Resource resource = new UrlResource(filePath.toUri());
+//                    System.out.println(filePath);
+
+                    if (resource.exists()) {
+                        return ResponseEntity.ok()
+                                .contentType(MediaType.APPLICATION_PDF)
+                                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                                .body(resource);
+                    } else {
+                        return ResponseEntity.notFound().build();
+                    }
+                } catch (MalformedURLException ex) {
+                    return ResponseEntity.badRequest().build();
+                }
+            }
+        }
+
+        return ResponseEntity.notFound().build();
+    }
 
 
 
