@@ -318,6 +318,10 @@ public class FileService {
         return fileInfoDao.findByResourcesId(resourcesID);
     }
 
+    public FileInfo getFileById(int bookID) {
+        return fileInfoDao.findById(bookID);
+    }
+
 
     public Page<FileInfo> keywordSearch(String keyword, Pageable pageable) {
         String searchPattern = "%" + keyword + "%"; // 在关键字前后加上百分号
