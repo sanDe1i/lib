@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header {
+            padding: 15px;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+        }
+        .header input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .header button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .header button:hover {
+            background-color: #0056b3;
+        }
+        .content {
+            display: flex;
+            flex: 1;
+        }
+        .aside {
+            width: 300px;
+            border-right: 1px solid #ccc;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .main {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .refine-results h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .refine-section {
+            margin-bottom: 20px;
+        }
+        .refine-section h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .refine-list {
+            list-style: none;
+            padding-left: 20px;
+            display: none;
+        }
+        .refine-list li {
+            margin-bottom: 5px;
+        }
+        .item {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .item-details {
+            display: flex;
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+
+        .source-type-image {
+            width: 100px;
+            height: auto;
+            margin-right: 15px;
+        }
+
+        .item-content {
+            flex-grow: 1;
+        }
+
+        .item-details h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .item-details p {
+            margin: 5px 0;
+        }
+
+        .item-meta {
+            margin-top: 15px;
+        }
+
+        .item-meta a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .item-meta a:hover {
+            text-decoration: underline;
+        }
+
+        .item-meta button {
+            margin-right: 10px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .item-meta button:hover {
+            background-color: #0056b3;
+        }
+
+        #no-files {
+            color: red;
+            font-weight: bold;
+        }
+
+        .active {
+            background-color: #007bff;
+            color: white;
+        }
+        .pagination button {
+            margin: 0 2px;
+            padding: 5px 10px;
+            border: 1px solid #007bff;
+            background-color: white;
+            cursor: pointer;
+        }
+        .pagination button.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .pagination button:disabled {
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <input id="keyword" placeholder="Enter keyword" />
+        <button id="search-button">Search</button>
+    </div>
+    <div class="content">
+        <div class="aside">
+            <div class="refine-results">
+                <h2>Refine Results</h2>
+                <div class="refine-section">
+                    <h3 onclick="toggleList(this)">Source Types</h3>
+                    <ul class="refine-list">
+                        <li>
+                            <input type="checkbox" id="sourceType1" value="Digitized eBook" onclick="applyFilter('sourceType', this.value)">
+                            <label for="sourceType1">Digitized eBook</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="sourceType2" value="Raw eBook" onclick="applyFilter('sourceType', this.value)">
+                            <label for="sourceType2">Raw eBook</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="sourceType3" value="Others" onclick="applyFilter('sourceType', this.value)">
+                            <label for="sourceType3">Others</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="refine-section">
+                    <h3 onclick="toggleList(this)">Language</h3>
+                    <ul class="refine-list">
+                        <li>
+                            <input type="checkbox" id="language1" value="english" onclick="applyFilter('language', this.value)">
+                            <label for="language1">English</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="language2" value="chinese" onclick="applyFilter('language', this.value)">
+                            <label for="language2">Chinese</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="language3" value="Others" onclick="applyFilter('language', this.value)">
+                            <label for="language3">Others</label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+
+            <div id="results">
+                <div id="no-files" style="display: none;">
+                    <p>No files found for the given keyword.</p>
+                </div>
+                <div id="item-list"></div>
+                <ul id="pagination" class="pagination"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const sourceTypeImages = {
+        'Digitized eBook': '../static/images/book.png',
+        'Academic Journal': '../static/images/book.png',
+    };
+
+    const API_BASE_URL = "localhost:8088";
+    let currentPage = 1;
+    const pageSize = 5;
+    let filters = {};
+
+    function searchFiles(page, size) {
+        const keyword = document.getElementById('keyword').value;
+        const sourceType = filters['sourceType'] || '';
+        const language = filters['language'] || '';
+
+        if (keyword) {
+            console.log(`Searching for keyword: ${keyword}, sourceType: ${sourceType}, language: ${language}, page: ${page}, size: ${size}`);
+
+            fetch(`http://${API_BASE_URL}/keyword/test/${encodeURIComponent(keyword)}?page=${page}&originalSource=${sourceType}&language=${language}`)
+                .then(response => {
+                    console.log('Received response:', response);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Received data:', data);
+                    const itemList = document.getElementById('item-list');
+                    itemList.innerHTML = ''; // Clear previous results
+
+                    if (data.content.length > 0) {
+                        data.content.forEach(file => {
+                            const item = document.createElement('div');
+                            item.className = 'item';
+                            const sourceImage = sourceTypeImages[file.sourceType] || '../static/images/book.png';
+                            item.innerHTML = `
+                            <div class="item-details">
+                                <img src="${sourceImage}" alt="${file.sourceType}" class="source-type-image">
+                                <div class="item-content">
+                                    <h3><strong>Title:</strong> <a href="../search/bookDetail.html?id=${file.id}" target="_blank">${file.title}</a></h3>
+                                    <p><strong>Alternate Title:</strong> ${file.alternativeTitle}</p>
+                                    <p><strong>Source Type:</strong> ${file.sourceType}</p>
+                                    <p><strong>Authors:</strong> ${file.authors}</p>
+                                    <p><strong>ISBN:</strong> ${file.isbn}</p>
+                                    <p><strong>Publisher:</strong> ${file.publisher}</p>
+                                    <p><strong>Published:</strong> ${file.published}</p>
+                                    <p><strong>Status:</strong> ${file.status}</p>
+                                    <p><strong>Loan Period:</strong> ${file.loanLabel}</p>
+                                    <p>${file.description || ''}</p>
+                                    <div class="item-meta">
+                                        <p><strong>Subjects:</strong> ${file.subjects || 'N/A'}</p>
+                                        <a href="${file.url || '#'}" target="_blank">URL: ${file.url || 'N/A'}</a>
+                                        <button onclick="viewPDF('${file.id}', ${file.display})">View PDF</button>
+                                        <button onclick="borrowBook('${file.id}')">Borrow</button>
+                                        <button onclick="toggleDownloadOptions('${file.id}', this)">Download</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                            itemList.appendChild(item);
+                        });
+                        document.getElementById('no-files').style.display = 'none';
+                        createPagination(data.totalElements, page, size);
+                    } else {
+                        document.getElementById('no-files').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching files:', error);
+                });
+        } else {
+            alert('Please enter a search query.');
+        }
+    }
+
+    function viewPDF(id, display) {
+        if (display === 1) {
+            window.location.href = `../pdf/pdf.html?fileId=${encodeURIComponent(id)}`;
+        } else {
+            fetch(`http://${API_BASE_URL}/downloadfiles/${encodeURIComponent(id)}`, { responseType: 'blob' })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    window.open(url);
+                })
+                .catch(error => {
+                    console.error('Error downloading PDF:', error);
+                });
+        }
+    }
+
+    function downloadBook(id) {
+        const downloadOptions = `
+            <div>
+                <button onclick="downloadFile('${id}', 'pdf')">Download PDF</button>
+                <button onclick="downloadFile('${id}', 'epub')">Download EPUB</button>
+            </div>
+        `;
+        const item = document.querySelector(`.item-meta button[onclick="downloadBook('${id}')"]`).parentNode;
+        item.innerHTML += downloadOptions;
+    }
+
+    function downloadFile(id, format) {
+        fetch(`http://${API_BASE_URL}/download/${encodeURIComponent(id)}?format=${format}`, { responseType: 'blob' })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                window.open(url);
+            })
+            .catch(error => {
+                console.error(`Error downloading ${format}:`, error);
+            });
+    }
+
+    function toggleDownloadOptions(id, button) {
+        const existingOptions = document.querySelector('.download-options');
+        if (existingOptions) {
+            existingOptions.remove();
+        }
+        const downloadOptions = document.createElement('div');
+        downloadOptions.className = 'download-options';
+        downloadOptions.innerHTML = `
+            <button onclick="downloadFile('${id}', 'pdf')">Download PDF</button>
+            <button onclick="downloadFile('${id}', 'epub')">Download EPUB</button>
+        `;
+        button.parentNode.appendChild(downloadOptions);
+    }
+
+    function borrowBook(id) {
+        window.location.href = `borrow.html?id=${encodeURIComponent(id)}`;
+    }
+
+    function toggleList(header) {
+        const list = header.nextElementSibling;
+        list.style.display = list.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function applyFilter(filterType, value) {
+        if (!filters[filterType]) {
+            filters[filterType] = [];
+        }
+        const index = filters[filterType].indexOf(value);
+        if (index > -1) {
+            filters[filterType].splice(index, 1);
+        } else {
+            filters[filterType].push(value);
+        }
+        searchFiles(currentPage, 20);
+    }
+
+    function createPagination(totalElements, currentPage, size) {
+        const paginationContainer = document.getElementById('pagination');
+        paginationContainer.innerHTML = '';
+        const totalPages = Math.ceil(totalElements / size);
+
+        const prevButton = document.createElement('button');
+        prevButton.innerText = 'Previous';
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => {
+            searchFiles(currentPage - 1, size);
+            window.scrollTo(0, 0);
+        };
+        paginationContainer.appendChild(prevButton);
+
+        let startPage, endPage;
+        if (currentPage === 1 || currentPage === 2) {
+            startPage = 1;
+            endPage = Math.min(5, totalPages);
+        } else {
+            startPage = Math.max(1, currentPage - 2);
+            endPage = Math.min(totalPages, currentPage + 2);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.innerText = i;
+            pageButton.className = currentPage === i ? 'active' : '';
+            pageButton.onclick = () => {
+                searchFiles(i, size);
+                window.scrollTo(0, 0);
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+
+        const nextButton = document.createElement('button');
+        nextButton.innerText = 'Next';
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => {
+            searchFiles(currentPage + 1, size);
+            window.scrollTo(0, 0);
+        };
+        paginationContainer.appendChild(nextButton);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('search-button').addEventListener('click', () => {
+            currentPage = 1;
+            searchFiles(currentPage, pageSize);
+        });
+    });
+</script>
+</body>
+</html>

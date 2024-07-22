@@ -259,6 +259,10 @@ public class ListBookController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/files-view")
+    public String fileList() {
+        return "fileList";  // 这里返回的是视图名称，不包括.html扩展名
+    }
 
 
 }
