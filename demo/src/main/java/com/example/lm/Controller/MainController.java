@@ -35,9 +35,9 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 public class MainController {
@@ -50,7 +50,8 @@ public class MainController {
     @Autowired
     private ResourcesLibService resourcesLibService;
 
-    private final Path fileStorageLocation = Paths.get("pdf").toAbsolutePath().normalize();
+    private final Path fileStorageLocation = Paths.get("demo/src/main/resources/static/PDFs").normalize();
+
 
     @GetMapping("test")
     public String upload() {
@@ -321,21 +322,50 @@ public class MainController {
     @GetMapping("/downloadfiles/{fileId}")
     public ResponseEntity<Resource> downloadFileMysql(@PathVariable String fileId) {
         System.out.println("Downloading file with id: " + fileId);
-        try {
-            Path filePath = this.fileStorageLocation.resolve(fileId + ".pdf").normalize();
-            System.out.println(filePath.toString());
-            Resource resource = new UrlResource(filePath.toUri());
 
-            if (resource.exists()) {
-                return ResponseEntity.ok()
-                        .contentType(MediaType.APPLICATION_PDF)
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (MalformedURLException ex) {
-            return ResponseEntity.badRequest().build();
+        // 查询 FileInfo 实体
+        FileInfo fileInfo = fileService.getBookById(Integer.parseInt(fileId));
+        if (fileInfo == null) {
+            return ResponseEntity.notFound().build();
         }
+
+        // 获取 ISBN 字符串并输出
+        String isbnString = fileInfo.getIsbn();
+        System.out.println("ISBN String: " + isbnString);
+
+        // 提取 ISBN 列表
+        List<String> isbns = extractIsbnNumbers(isbnString);
+
+        // 构造并检查每个 ISBN 的文件路径
+        for (String isbn : isbns) {
+            String possiblePath = isbn + ".pdf";
+            try {
+                Path filePath = this.fileStorageLocation.resolve(possiblePath).normalize();
+                System.out.println("Checking path: " + filePath.toString());
+                Resource resource = new UrlResource(filePath.toUri());
+
+                if (resource.exists() || resource.isReadable()) {
+                    return ResponseEntity.ok()
+                            .contentType(MediaType.APPLICATION_PDF)
+                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                            .body(resource);
+                }
+            } catch (MalformedURLException ex) {
+                System.err.println("Malformed URL: " + ex.getMessage());
+            }
+        }
+
+        return ResponseEntity.notFound().build();
     }
-}
+
+    private List<String> extractIsbnNumbers(String input) {
+        List<String> isbnList = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            isbnList.add(matcher.group());
+        }
+        return isbnList;
+    }
+    }
+

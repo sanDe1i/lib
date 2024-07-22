@@ -131,6 +131,7 @@ public class FileService {
 
             if (fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName).size() > 0) {
                 String uploadPDFPath = PDFUploadPath;
+                System.out.println(uploadPDFPath);
                 java.io.File uploadFile = new java.io.File(uploadPDFPath);
                 if (!uploadFile.exists()) {
                     uploadFile.mkdirs();

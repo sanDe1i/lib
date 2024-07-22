@@ -301,8 +301,9 @@
     }
 
     function viewPDF(id, display) {
-        if (display === 1) {
-            window.location.href = `../pdf/pdf.html?fileId=${encodeURIComponent(id)}`;
+        console.log('Display:', display)
+        if (display == null) {
+            window.location.href = `pdf.html?fileId=${encodeURIComponent(id)}`;
         } else {
             fetch(`http://${API_BASE_URL}/downloadfiles/${encodeURIComponent(id)}`, { responseType: 'blob' })
                 .then(response => {
