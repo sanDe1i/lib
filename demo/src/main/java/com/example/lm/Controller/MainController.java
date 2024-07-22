@@ -139,7 +139,7 @@ public class MainController {
     @PostMapping("/hideBook")
     public ResponseEntity<?> hideBooks(@RequestParam("folderId") int libId) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
-        for(FileInfo pdf : list) {
+        for (FileInfo pdf : list) {
             pdf.setStatus("Hide");
             fileService.savePDF(pdf);
         }
@@ -149,7 +149,7 @@ public class MainController {
     @PostMapping("/showBook")
     public ResponseEntity<?> showBooks(@RequestParam("folderId") int libId) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
-        for(FileInfo pdf : list) {
+        for (FileInfo pdf : list) {
             pdf.setStatus("Published");
             fileService.savePDF(pdf);
         }
@@ -159,7 +159,7 @@ public class MainController {
     @PostMapping("/cancelView")
     public ResponseEntity<?> cancelViewBooks(@RequestParam("folderId") int libId) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
-        for(FileInfo pdf : list) {
+        for (FileInfo pdf : list) {
             pdf.setView("Hide");
             fileService.savePDF(pdf);
         }
@@ -169,7 +169,7 @@ public class MainController {
     @PostMapping("/AbleView")
     public ResponseEntity<?> ableViewBooks(@RequestParam("folderId") int libId) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
-        for(FileInfo pdf : list) {
+        for (FileInfo pdf : list) {
             pdf.setView("View");
             fileService.savePDF(pdf);
         }
@@ -177,17 +177,14 @@ public class MainController {
     }
 
     /**
-     *
      * @param libId
-     * @return
-     *
-     * Disable: 不允许下载
+     * @return Disable: 不允许下载
      * Able: 允许下载
      */
     @PostMapping("/cancelDownload")
     public ResponseEntity<?> cancelDownloadBooks(@RequestParam("folderId") int libId) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
-        for(FileInfo pdf : list) {
+        for (FileInfo pdf : list) {
             pdf.setDownload("Disable");
             fileService.savePDF(pdf);
         }
@@ -197,7 +194,7 @@ public class MainController {
     @PostMapping("/ableDownload")
     public ResponseEntity<?> ableDownloadBooks(@RequestParam("folderId") int libId) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
-        for(FileInfo pdf : list) {
+        for (FileInfo pdf : list) {
             pdf.setDownload("Able");
             fileService.savePDF(pdf);
         }
@@ -207,7 +204,7 @@ public class MainController {
     @PostMapping("/cancelBorrow")
     public ResponseEntity<?> cancelBorrowBooks(@RequestParam("folderId") int libId) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
-        for(FileInfo pdf : list) {
+        for (FileInfo pdf : list) {
             pdf.setLoanLabel("no");
             fileService.savePDF(pdf);
         }
@@ -217,12 +214,22 @@ public class MainController {
     @PostMapping("/ableBorrow")
     public ResponseEntity<?> ableBorrowBooks(@RequestParam("folderId") int libId, @RequestParam("borrow_period") int period) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
-        for(FileInfo pdf : list) {
+        for (FileInfo pdf : list) {
             pdf.setLoanLabel("yes");
             pdf.setBorrowPeriod(period);
             fileService.savePDF(pdf);
         }
         return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/ableBorrowForSingleBook")
+    public ResponseEntity<?> ableBorrowForBooks(@RequestParam("bookID") int bookID, @RequestParam("borrow_period") int period) {
+        FileInfo pdf = fileService.getFileById(bookID);
+        pdf.setLoanLabel("yes");
+        pdf.setBorrowPeriod(period);
+        fileService.savePDF(pdf);
+
+        return ResponseEntity.ok(pdf);
     }
 
     // 处理文件下载请求
@@ -256,7 +263,7 @@ public class MainController {
     @ResponseBody
     public SearchResult<FileInfo> getPDFByKeyword(@PathVariable String keyword,
                                                   @RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page-1, 5);
+        Pageable pageable = PageRequest.of(page - 1, 5);
         Page<FileInfo> files = fileService.keywordSearch(keyword, pageable);
         System.out.println(page);
         if (files.isEmpty()) {
@@ -284,7 +291,7 @@ public class MainController {
 
         System.out.println("page: " + page);
 
-        Pageable pageable = PageRequest.of(page-1, 5);
+        Pageable pageable = PageRequest.of(page - 1, 5);
         Page<FileInfo> files = fileService.keywordSearch(keyword, originalSource, language, pageable);
         System.out.println(page);
         if (files.isEmpty()) {
@@ -305,7 +312,6 @@ public class MainController {
             return ResponseEntity.notFound().build();
         }
     }
-
 
 
     @PostMapping("/saveTable")
