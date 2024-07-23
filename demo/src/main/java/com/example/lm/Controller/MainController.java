@@ -1,9 +1,7 @@
 package com.example.lm.Controller;
 
-import com.example.lm.Model.File;
-import com.example.lm.Model.FileInfo;
-import com.example.lm.Model.PDFs;
-import com.example.lm.Model.ResourcesLib;
+import com.example.lm.Model.*;
+import com.example.lm.Service.BorrowService;
 import com.example.lm.Service.FileService;
 import com.example.lm.Service.ResourcesLibService;
 
@@ -59,6 +57,9 @@ public class MainController {
     private static final String PDF_DIRECTORY = "demo/src/main/resources/static/PDFs/";
 
     private static final String MARC_DIRECTORY = "demo/src/main/resources/static/Epub/";
+
+    @Autowired
+    private BorrowService borrowService;
 
 
     @GetMapping("test")
@@ -237,7 +238,13 @@ public class MainController {
         pdf.setLoanLabel("yes");
         pdf.setBorrowPeriod(period);
         fileService.savePDF(pdf);
-
+        Borrow borrow = new Borrow();
+        borrow.setBookId(bookID);
+        borrow.setBookTitle(pdf.getTitle());
+        borrow.setUsername("admin");
+        borrow.setLoanStartTime(String.valueOf(System.currentTimeMillis()));
+        borrow.setLoanEndTime(String.valueOf(System.currentTimeMillis() + period * 24 * 60 * 60 * 1000));
+        borrowService.saveBorrow(borrow,period);
         return ResponseEntity.ok(pdf);
     }
 
@@ -335,7 +342,7 @@ public class MainController {
 
     @GetMapping("/downloadfiles/{fileId}")
     public ResponseEntity<Resource> downloadFileMysql(@PathVariable String fileId) {
-        System.out.println("Downloading file with id: " + fileId);
+        System.out.println("Viewing file with id: " + fileId);
 
         // 查询 FileInfo 实体
         FileInfo fileInfo = fileService.getBookById(Integer.parseInt(fileId));
@@ -361,7 +368,7 @@ public class MainController {
                 if (resource.exists() || resource.isReadable()) {
                     return ResponseEntity.ok()
                             .contentType(MediaType.APPLICATION_PDF)
-                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                             .body(resource);
                 }
             } catch (MalformedURLException ex) {
@@ -382,27 +389,27 @@ public class MainController {
         return isbnList;
     }
 
+
     @GetMapping("/downloadpdfs/{id}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String id, @RequestParam String format) {
+        System.out.println("Downloading file with id: " + id + " and format: " + format);
         try {
-            byte[] fileContent = getFileContentByIdAndFormat(id, format);
+            Resource fileResource = getFileResourceByIdAndFormat(id, format);
 
-            if (fileContent == null) {
+            if (fileResource == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            ByteArrayResource resource = new ByteArrayResource(fileContent);
-
             return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_PDF)  // 确保设置了 PDF 的 MIME 类型
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)  // 设置通用的MIME类型
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + id + "." + format + "\"")
-                    .body(resource);
+                    .body(fileResource);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private byte[] getFileContentByIdAndFormat(String id, String format) throws IOException {
+    private Resource getFileResourceByIdAndFormat(String id, String format) throws IOException {
         String directory;
         if ("pdf".equalsIgnoreCase(format)) {
             directory = PDF_DIRECTORY;
@@ -421,9 +428,7 @@ public class MainController {
                 java.io.File file = filePath.toFile();
 
                 if (file.exists() && file.canRead()) {
-                    try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                        return FileCopyUtils.copyToByteArray(fileInputStream);
-                    }
+                    return new InputStreamResource(new FileInputStream(file));
                 }
             }
 
@@ -434,22 +439,21 @@ public class MainController {
             if (fileInfo == null) {
                 return null;
             }
-//            String title = fileInfo.getTitle();
-            String title = new String("Corporate Sustainability  Shareholder Primacy Versus Stakeholder Primacy");
+
+            String title = "Corporate Sustainability  Shareholder Primacy Versus Stakeholder Primacy";
             Path filePath = Paths.get(directory, title + "." + format).normalize();
             System.out.println("Checking path: " + filePath.toString());
             java.io.File file = filePath.toFile();
             if (!file.exists()) {
                 return null;
             }
-            try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                return FileCopyUtils.copyToByteArray(fileInputStream);
-            }
+            return new InputStreamResource(new FileInputStream(file));
         } else {
             return null; // 如果格式不支持，返回 null
         }
         return null; // 如果没有找到文件，返回 null
     }
+
 
     @GetMapping("/")
     public String index(HttpSession session, Model model) {

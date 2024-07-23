@@ -348,8 +348,8 @@ public class FileService {
     public Page<FileInfo> keywordSearch(String keyword, String sourceType, String language, Pageable pageable) {
         System.out.println(sourceType);
         String searchPattern = "%" + keyword + "%"; // 在关键字前后加上百分号
-        String jpql = "SELECT f FROM FileInfo f WHERE f.title LIKE :keyword";
-        String countJpql = "SELECT COUNT(f) FROM FileInfo f WHERE f.title LIKE :keyword";
+        String jpql = "SELECT f FROM FileInfo f WHERE f.title LIKE :keyword AND f.status = 'published'";
+        String countJpql = "SELECT COUNT(f) FROM FileInfo f WHERE f.title LIKE :keyword AND f.status = 'published'";
 
         if (sourceType != null && !sourceType.isEmpty()) {
             jpql += " AND f.sourceType = :sourceType";
@@ -388,6 +388,7 @@ public class FileService {
 
         return new PageImpl<>(fileList, pageable, total);
     }
+
 
 
 

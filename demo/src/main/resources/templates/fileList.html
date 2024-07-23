@@ -85,45 +85,36 @@
             border-radius: 5px;
             background-color: #f9f9f9;
         }
-
         .item-details {
             display: flex;
             align-items: flex-start;
             margin-top: 10px;
         }
-
         .source-type-image {
             width: 100px;
             height: auto;
             margin-right: 15px;
         }
-
         .item-content {
             flex-grow: 1;
         }
-
         .item-details h3 {
             font-size: 1.5em;
             margin-bottom: 10px;
         }
-
         .item-details p {
             margin: 5px 0;
         }
-
         .item-meta {
             margin-top: 15px;
         }
-
         .item-meta a {
             color: #007bff;
             text-decoration: none;
         }
-
         .item-meta a:hover {
             text-decoration: underline;
         }
-
         .item-meta button {
             margin-right: 10px;
             padding: 5px 10px;
@@ -133,16 +124,13 @@
             border-radius: 3px;
             cursor: pointer;
         }
-
         .item-meta button:hover {
             background-color: #0056b3;
         }
-
         #no-files {
             color: red;
             font-weight: bold;
         }
-
         .active {
             background-color: #007bff;
             color: white;
@@ -162,6 +150,24 @@
             background-color: #cccccc;
             color: #666666;
             cursor: not-allowed;
+        }
+        .footer {
+            padding: 15px;
+            background-color: #f1f1f1;
+            border-top: 1px solid #ccc;
+            text-align: right;
+        }
+        .footer button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .footer button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -212,7 +218,6 @@
             </div>
         </div>
         <div class="main">
-
             <div id="results">
                 <div id="no-files" style="display: none;">
                     <p>No files found for the given keyword.</p>
@@ -221,6 +226,9 @@
                 <ul id="pagination" class="pagination"></ul>
             </div>
         </div>
+    </div>
+    <div class="footer">
+        <button onclick="window.location.href='/userhome'">Go to User Home</button>
     </div>
 </div>
 <script>
