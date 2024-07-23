@@ -94,6 +94,15 @@ public class FileInfo {
     @Column(name = "downloadLink")
     private String downloadLink;
 
+    private String display;
+
+    public String getDisplay() {
+        return display;
+    }
+
+    public void setDisplay(String display) {
+        this.display = display;
+    }
 //    @Column(name = "downloadable")
 //    private boolean downloadable;
 

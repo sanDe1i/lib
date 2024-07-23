@@ -10,6 +10,7 @@ import com.example.lm.Service.ResourcesLibService;
 import com.example.lm.utils.SearchResult;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
@@ -450,6 +451,34 @@ public class MainController {
         return null; // 如果没有找到文件，返回 null
     }
 
-
+    @GetMapping("/")
+    public String index(HttpSession session, Model model) {
+        // 检查会话中是否有用户名
+        return "index";  // 返回index视图
     }
+
+    @GetMapping("/adminHome")
+    public String adminHome(HttpSession session, Model model) {
+        return "adminHome";  // 返回adminHome视图
+    }
+
+    @GetMapping("/adminLogin")
+    public String adminLogin(HttpSession session, Model model) {
+        return "adminLogin";  // 返回adminLogin视图
+    }
+
+    @GetMapping("/fileList")
+    public String UserSearch(HttpSession session, Model model) {
+        return "fileList";  // 返回adminLogin视图
+    }
+
+
+    @GetMapping("/pdf")
+    public String viewPdf(@RequestParam("fileId") String fileId, Model model) {
+        model.addAttribute("fileId", fileId);
+        return "pdf";  // 返回 pdf.html 视图
+    }
+
+
+}
 

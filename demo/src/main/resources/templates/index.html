@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register</title>
+    <style>
+        .blue-link {
+            color: blue;
+        }
+    </style>
+    <link rel="stylesheet" href="../static/assets/style.css">
+    <link rel="stylesheet" href="../static/assets/iconfont/iconfont.css">
+</head>
+<body>
+<div class='container' id='container'>
+    <div class="form-container sign-up-container">
+        <!-- 注册 -->
+        <form id="registerForm" action="#">
+            <h1>User Register</h1>
+            <div class="social-container">
+                <a href="#" class="social"><i class="iconfont icon-qq"></i></a>
+                <a href="#" class="social"><i class="iconfont icon-weixin"></i></a>
+                <a href="#" class="social"><i class="iconfont icon-weibo-copy"></i></a>
+                <a href="#" class="social"><i class="iconfont icon-github"></i></a>
+            </div>
+            <span>Extra Way</span>
+            <input id="fullname" name="fullname" type="text" placeholder="Username">
+            <input id="create-password" name="password" type="password" placeholder="password">
+            <input id="email" name="email" type="email" placeholder="email">
+            <button id="send_code">Verification code</button>
+            <input id="confirm-password" name="confirmPassword" type="text" placeholder="Verification code">
+            <button type="submit">register</button>
+            <div id="emailError" style="color: red;"></div>
+            <div id="passwordError" style="color: red;"></div>
+            <div id="confirmPasswordError" style="color: red;"></div>
+            <div id="validationResult" style="color: red;"></div>
+        </form>
+    </div>
+    <div class="form-container sign-in-container">
+        <!-- 登陆 -->
+        <form id="loginForm" action="#">
+            <h1>Login</h1>
+            <div class="social-container">
+                <a href="#" class="social"><i class="iconfont icon-qq"></i></a>
+                <a href="#" class="social"><i class="iconfont icon-weixin"></i></a>
+                <a href="#" class="social"><i class="iconfont icon-weibo-copy"></i></a>
+                <a href="#" class="social"><i class="iconfont icon-github"></i></a>
+            </div>
+            <span>Extra way</span>
+            <input id="login-username" name="username" type="text" placeholder="username">
+            <input id="login-password" name="password" type="password" placeholder="password">
+            <a href="#" class="yellow-link" onclick="signInAsManager()">Sign In as Manager</a>
+            <button type="submit">login</button>
+        </form>
+    </div>
+    <!-- 侧边栏内容 -->
+    <div class="overlay-container">
+        <div class="overlay">
+            <div class="overlay-panel overlay-left">
+                <h1>Already have an account?</h1>
+                <p>click me to login</p>
+                <button class='ghost' id="signIn">login</button>
+            </div>
+            <div class="overlay-panel overlay-right">
+                <h1>No account yet?</h1>
+                <p>register</p>
+                <button class='ghost' id="signUp">register</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="module" src="../static/js/index.js"></script>
+<script>
+    function signInAsManager() {
+        // 在此处添加您的处理逻辑，例如跳转到登录页面或执行其他操作
+        window.location.href = '/adminLogin'; // 示例：跳转到管理登录页面
+    }
+</script>
+<script type="module" src="../static/js/config.js"></script>
+</body>
+</html>

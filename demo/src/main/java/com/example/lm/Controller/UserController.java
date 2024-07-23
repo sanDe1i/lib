@@ -33,25 +33,7 @@ public class UserController {
     @Autowired
     private TokenService tokenService;
 
-    @GetMapping("/")
-    public String index(HttpSession session, Model model) {
-        // 检查会话中是否有用户名
-        String username = (String) session.getAttribute("username");
-        if (username == null) {
-            // 如果用户名不存在，跳转到登录页面
-            return "redirect:/log_in";
-        }
 
-        // 如果用户名存在，将其添加到模型
-        model.addAttribute("username", username);
-
-        String message = (String) model.asMap().get("message");
-        if (message != null) {
-            model.addAttribute("message", message);
-        }
-
-        return "home";
-    }
 
     @GetMapping("/log_in")
     public String index(Model model) {
@@ -68,7 +50,7 @@ public class UserController {
         String username = (String) session.getAttribute("username");
         if (username == null) {
             // 如果用户名不存在，跳转到登录页面
-            return "redirect:/log_in";
+            return "redirect:/adminHome";
         }
         try {
             userService.addBookToUserCollection(username, bookisbn);

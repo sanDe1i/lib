@@ -19,6 +19,7 @@ public class CorsConfig {
                 "http://127.0.0.1:8080",
                 "http://120.26.136.194:8080",
                 "http://localhost:8080",
+                "http://localhost:8088",
                 "http://8.130.130.240:8080",
                 "http://8.130.130.240:8088",
                 "http://localhost:63342"
