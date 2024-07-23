@@ -334,7 +334,7 @@
     }
 
     function downloadFile(id, format) {
-        fetch(`http://${API_BASE_URL}/download/${encodeURIComponent(id)}?format=${format}`, { responseType: 'blob' })
+        fetch(`http://${API_BASE_URL}/downloadpdfs/${encodeURIComponent(id)}?format=${format}`, { responseType: 'blob' })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -343,12 +343,20 @@
             })
             .then(blob => {
                 const url = window.URL.createObjectURL(blob);
-                window.open(url);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `${id}.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
             })
             .catch(error => {
                 console.error(`Error downloading ${format}:`, error);
             });
     }
+
 
     function toggleDownloadOptions(id, button) {
         const existingOptions = document.querySelector('.download-options');

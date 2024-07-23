@@ -11,6 +11,7 @@ import com.example.lm.utils.SearchResult;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -23,12 +24,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -51,6 +54,10 @@ public class MainController {
     private ResourcesLibService resourcesLibService;
 
     private final Path fileStorageLocation = Paths.get("demo/src/main/resources/static/PDFs").normalize();
+
+    private static final String PDF_DIRECTORY = "demo/src/main/resources/static/PDFs/";
+
+    private static final String MARC_DIRECTORY = "demo/src/main/resources/static/Epub/";
 
 
     @GetMapping("test")
@@ -373,5 +380,76 @@ public class MainController {
         }
         return isbnList;
     }
+
+    @GetMapping("/downloadpdfs/{id}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String id, @RequestParam String format) {
+        try {
+            byte[] fileContent = getFileContentByIdAndFormat(id, format);
+
+            if (fileContent == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            ByteArrayResource resource = new ByteArrayResource(fileContent);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)  // 确保设置了 PDF 的 MIME 类型
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + id + "." + format + "\"")
+                    .body(resource);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private byte[] getFileContentByIdAndFormat(String id, String format) throws IOException {
+        String directory;
+        if ("pdf".equalsIgnoreCase(format)) {
+            directory = PDF_DIRECTORY;
+
+            com.example.lm.Model.FileInfo fileInfo = fileService.getFileById(Integer.parseInt(id));
+            if (fileInfo == null) {
+                return null;
+            }
+
+            String isbnString = fileInfo.getIsbn();
+            List<String> isbns = extractIsbnNumbers(isbnString);
+
+            for (String isbn : isbns) {
+                String possiblePath = isbn + ".pdf";
+                Path filePath = Paths.get(directory).resolve(possiblePath).normalize();
+                java.io.File file = filePath.toFile();
+
+                if (file.exists() && file.canRead()) {
+                    try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                        return FileCopyUtils.copyToByteArray(fileInputStream);
+                    }
+                }
+            }
+
+        } else if ("epub".equalsIgnoreCase(format)) {
+            System.out.println("Downloading EPUB file...");
+            directory = MARC_DIRECTORY;
+            com.example.lm.Model.FileInfo fileInfo = fileService.getFileById(Integer.parseInt(id));
+            if (fileInfo == null) {
+                return null;
+            }
+//            String title = fileInfo.getTitle();
+            String title = new String("Corporate Sustainability  Shareholder Primacy Versus Stakeholder Primacy");
+            Path filePath = Paths.get(directory, title + "." + format).normalize();
+            System.out.println("Checking path: " + filePath.toString());
+            java.io.File file = filePath.toFile();
+            if (!file.exists()) {
+                return null;
+            }
+            try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                return FileCopyUtils.copyToByteArray(fileInputStream);
+            }
+        } else {
+            return null; // 如果格式不支持，返回 null
+        }
+        return null; // 如果没有找到文件，返回 null
+    }
+
+
     }
 
