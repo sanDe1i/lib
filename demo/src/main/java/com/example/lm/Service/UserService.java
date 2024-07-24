@@ -37,6 +37,29 @@ public class UserService {
     @Autowired
     private UserRepository userRepositoryForLogin;
 
+    public List<User> getAllUsers() {
+        return userRepositoryForLogin.findAll();
+    }
+
+    public Page<User> getAllUsers2(Pageable pageable) {
+        return userRepositoryForLogin.findAll(pageable);
+    }
+
+    public Page<User> getUsersByKeyword2(String keyword, Pageable pageable) {
+        return userRepositoryForLogin.findByUsernameContaining(keyword, pageable);
+    }
+
+
+    public void banUser(int userId, int banDuration) {
+        User user = userRepositoryForLogin.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        LocalDateTime unbanTime = LocalDateTime.now().plusDays(banDuration);
+        user.setUnbanTime(Timestamp.valueOf(unbanTime));
+        userRepositoryForLogin.save(user);
+        System.out.println("User banned: " + user.getUsername() + " until " + user.getUnbanTime());
+    }
+
+
+
     public User authenticate(String username) {
         try {
             User user = userRepositoryForLogin.findByUsername(username);

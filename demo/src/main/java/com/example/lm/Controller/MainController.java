@@ -236,6 +236,7 @@ public class MainController {
     public ResponseEntity<?> ableBorrowForBooks(@RequestParam("bookID") int bookID, @RequestParam("borrow_period") int period) {
         FileInfo pdf = fileService.getFileById(bookID);
         pdf.setLoanLabel("yes");
+        pdf.setStatus("Borrowed");
         pdf.setBorrowPeriod(period);
         fileService.savePDF(pdf);
         Borrow borrow = new Borrow();
