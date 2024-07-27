@@ -4,18 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="联调了databaseID，name，连接了资源库管理界面，等。性能暂不考虑。">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/5656e9b0-aadb-413e-923d-60d1e8b6b7d1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/5656e9b0-aadb-413e-923d-60d1e8b6b7d1.xml" afterDir="false" />
+    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="新接口下载能匹配bookid@(&quot;/downloadFromList/{bookId}&quot;)；更新功能：察看是否上传pdf">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_7_14_21_32_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_7_14_21_32__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/ListBookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/ListBookController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/PDFDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/PDFDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/ResourcesLibDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/ResourcesLibDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Model/FileInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Model/FileInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/FileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/FileService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/ResourcesLibService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/ResourcesLibService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/search2.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/MainController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/searchresults.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/searchresults.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/viewDetails.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/viewDetails.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,7 +109,7 @@
       <workItem from="1719587289552" duration="24679000" />
       <workItem from="1720718923829" duration="17000" />
       <workItem from="1720719112378" duration="807000" />
-      <workItem from="1720870032459" duration="104322000" />
+      <workItem from="1720870032459" duration="113680000" />
     </task>
     <task id="LOCAL-00001" summary="拦截+搜索访问@GetMapping(&quot;test/search2&quot;)">
       <created>1720963712259</created>
@@ -144,7 +139,14 @@
       <option name="project" value="LOCAL" />
       <updated>1721381186143</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="新接口下载能匹配bookid@(&quot;/downloadFromList/{bookId}&quot;)；更新功能：察看是否上传pdf">
+      <created>1721555416390</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1721555416390</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -165,6 +167,17 @@
     <MESSAGE value="拦截+搜索访问@GetMapping(&quot;test/search2&quot;)" />
     <MESSAGE value="做了edit，访问@GetMapping(&quot;test/search2&quot;)" />
     <MESSAGE value="联调了databaseID，name，连接了资源库管理界面，等。性能暂不考虑。" />
-    <option name="LAST_COMMIT_MESSAGE" value="联调了databaseID，name，连接了资源库管理界面，等。性能暂不考虑。" />
+    <MESSAGE value="新接口下载能匹配bookid@(&quot;/downloadFromList/{bookId}&quot;)；更新功能：察看是否上传pdf" />
+    <option name="LAST_COMMIT_MESSAGE" value="新接口下载能匹配bookid@(&quot;/downloadFromList/{bookId}&quot;)；更新功能：察看是否上传pdf" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="jakarta.persistence.NonUniqueResultException" package="jakarta.persistence" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

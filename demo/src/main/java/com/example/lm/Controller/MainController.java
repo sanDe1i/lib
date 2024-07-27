@@ -427,6 +427,7 @@ public class MainController {
                 String possiblePath = isbn + ".pdf";
                 Path filePath = Paths.get(directory).resolve(possiblePath).normalize();
                 java.io.File file = filePath.toFile();
+                System.out.println(filePath);
 
                 if (file.exists() && file.canRead()) {
                     return new InputStreamResource(new FileInputStream(file));
