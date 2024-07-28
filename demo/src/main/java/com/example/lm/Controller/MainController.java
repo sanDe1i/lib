@@ -236,6 +236,7 @@ public class MainController {
     public ResponseEntity<?> ableBorrowForBooks(@RequestParam("bookID") int bookID, @RequestParam("borrow_period") int period) {
         FileInfo pdf = fileService.getFileById(bookID);
         pdf.setLoanLabel("yes");
+        pdf.setStatus("Borrowed");
         pdf.setBorrowPeriod(period);
         fileService.savePDF(pdf);
         Borrow borrow = new Borrow();
@@ -426,6 +427,7 @@ public class MainController {
                 String possiblePath = isbn + ".pdf";
                 Path filePath = Paths.get(directory).resolve(possiblePath).normalize();
                 java.io.File file = filePath.toFile();
+                System.out.println(filePath);
 
                 if (file.exists() && file.canRead()) {
                     return new InputStreamResource(new FileInputStream(file));

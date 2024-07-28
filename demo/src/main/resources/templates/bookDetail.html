@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Detail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .book-details {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .book-details img {
+            max-width: 100px;
+            margin-bottom: 20px;
+        }
+        .book-details h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .book-details p {
+            margin: 5px 0;
+        }
+        .book-details strong {
+            display: inline-block;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="book-details" id="book-details">
+        <img id="source-image" src="../static/images/book.png" alt="Source Type">
+        <h1 id="book-title">Book Title</h1>
+        <p><strong>Alternate Title:</strong> <span id="alternative-title"></span></p>
+        <p><strong>Source Type:</strong> <span id="source-type"></span></p>
+        <p><strong>Authors:</strong> <span id="authors"></span></p>
+        <p><strong>Editors:</strong> <span id="editors"></span></p>
+        <p><strong>Series:</strong> <span id="series"></span></p>
+        <p><strong>Language:</strong> <span id="language"></span></p>
+        <p><strong>ISBN:</strong> <span id="isbn"></span></p>
+        <p><strong>Publisher:</strong> <span id="publisher"></span></p>
+        <p><strong>Published:</strong> <span id="published"></span></p>
+        <p><strong>Edition:</strong> <span id="edition"></span></p>
+        <p><strong>Copyright Year:</strong> <span id="copyright-year"></span></p>
+        <p><strong>Copyright Declaration:</strong> <span id="copyright-declaration"></span></p>
+        <p><strong>Status:</strong> <span id="status"></span></p>
+        <p><strong>URL:</strong> <a id="url" href="" target="_blank">Link</a></p>
+        <p><strong>Pages:</strong> <span id="pages"></span></p>
+        <p><strong>Subjects:</strong> <span id="subjects"></span></p>
+        <p><strong>Description:</strong></p>
+        <p id="description"></p>
+        <p><strong>Chapters:</strong> <span id="chapters"></span></p>
+        <p><strong>Book Database ID:</strong> <span id="book-databases-id"></span></p>
+        <p><strong>Original Source:</strong> <span id="original-source"></span></p>
+        <p><strong>Contributing Institution:</strong> <span id="contributing-institution"></span></p>
+        <p><strong>Digitization Explanation:</strong> <span id="digitization-explanation"></span></p>
+        <p><strong>Loan Period:</strong> <span id="loan-period"></span></p>
+        <p><strong>Display:</strong> <span id="display"></span></p>
+        <input type="hidden" id="fileId" th:value="${fileId}">
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const bookId = document.getElementById('fileId').value;
+        console.log('Book ID:', bookId);
+        if (bookId !== 'default_id') {
+            fetch(`http://8.130.130.240:8088/book/${bookId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('source-image').src = '../static/images/book.png';
+                    document.getElementById('book-title').textContent = data.title;
+                    document.getElementById('alternative-title').textContent = data.alternativeTitle;
+                    document.getElementById('source-type').textContent = data.sourceType;
+                    document.getElementById('authors').textContent = data.authors;
+                    document.getElementById('editors').textContent = data.editors;
+                    document.getElementById('series').textContent = data.series;
+                    document.getElementById('language').textContent = data.language;
+                    document.getElementById('isbn').textContent = data.isbn;
+                    document.getElementById('publisher').textContent = data.publisher;
+                    document.getElementById('published').textContent = data.published;
+                    document.getElementById('edition').textContent = data.edition;
+                    document.getElementById('copyright-year').textContent = data.copyright_year;
+                    document.getElementById('copyright-declaration').textContent = data.copyright_declaration;
+                    document.getElementById('status').textContent = data.status;
+                    const urlElement = document.getElementById('url');
+                    urlElement.href = data.url || '#';
+                    urlElement.textContent = data.url || 'N/A';
+                    document.getElementById('pages').textContent = data.pages;
+                    document.getElementById('subjects').textContent = data.subjects || 'N/A';
+                    document.getElementById('description').textContent = data.description || '';
+                    document.getElementById('chapters').textContent = data.chapters;
+                    document.getElementById('book-databases-id').textContent = data.book_databases_id;
+                    document.getElementById('original-source').textContent = data.original_source;
+                    document.getElementById('contributing-institution').textContent = data.contributing_institution;
+                    document.getElementById('digitization-explanation').textContent = data.digitization_explanation;
+                    document.getElementById('loan-period').textContent = data.loan_label;
+                    document.getElementById('display').textContent = data.display;
+                })
+                .catch(error => {
+                    console.error('Error fetching book details:', error);
+                });
+        } else {
+            console.error('No book ID provided in URL');
+        }
+    });
+</script>
+</body>
+</html>

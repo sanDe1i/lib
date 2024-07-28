@@ -96,6 +96,9 @@ public class FileInfo {
 
 
 
+//    @Column(name = "downloadable")
+//    private boolean downloadable;
+
 //    public boolean isDownloadable() {
 //        return downloadable;
 //    }

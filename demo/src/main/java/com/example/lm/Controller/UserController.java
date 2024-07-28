@@ -20,10 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 public class UserController {
@@ -32,6 +29,43 @@ public class UserController {
 
     @Autowired
     private TokenService tokenService;
+
+    @GetMapping("/searchUsers")
+    public ResponseEntity<Map<String, Object>> searchUsers(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        List<User> users;
+        Pageable paging = PageRequest.of(page - 1, size);
+
+        Page<User> pageUsers;
+        if (keyword == null || keyword.isEmpty()) {
+            pageUsers = userService.getAllUsers2(paging);
+        } else {
+            pageUsers = userService.getUsersByKeyword2(keyword, paging);
+        }
+
+        users = pageUsers.getContent();
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", users);
+        response.put("currentPage", pageUsers.getNumber() + 1);
+        response.put("totalItems", pageUsers.getTotalElements());
+        response.put("totalPages", pageUsers.getTotalPages());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+
+
+
+
+
+    @GetMapping("/getUsers")
+    public ResponseEntity<List<User>> getUsers() {
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
 
 
 

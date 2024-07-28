@@ -10,4 +10,5 @@ import org.springframework.data.repository.query.Param;
 public interface UserRepository extends JpaRepository<User, Integer> {
     User findByUsername(String username);
 
+    Page<User> findByUsernameContaining(String keyword, Pageable pageable);
 }
