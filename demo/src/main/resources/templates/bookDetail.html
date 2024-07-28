@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Book Detail</title>
@@ -38,7 +38,7 @@
 <body>
 <div class="container">
     <div class="book-details" id="book-details">
-        <img id="source-image" src="" alt="Source Type">
+        <img id="source-image" src="../static/images/book.png" alt="Source Type">
         <h1 id="book-title">Book Title</h1>
         <p><strong>Alternate Title:</strong> <span id="alternative-title"></span></p>
         <p><strong>Source Type:</strong> <span id="source-type"></span></p>
@@ -65,13 +65,15 @@
         <p><strong>Digitization Explanation:</strong> <span id="digitization-explanation"></span></p>
         <p><strong>Loan Period:</strong> <span id="loan-period"></span></p>
         <p><strong>Display:</strong> <span id="display"></span></p>
+        <input type="hidden" id="fileId" th:value="${fileId}">
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const bookId = new URLSearchParams(window.location.search).get('id');
-        if (bookId) {
+        const bookId = document.getElementById('fileId').value;
+        console.log('Book ID:', bookId);
+        if (bookId !== 'default_id') {
             fetch(`http://localhost:8088/book/${bookId}`)
                 .then(response => response.json())
                 .then(data => {
