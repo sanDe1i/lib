@@ -74,7 +74,7 @@
         const bookId = document.getElementById('fileId').value;
         console.log('Book ID:', bookId);
         if (bookId !== 'default_id') {
-            fetch(`http://localhost:8088/book/${bookId}`)
+            fetch(`http://8.130.130.240:8088/book/${bookId}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('source-image').src = '../static/images/book.png';

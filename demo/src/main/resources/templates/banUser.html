@@ -130,24 +130,6 @@
         .footer button:hover {
             background-color: #0056b3;
         }
-        .footer button {
-            display: none;
-        }
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #4caf50;
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            display: none;
-            z-index: 1000;
-        }
-        .notification.error {
-            background-color: #f44336;
-        }
     </style>
 </head>
 <body>
@@ -167,26 +149,17 @@
             </div>
         </div>
     </div>
-    <div class="footer">
-        <button onclick="window.location.href='/userhome'">Go to User Home</button>
-    </div>
 </div>
-<div id="notification" class="notification"></div>
+<div class="footer" style="display: none;">
+    <button onclick="window.location.href='/userhome'">Go to User Home</button>
+</div>
+
+</div>
 <script>
-    const API_BASE_URL = "localhost:8088";
+    const API_BASE_URL = "8.130.130.240:8088";
     let currentPage = 1;
     const pageSize = 5;
     let filters = {};
-
-    function showNotification(message, isError = false) {
-        const notification = document.getElementById('notification');
-        notification.textContent = message;
-        notification.className = isError ? 'notification error' : 'notification';
-        notification.style.display = 'block';
-        setTimeout(() => {
-            notification.style.display = 'none';
-        }, 3000);
-    }
 
     function searchUsers(page, size) {
         const keyword = document.getElementById('keyword').value;
@@ -230,7 +203,6 @@
                                             <option value="3650">Permanent</option>
                                         </select>
                                         <button onclick="banUser('${user.id}')">Ban User</button>
-                                        <button onclick="removeBan('${user.id}')">Remove Ban</button>
                                     </div>
                                 </div>
                             </div>
@@ -245,7 +217,6 @@
                 })
                 .catch(error => {
                     console.error('Error fetching users:', error);
-                    showNotification('Error fetching users.', true);
                 });
         } else {
             alert('Please enter a search query.');
@@ -258,7 +229,7 @@
 
         console.log(`Ban user with ID: ${id} for ${banDuration}`);
 
-        fetch(`http://localhost:8088/banUser`, {
+        fetch(`http://8.130.130.240:8088/banUser`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -269,52 +240,21 @@
             })
         })
             .then(response => {
-                console.log('Response status:', response.status);  // 打印状态码
-                if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.message || 'Network response was not ok'); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('User banned successfully:', data);
-                showNotification('User banned successfully');
-                searchUsers(currentPage, pageSize); // Refresh the user list
-            })
-            .catch(error => {
-                console.error('Error banning user:', error);
-                showNotification('Error banning user.', true);
-            });
-    }
-
-
-    function removeBan(id) {
-        console.log(`Remove ban for user with ID: ${id}`);
-
-        fetch(`http://localhost:8088/removeBan`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userId: id
-            })
-        })
-            .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return response.json();
             })
             .then(data => {
-                console.log('Ban removed successfully:', data);
-                showNotification('Ban removed successfully');
+                console.log('User banned successfully:', data);
+                alert('User banned successfully');
                 searchUsers(currentPage, pageSize); // Refresh the user list
             })
             .catch(error => {
-                console.error('Error removing ban:', error);
-                showNotification('Error removing ban.', true);
+                console.error('Error banning user:', error);
             });
     }
+
 
     function createPagination(totalElements, currentPage, size) {
         const paginationContainer = document.getElementById('pagination');
