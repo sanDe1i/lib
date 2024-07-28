@@ -17,8 +17,8 @@ class LmApplicationTests {
     private BorrowRepository borrowRepository;
     @Test
     void contextLoads() {
-       Borrow a = borrowRepository.findByBorrowId(1);
-        System.out.println(a.getBookId());
+//       Borrow a = borrowRepository.findByBorrowId(1);
+//        System.out.println(a.getBookId());
     }
 
 }

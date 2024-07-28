@@ -101,7 +101,7 @@
 
     function viewBook(bookId) {
         console.log('View book with ID:', bookId);
-        const display = 1; // Adjust this based on your needs
+        const display = null; // Adjust this based on your needs
         if (display == null) {
             window.location.href = `/pdf?fileId=${encodeURIComponent(bookId)}`;
         } else {

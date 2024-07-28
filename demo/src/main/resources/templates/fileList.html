@@ -272,7 +272,7 @@
                             <div class="item-details">
                                 <img src="${sourceImage}" alt="${file.sourceType}" class="source-type-image">
                                 <div class="item-content">
-                                    <h3><strong>Title:</strong> <a href="bookDetail.html?id=${file.id}" target="_blank">${file.title}</a></h3>
+                                    <h3><strong>Title:</strong> <a href="/bookDetail?id=${file.id}" target="_blank">${file.title}</a></h3>
                                     <p><strong>Alternate Title:</strong> ${file.alternativeTitle}</p>
                                     <p><strong>Source Type:</strong> ${file.sourceType}</p>
                                     <p><strong>Authors:</strong> ${file.authors}</p>
@@ -308,9 +308,8 @@
         }
     }
 
-    function viewPDF(id, display) {
-        console.log('Display:', display)
-        if (display == null) {
+    function viewPDF(id, view) {
+        if (view == null) {
             window.location.href = `/pdf?fileId=${encodeURIComponent(id)}`;
         } else {
             fetch(`http://${API_BASE_URL}/downloadfiles/${encodeURIComponent(id)}`, { responseType: 'blob' })
