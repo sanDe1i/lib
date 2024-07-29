@@ -26,6 +26,9 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
 
     @Query("SELECT f FROM FileInfo f WHERE " +
             "(:title IS NULL OR f.title LIKE %:title%) " +
+            "AND (:isbn IS NULL OR f.isbn LIKE %:isbn%) " +
+            "AND (:alternativeTitle IS NULL OR f.alternativeTitle LIKE %:alternativeTitle%) " +
+            "AND (:author IS NULL OR f.authors LIKE %:author%) " +
             "AND (:status IS NULL OR f.status = :status) " +
             "AND (:publisher IS NULL OR f.publisher = :publisher) " +
             "AND (:sourceType IS NULL OR f.sourceType = :sourceType) " +
@@ -33,6 +36,9 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
             "AND (:published IS NULL OR f.published = :published) " +
             "AND (:databaseId IS NULL OR f.resourcesId = :databaseId)")
     List<FileInfo> searchBooks(@Param("title") String title,
+                               @Param("isbn") String isbn,
+                               @Param("alternativeTitle") String alternativeTitle,
+                               @Param("author") String author,
                                @Param("status") String status,
                                @Param("publisher") String publisher,
                                @Param("sourceType") String sourceType,

@@ -4,12 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="新接口下载能匹配bookid@(&quot;/downloadFromList/{bookId}&quot;)；更新功能：察看是否上传pdf">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_7_14_21_32_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_7_14_21_32__Changes_.xml" beforeDir="false" />
+    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改下拉选框及在线浏览">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_7_19_15_40_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_7_19_15_40__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/ListBookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/ListBookController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/MainController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/FileInfoDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/FileInfoDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Model/FileInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Model/FileInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/FileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/FileService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/searchresults.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/searchresults.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -109,7 +111,7 @@
       <workItem from="1719587289552" duration="24679000" />
       <workItem from="1720718923829" duration="17000" />
       <workItem from="1720719112378" duration="807000" />
-      <workItem from="1720870032459" duration="113680000" />
+      <workItem from="1720870032459" duration="129621000" />
     </task>
     <task id="LOCAL-00001" summary="拦截+搜索访问@GetMapping(&quot;test/search2&quot;)">
       <created>1720963712259</created>
@@ -146,7 +148,14 @@
       <option name="project" value="LOCAL" />
       <updated>1721555416390</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="修改下拉选框及在线浏览">
+      <created>1722052640819</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1722052640819</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -168,7 +177,8 @@
     <MESSAGE value="做了edit，访问@GetMapping(&quot;test/search2&quot;)" />
     <MESSAGE value="联调了databaseID，name，连接了资源库管理界面，等。性能暂不考虑。" />
     <MESSAGE value="新接口下载能匹配bookid@(&quot;/downloadFromList/{bookId}&quot;)；更新功能：察看是否上传pdf" />
-    <option name="LAST_COMMIT_MESSAGE" value="新接口下载能匹配bookid@(&quot;/downloadFromList/{bookId}&quot;)；更新功能：察看是否上传pdf" />
+    <MESSAGE value="修改下拉选框及在线浏览" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改下拉选框及在线浏览" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

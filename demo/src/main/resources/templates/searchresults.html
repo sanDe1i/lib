@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
     .table {
-      font-size: 10px; /* 调整表格字体大小 */
+      font-size: 12px; /* 调整表格字体大小 */
     }
     .btn-spacing {
       margin-right: 10px; /* 调整按钮之间的间距 */
@@ -17,21 +17,48 @@
 </head>
 <body>
 <div class="container mt-5">
+  <a href="/adminHome" class="btn btn-secondary mt-3">Back to Home</a>
+  <a href="/resourcesLib" class="btn btn-secondary mt-3">Back to Source Databases</a>
   <h1>Searching results</h1>
 
-  <!-- 显示搜索结果的条数 -->
   <div class="mb-4">
     <h2><span th:text="${resultCount}">0</span> results found</h2>
   </div>
 
-  <!-- 搜索表单 -->
+  <!-- 显示搜索结果的条数 -->
   <div class="mb-4">
-    <form action="/test/search2" method="get">
+    <form id="searchForm" action="/test/search2" method="get">
       <div class="form-group">
-        <label for="title">Title</label>
-        <input type="text" id="title" name="title" class="form-control" th:value="${title}">
+        <label for="searchType">Search By</label>
+        <select id="searchType" name="searchType" class="form-control" onchange="updateSearchField()">
+          <option value="title">Title</option>
+          <option value="isbn">ISBN</option>
+          <option value="alternativeTitle">Alternative Title</option>
+          <option value="author">Author</option>
+        </select>
       </div>
 
+      <div class="form-group" id="searchTitleGroup" style="display: none;">
+        <label for="searchTitle">Title</label>
+        <input type="text" id="searchTitle" class="form-control" placeholder="Enter title">
+      </div>
+
+      <div class="form-group" id="searchIsbnGroup" style="display: none;">
+        <label for="searchIsbn">ISBN</label>
+        <input type="text" id="searchIsbn" class="form-control" placeholder="Enter ISBN">
+      </div>
+
+      <div class="form-group" id="searchAlternativeTitleGroup" style="display: none;">
+        <label for="searchAlternativeTitle">Alternative Title</label>
+        <input type="text" id="searchAlternativeTitle" class="form-control" placeholder="Enter alternative title">
+      </div>
+
+      <div class="form-group" id="searchAuthorGroup" style="display: none;">
+        <label for="searchAuthor">Author</label>
+        <input type="text" id="searchAuthor" class="form-control" placeholder="Enter author">
+      </div>
+
+      <!-- Existing form groups for other filters -->
       <div class="form-group">
         <label for="publisher">Publisher</label>
         <select id="publisher" name="publisher" class="form-control">
@@ -92,59 +119,110 @@
         </select>
       </div>
 
+      <!-- Hidden field to store search value -->
+      <input type="hidden" id="searchValue" name="searchValue">
+
       <button type="submit" class="btn btn-primary">Search</button>
     </form>
   </div>
 
+  <script>
+    function updateSearchField() {
+      var searchType = document.getElementById('searchType').value;
+      var searchTitleGroup = document.getElementById('searchTitleGroup');
+      var searchIsbnGroup = document.getElementById('searchIsbnGroup');
+      var searchAlternativeTitleGroup = document.getElementById('searchAlternativeTitleGroup');
+      var searchAuthorGroup = document.getElementById('searchAuthorGroup');
 
+      // Hide all search fields
+      searchTitleGroup.style.display = 'none';
+      searchIsbnGroup.style.display = 'none';
+      searchAlternativeTitleGroup.style.display = 'none';
+      searchAuthorGroup.style.display = 'none';
+
+      // Show the selected search field
+      if (searchType === 'title') {
+        searchTitleGroup.style.display = 'block';
+      } else if (searchType === 'isbn') {
+        searchIsbnGroup.style.display = 'block';
+      } else if (searchType === 'alternativeTitle') {
+        searchAlternativeTitleGroup.style.display = 'block';
+      }else if (searchType === 'author') {
+        searchAuthorGroup.style.display = 'block';
+      }
+    }
+
+    document.getElementById('searchForm').addEventListener('submit', function (event) {
+      var searchType = document.getElementById('searchType').value;
+      var searchValueInput = document.getElementById('searchValue');
+      var searchTitle = document.getElementById('searchTitle');
+      var searchIsbn = document.getElementById('searchIsbn');
+      var searchAlternativeTitle = document.getElementById('searchAlternativeTitle');
+      var searchAuthor = document.getElementById('searchAuthor');
+
+      // Set the value for searchValue based on the selected searchType
+      if (searchType === 'title') {
+        searchValueInput.value = searchTitle.value;
+      } else if (searchType === 'isbn') {
+        searchValueInput.value = searchIsbn.value;
+      } else if (searchType === 'alternativeTitle') {
+        searchValueInput.value = searchAlternativeTitle.value;
+      }else if (searchType === 'author') {
+        searchValueInput.value = searchAuthor.value;
+      }
+    });
+
+    // Initialize the form to show the correct field based on the current search type
+    updateSearchField();
+  </script>
+
+
+
+  <style>
+    .table-responsive {
+      overflow-x: auto;
+    }
+  </style>
   <!-- 搜索结果表格 -->
+  <div class="table-responsive">
   <table class="table table-striped">
     <thead>
     <tr>
+      <th>ISBN</th>
       <th>Title</th>
       <th>Alternate Title</th>
-      <th>Source Type</th>
       <th>Authors</th>
-      <th>ISBN</th>
       <th>Publisher</th>
       <th>Published</th>
-      <th>Status</th>
-      <th>Database</th>
-      <th>Loan</th>
-      <th>Loaned</th>
-      <th>Downloadable</th>
-      <th>Viewable</th>
+      <th>Source Type</th>
       <th>Pdf</th>
+      <th>Database</th>
+      <th>Status</th>
+      <th>View Online</th>
+      <th>Download</th>
+      <th>Borrow</th>
+      <th>Loan Status</th>
       <th>Operate</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="book : ${books}">
+      <td th:text="${book.isbn}">ISBN</td>
       <td th:text="${book.title}">Title</td>
       <td th:text="${book.alternativeTitle}">Alternative Title</td>
-      <td th:text="${book.sourceType}">Source Type</td>
       <td th:text="${book.author}">Author</td>
-      <td th:text="${book.isbn}">ISBN</td>
       <td th:text="${book.publisher}">Publisher</td>
       <td th:text="${book.published}">Published</td>
+      <td th:text="${book.sourceType}">Source Type</td>
+      <td>
+        <a th:if="${book.downloadLink != null && !book.downloadLink.isEmpty()}" th:href="@{/downloadfiles/{bookId}(bookId=${book.id})}">Download</a>
+        <span th:if="${book.downloadLink == null || book.downloadLink.isEmpty()}">Not available</span>
+      </td>
+      <td th:text="${book.resourcesId}">Resources ID</td>
       <td>
         <span th:text="${book.status}">Status</span>
         <button class="btn btn-link edit-button"
                 th:attr="data-id=${book.id}, data-type='status', data-value=${book.status}"
-                onclick="showEditModal(this)">edit</button>
-      </td>
-      <td th:text="${book.resourcesId}">Resources ID</td>
-      <td>
-        <span th:text="${book.loanLabel}">Loan Label</span>
-        <button class="btn btn-link edit-button"
-                th:attr="data-id=${book.id}, data-type='loan', data-value=${book.loanLabel}"
-                onclick="showEditModal(this)">edit</button>
-      </td>
-      <td th:text="${book.loaned}">Loaned</td>
-      <td>
-        <span th:text="${book.download}">Download</span>
-        <button class="btn btn-link edit-button"
-                th:attr="data-id=${book.id}, data-type='download', data-value=${book.download}"
                 onclick="showEditModal(this)">edit</button>
       </td>
       <td>
@@ -154,9 +232,18 @@
                 onclick="showEditModal(this)">edit</button>
       </td>
       <td>
-        <a th:if="${book.downloadLink != null && !book.downloadLink.isEmpty()}" th:href="@{/downloadfiles/{bookId}(bookId=${book.id})}">Download</a>
-        <span th:if="${book.downloadLink == null || book.downloadLink.isEmpty()}">Not available</span>
+        <span th:text="${book.download}">Download</span>
+        <button class="btn btn-link edit-button"
+                th:attr="data-id=${book.id}, data-type='download', data-value=${book.download}"
+                onclick="showEditModal(this)">edit</button>
       </td>
+      <td>
+        <span th:text="${book.loanLabel}">Loan Label</span>
+        <button class="btn btn-link edit-button"
+                th:attr="data-id=${book.id}, data-type='loan', data-value=${book.loanLabel}"
+                onclick="showEditModal(this)">edit</button>
+      </td>
+      <td th:text="${book.loaned}">Loaned</td>
       <td>
         <form th:action="@{/test/deleteList/{fileID}(fileID=${book.id})}" method="post" style="display:inline;">
           <input type="hidden" name="title" th:value="${title}">
@@ -182,6 +269,7 @@
     </tr>
     </tbody>
   </table>
+  </div>
 
   <!-- 返回搜索页面的链接 -->
   <a href="/test/searchPage" class="btn btn-secondary mt-3">返回搜索页面</a>
@@ -230,11 +318,11 @@
       select.empty();  // Clear existing options
 
       if (type === 'status') {
-        select.append('<option value="published">Published</option>');
-        select.append('<option value="hide">Hide</option>');
+        select.append('<option value="Published">Published</option>');
+        select.append('<option value="Unpublished">Unpublished</option>');
       } else {
-        select.append('<option value="true">True</option>');
-        select.append('<option value="false">False</option>');
+        select.append('<option value="Enable">Enable</option>');
+        select.append('<option value="Disable">Disable</option>');
       }
 
       select.val(value);  // Set the current value

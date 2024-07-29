@@ -136,7 +136,8 @@ public class ListBookController {
 //    }
 
     @GetMapping("test/search2")
-    public String searchBooks(@RequestParam(required = false) String title,
+    public String searchBooks(@RequestParam(required = false) String searchValue,
+                              @RequestParam(required = false) String searchType,
                               @RequestParam(required = false) String publisher,
                               @RequestParam(required = false) String sourceType,
                               @RequestParam(required = false) String language,
@@ -144,7 +145,24 @@ public class ListBookController {
                               @RequestParam(required = false) String status,
                               @RequestParam(required = false) Integer databaseId,
                               Model model) {
-        List<FileInfo> fileInfos = fileService.searchBooks(title, status, publisher, sourceType, language, published, databaseId);
+
+        String title = null;
+        String isbn = null;
+        String alternativeTitle = null;
+        String author = null;
+
+        if ("title".equals(searchType)) {
+            title = searchValue;
+        } else if ("isbn".equals(searchType)) {
+            isbn = searchValue;
+        } else if ("alternativeTitle".equals(searchType)) {
+            alternativeTitle = searchValue;
+        }else if ("author".equals(searchType)) {
+            author = searchValue;
+        }
+        List<FileInfo> fileInfos = fileService.searchBooks(title, isbn, alternativeTitle, author, status, publisher, sourceType, language, published, databaseId);
+
+        //List<FileInfo> fileInfos = fileService.searchBooks(title, status, publisher, sourceType, language, published, databaseId);
 
         // Collect all resource IDs
         Set<Integer> resourceIds = fileInfos.stream()

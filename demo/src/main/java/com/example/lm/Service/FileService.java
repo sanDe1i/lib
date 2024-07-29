@@ -474,18 +474,21 @@ public class FileService {
         }
     }
 
-    public List<FileInfo> searchBooks(String title, String status, String publisher,
-                                      String sourceType, String language, String published,
-                                      Integer databaseId) {
+    public List<FileInfo> searchBooks(String title, String isbn, String alternativeTitle, String author,
+                                      String status, String publisher, String sourceType,
+                                      String language, String published, Integer databaseId) {
         // 处理空字符串，将其转换为 null
         title = (title != null && title.isEmpty()) ? null : title;
+        isbn = (isbn != null && isbn.isEmpty()) ? null : isbn;
+        alternativeTitle = (alternativeTitle != null && alternativeTitle.isEmpty()) ? null : alternativeTitle;
+        author = (author != null && author.isEmpty()) ? null : author;
         status = (status != null && status.isEmpty()) ? null : status;
         publisher = (publisher != null && publisher.isEmpty()) ? null : publisher;
         sourceType = (sourceType != null && sourceType.isEmpty()) ? null : sourceType;
         language = (language != null && language.isEmpty()) ? null : language;
         published = (published != null && published.isEmpty()) ? null : published;
 
-        return fileInfoDao.searchBooks(title, status, publisher, sourceType, language, published, databaseId);
+        return fileInfoDao.searchBooks(title, isbn, alternativeTitle, author, status, publisher, sourceType, language, published, databaseId);
     }
 
     public FileInfo getBookById(Integer id) {

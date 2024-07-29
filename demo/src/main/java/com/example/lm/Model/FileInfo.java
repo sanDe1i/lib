@@ -94,19 +94,6 @@ public class FileInfo {
     @Column(name = "downloadLink")
     private String downloadLink;
 
-
-
-//    @Column(name = "downloadable")
-//    private boolean downloadable;
-
-//    public boolean isDownloadable() {
-//        return downloadable;
-//    }
-//
-//    public void setDownloadable(boolean downloadable) {
-//        this.downloadable = downloadable;
-//    }
-
     public String getDownloadLink() {
         return downloadLink;
     }
