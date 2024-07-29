@@ -10,20 +10,25 @@
             background-color: #f8f9fa;
             padding-top: 20px;
         }
+
         .container {
             margin-top: 50px;
         }
+
         .card {
             margin-bottom: 20px;
             border-color: #007bff;
         }
+
         .card-header {
             background-color: #007bff;
             color: white;
         }
+
         .card-body {
             background-color: #ffffff;
         }
+
         .view-button {
             margin-top: 10px;
         }
@@ -89,10 +94,18 @@
                 viewBook(book.bookId);
             });
 
+            const returnButton = document.createElement('button');
+            returnButton.className = 'btn btn-primary view-button';
+            returnButton.textContent = 'Return';
+            returnButton.addEventListener('click', () => {
+                returnBook(book.bookId);
+            });
+
             cardBody.appendChild(bookId);
             cardBody.appendChild(loanStartTime);
             cardBody.appendChild(loanEndTime);
             cardBody.appendChild(viewButton);
+            cardBody.appendChild(returnButton);
             card.appendChild(cardHeader);
             card.appendChild(cardBody);
             container.appendChild(card);
@@ -105,7 +118,7 @@
         if (display == null) {
             window.location.href = `/pdf?fileId=${encodeURIComponent(bookId)}`;
         } else {
-            fetch(`http://8.130.130.240:8088/downloadfiles/${encodeURIComponent(bookId)}`, { responseType: 'blob' })
+            fetch(`http://8.130.130.240:8088/downloadfiles/${encodeURIComponent(bookId)}`, {responseType: 'blob'})
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -120,6 +133,28 @@
                     console.error('Error downloading book:', error);
                 });
         }
+    }
+
+    function returnBook(bookId) {
+        let data = new URLSearchParams();
+        data.append('bookId', bookId);
+        fetch("/returnBook", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: data
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                alert('Operation successful');
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Operation failed');
+            });
+
     }
 
     document.addEventListener('DOMContentLoaded', () => {

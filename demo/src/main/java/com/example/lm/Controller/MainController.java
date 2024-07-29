@@ -215,7 +215,7 @@ public class MainController {
     public ResponseEntity<?> cancelBorrowBooks(@RequestParam("folderId") int libId) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
-            pdf.setLoanLabel("no");
+            pdf.setBorrowPeriod(0);
             fileService.savePDF(pdf);
         }
         return ResponseEntity.ok(list);
@@ -225,18 +225,24 @@ public class MainController {
     public ResponseEntity<?> ableBorrowBooks(@RequestParam("folderId") int libId, @RequestParam("borrow_period") int period) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
-            pdf.setLoanLabel("yes");
             pdf.setBorrowPeriod(period);
             fileService.savePDF(pdf);
         }
         return ResponseEntity.ok(list);
     }
 
-    @PostMapping("/ableBorrowForSingleBook")
+    @PostMapping("/returnBook")
+    public ResponseEntity<?> returnBook(@RequestParam("bookId") int bookId) {
+        FileInfo pdf = fileService.getFileById(bookId);
+        pdf.setLoanLabel("Returned");
+        fileService.savePDF(pdf);
+        return ResponseEntity.ok(pdf);
+    }
+
+    @PostMapping("/borrowBook")
     public ResponseEntity<?> ableBorrowForBooks(@RequestParam("bookID") int bookID, @RequestParam("borrow_period") int period) {
         FileInfo pdf = fileService.getFileById(bookID);
-        pdf.setLoanLabel("yes");
-        pdf.setStatus("Borrowed");
+        pdf.setLoanLabel("Borrowed");
         pdf.setBorrowPeriod(period);
         fileService.savePDF(pdf);
         Borrow borrow = new Borrow();
@@ -318,6 +324,11 @@ public class MainController {
         }
 
         return new SearchResult<>(files.getContent(), files.getTotalElements());
+    }
+
+    @GetMapping("/getBookPeriod")
+    public ResponseEntity<?> getBookPeriod(@RequestParam("bookID") int bookId) {
+       return ResponseEntity.ok(fileService.getBookPeriod(bookId));
     }
 
     @GetMapping("/book/{id}")

@@ -511,6 +511,9 @@ public class FileService {
         return borrowRepository.findByBookId(bookId).isPresent();
     }
 
-
+    public int getBookPeriod(int bookId) {
+        FileInfo fl = fileInfoDao.findById(bookId);
+        return fl.getBorrowPeriod();
+    }
 
 }
