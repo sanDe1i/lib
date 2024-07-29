@@ -63,6 +63,7 @@ public class test {
                         List<String> subfieldDataList = subfieldEntry.getValue();
                         System.out.println("  Subfield " + subfieldCode + ": " + String.join("; ", subfieldDataList));
                     }
+
                 }
             }
         } catch (Exception e) {

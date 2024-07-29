@@ -237,7 +237,7 @@
         'Academic Journal': '../static/images/book.png',
     };
 
-    const API_BASE_URL = "8.130.130.240:8088";
+    const API_BASE_URL = "localhost:8088";
     let currentPage = 1;
     const pageSize = 5;
     let filters = {};
@@ -420,31 +420,52 @@
         button.parentNode.appendChild(downloadOptions);
     }
 
-    function borrowBook(id) {
-        let data = new URLSearchParams();
-        data.append('bookID', id);
-        data.append('borrow_period', '7'); // 固定借阅天数为7天
+    async function borrowBook(id) {
+        try {
+            // Construct the URL with the book ID parameter
+            let periodUrl = `/getBookPeriod?bookID=${id}`;
 
-        fetch("/ableBorrowForSingleBook", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: data
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                alert('Operation successful');
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                alert('Operation failed');
+            // Fetch the borrow period
+            let periodResponse = await fetch(periodUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
             });
+
+            if (!periodResponse.ok) {
+                throw new Error('Failed to fetch borrow period');
+            }
+
+            let borrowPeriodText = await periodResponse.text();
+            let borrowPeriod = parseInt(borrowPeriodText, 10); // 将文本转换为整数
+
+            // Prepare the data for borrowing the book
+            let data = new URLSearchParams();
+            data.append('bookID', id);
+            data.append('borrow_period', borrowPeriod); // 使用获取的借阅时间
+
+            // Borrow the book
+            let borrowResponse = await fetch("/borrowBook", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: data
+            });
+
+            if (!borrowResponse.ok) {
+                throw new Error('Failed to borrow book');
+            }
+
+            let borrowData = await borrowResponse.json();
+            console.log('Success:', borrowData);
+            alert('Operation successful');
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Operation failed');
+        }
     }
-
-
-
 
     function toggleList(header) {
         const list = header.nextElementSibling;
