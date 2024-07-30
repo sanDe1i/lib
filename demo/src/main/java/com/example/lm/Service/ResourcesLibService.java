@@ -71,4 +71,13 @@ public class ResourcesLibService {
         List<ResourcesLib> resourcesLibs = resourcesLibDao.findByIdIn(ids);
         return resourcesLibs.stream().collect(Collectors.toMap(ResourcesLib::getId, Function.identity()));
     }
+
+    public void updateFolderDetails(int folderId, String newName, String newAlternateNames, String newType, String newDescription) {
+        ResourcesLib folder = resourcesLibDao.findById(folderId).orElseThrow(() -> new IllegalArgumentException("Invalid folder ID"));
+        folder.setName(newName);
+        folder.setAlternateName(newAlternateNames);
+        folder.setType(newType);
+        folder.setDescription(newDescription);
+        resourcesLibDao.save(folder);
+    }
 }

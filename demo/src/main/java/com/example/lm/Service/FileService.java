@@ -7,6 +7,7 @@ import com.example.lm.Dao.PDFDao;
 import com.example.lm.Model.File;
 import com.example.lm.Model.FileInfo;
 import com.example.lm.Model.PDFs;
+import com.example.lm.Model.ResourcesLib;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -250,7 +251,10 @@ public class FileService {
                 fileInfo.setDescription(getFieldData(record, "520", 'a'));
                 fileInfo.setChapters(getFieldData(record, "505", 'a'));
                 fileInfo.setResourcesId(folderId);
-                fileInfo.setStatus("Hide");
+                fileInfo.setStatus("Unpublished");
+                fileInfo.setView("Disable");
+                fileInfo.setDownload("Disable");
+                fileInfo.setBorrowPeriod(0);
                 fileInfoDao.save(fileInfo);
             }
         } catch (Exception e) {
@@ -300,10 +304,16 @@ public class FileService {
         StringBuilder data = new StringBuilder();
 
         for (String fieldNum : fieldNums) {
-            data.append(getFieldData(record, fieldNum, subfieldCodes));
+            String fieldData = getFieldData(record, fieldNum, subfieldCodes);
+            if (fieldNums.length == 2 && fieldNums[0].equals("264") && fieldNums[1].equals("260") && subfieldCodes.length == 1 && subfieldCodes[0] == 'c') {
+                // 只保留数字
+                fieldData = fieldData.replaceAll("[^0-9]", "");
+            }
+            data.append(fieldData);
         }
         return data.toString();
     }
+
 
     public List<File> getPDFsByLib(int resourcesID) {
         return fileDao.findFilenamesByResourcesId(resourcesID);
@@ -518,5 +528,6 @@ public class FileService {
         FileInfo fl = fileInfoDao.findById(bookId);
         return fl.getBorrowPeriod();
     }
+
 
 }
