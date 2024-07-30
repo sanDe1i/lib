@@ -106,7 +106,6 @@ public class MainController {
             @RequestParam("files") List<MultipartFile> pdfFiles,
             RedirectAttributes redirectAttributes) throws IOException {
 
-        // Your logic to handle the request
         ResourcesLib resourcesLib = new ResourcesLib();
         resourcesLib.setName(databaseName);
         resourcesLib.setAlternateName(alternateNames);
@@ -126,9 +125,19 @@ public class MainController {
 
 
     @PostMapping("/rename-folder")
-    public String renameFolder(@RequestParam("folderId") int folderId, @RequestParam String newName) {
-        resourcesLibService.renameFolder(folderId, newName);
-        return "redirect:/resourcesLib";
+    @ResponseBody
+    public String renameFolder(@RequestParam("folderId") int folderId,
+                               @RequestParam("newName") String newName,
+                               @RequestParam("newAlternateNames") String newAlternateNames,
+                               @RequestParam("newType") String newType,
+                               @RequestParam("newDescription") String newDescription,
+                               Model model) {
+        try {
+            resourcesLibService.updateFolderDetails(folderId, newName, newAlternateNames, newType, newDescription);
+            return "redirect:/resourcesLib";
+        } catch (Exception e) {
+            return "Error updating folder details: " + e.getMessage();
+        }
     }
 
     @PostMapping("/uploadMARC")
@@ -151,7 +160,7 @@ public class MainController {
     public ResponseEntity<?> hideBooks(@RequestParam("folderId") int libId) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
-            pdf.setStatus("Hide");
+            pdf.setStatus("Unpublished");
             fileService.savePDF(pdf);
         }
         return ResponseEntity.ok(list);
@@ -171,7 +180,7 @@ public class MainController {
     public ResponseEntity<?> cancelViewBooks(@RequestParam("folderId") int libId) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
-            pdf.setView("Hide");
+            pdf.setView("Disable");
             fileService.savePDF(pdf);
         }
         return ResponseEntity.ok(list);
@@ -181,7 +190,7 @@ public class MainController {
     public ResponseEntity<?> ableViewBooks(@RequestParam("folderId") int libId) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
-            pdf.setView("View");
+            pdf.setView("Enable");
             fileService.savePDF(pdf);
         }
         return ResponseEntity.ok(list);
@@ -206,7 +215,7 @@ public class MainController {
     public ResponseEntity<?> ableDownloadBooks(@RequestParam("folderId") int libId) {
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
-            pdf.setDownload("Able");
+            pdf.setDownload("Enable");
             fileService.savePDF(pdf);
         }
         return ResponseEntity.ok(list);
