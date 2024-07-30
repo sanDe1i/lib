@@ -14,56 +14,137 @@
     <link rel="stylesheet" href="../static/vendor/jquery-scrollbar/css/jquery-scrollbar.css">
     <link type="text/css" href="../static/vendor/highlight/css/highlight.min.css" rel="stylesheet">
     <link type="text/css" href="../static/css/demo.css" rel="stylesheet">
+    <style>
+        .table-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        table {
+            width: 80%;
+            color: #212529;
+        }
+
+        th, td {
+            padding: 0.5rem;
+            text-align: center;
+            vertical-align: middle;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            font-size: 0.875rem;
+        }
+
+        .modal-header, .modal-footer {
+            border-bottom: none;
+            border-top: none;
+        }
+    </style>
 </head>
 <body>
-<main class="main">
-    <section class="content">
-        <div class="content-inner content-docs">
-            <div class="container">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3 id="metadata">Source Databases</h3>
-                    <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addFolderModal">Add Databases</button>
-                </div>
-                <div class="code-example">
-                    <div class="row" th:each="folder : ${folders}">
-                        <div class="col-lg-12 mb-4">
-                            <div class="card p-4">
-                                <div class="card-body">
-                                    <h5 class="heading heading-5 strong-600" th:text="${folder.name}">Folder Title</h5>
-                                    <h6 class="text-muted mb-4" th:text="${folder.alternateName}">Folder AlternateName</h6>
-                                    <p class="card-text" th:text="${folder.description}">Folder Description</p>
-                                    <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#renameFolderModal" th:attr="data-id=${folder.id}">Edit Databases details</a>
-                                    <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#uploadMarcModal" th:attr="data-id=${folder.id}">Upload Marc</a>
-                                    <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#uploadPdfModal" th:attr="data-id=${folder.id}">Upload PDF</a>
-                                    <a th:href="@{/test/search2(databaseId=${folder.id})}" class="btn btn-sm btn-primary">Edit Book Info</a>
-                                    <a th:href="@{/table(folderId=${folder.id})}" class="btn btn-sm btn-primary edit-marc-info">Edit Marc Info</a>
-
-                                    <!-- New Buttons -->
-                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'hideBook\', ' + ${folder.id} + ')'">Hide Books</button>
-                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'showBook\', ' + ${folder.id} + ')'">Show Books</button>
-                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'cancelView\', ' + ${folder.id} + ')'">Cancel View</button>
-                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'ableView\', ' + ${folder.id} + ')'">Enable View</button>
-                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'cancelDownload\', ' + ${folder.id} + ')'">Disable Download</button>
-                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'ableDownload\', ' + ${folder.id} + ')'">Enable Download</button>
-                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'cancelBorrow\', ' + ${folder.id} + ')'">Disable Borrow</button>
-                                    <button class="btn btn-sm btn-primary" th:onclick="'performAction(\'ableBorrow\', ' + ${folder.id} + ')'">Enable Borrow</button>
-
-                                    <div th:if="${invalidFiles != null and folderIdWithInvalidFiles != null and folderIdWithInvalidFiles == folder.id}">
-                                        <h6 class="text-danger">Invalid Files:</h6>
-                                        <ul>
-                                            <li th:each="file : ${invalidFiles}" th:text="${file}"></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
+<div class="container mt-5">
+    <h3 id="metadata" class="text-center">Source Databases</h3>
+    <button class="btn btn-sm btn-primary mb-3" data-toggle="modal" data-target="#addFolderModal">Add Databases</button>
+    <div class="table-container">
+        <table class="table">
+            <thead class="thead-light">
+            <tr>
+                <th>Database Name</th>
+                <th>Alternate Names</th>
+                <th>Description</th>
+                <th>Titles</th>
+                <th>PDFs</th>
+                <th>EPUBs</th>
+                <th>Edit Database</th>
+                <th>Edit Titles</th>
+                <th>Upload New</th>
+                <th>Status</th>
+                <th>View Online</th>
+                <th>Download</th>
+                <th>Borrow</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="folder : ${folders}">
+                <td th:text="${folder.name}">Database Name</td>
+                <td th:text="${folder.alternateName}">Alternate Names</td>
+                <td th:text="${folder.description}">Description</td>
+                <td>
+                    <a th:href="@{/test/search2(databaseId=${folder.id})}" class="btn btn-sm btn-primary">Edit
+                        Book Info</a>
+                </td>
+                <td></td>
+                <td></td>
+                <td><a href="#" class="btn btn-sm btn-primary" data-toggle="modal"
+                       data-target="#renameFolderModal" th:attr="data-id=${folder.id}">Edit Details</a></td>
+                <td>
+                    <a th:href="@{/table(folderId=${folder.id})}"
+                       class="btn btn-sm btn-primary edit-marc-info">Edit Marc Info</a>
+                </td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-primary" data-toggle="modal"
+                       data-target="#uploadMarcModal" th:attr="data-id=${folder.id}">Upload Marc</a>
+                    <a href="#" class="btn btn-sm btn-primary" data-toggle="modal"
+                       data-target="#uploadPdfModal" th:attr="data-id=${folder.id}">Upload PDF</a>
+                    <div th:if="${invalidFiles != null and folderIdWithInvalidFiles != null and folderIdWithInvalidFiles == folder.id}">
+                        <h6 class="text-danger">Invalid Files:</h6>
+                        <ul>
+                            <li th:each="file : ${invalidFiles}" th:text="${file}"></li>
+                        </ul>
+                    </div>
+                </td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="statusDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Status
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="statusDropdown">
+                            <a class="dropdown-item" th:onclick="'performAction(\'hideBook\', ' + ${folder.id} + ')'">Unpublished</a>
+                            <a class="dropdown-item" th:onclick="'performAction(\'showBook\', ' + ${folder.id} + ')'">Published</a>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
-</main>
-
+                </td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="viewOnlineDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            View Online
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="viewOnlineDropdown">
+                            <a class="dropdown-item" th:onclick="'performAction(\'cancelView\', ' + ${folder.id} + ')'">Disable</a>
+                            <a class="dropdown-item" th:onclick="'performAction(\'ableView\', ' + ${folder.id} + ')'">Enable</a>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="downloadDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Download
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="downloadDropdown">
+                            <a class="dropdown-item" th:onclick="'performAction(\'cancelDownload\', ' + ${folder.id} + ')'">Disable</a>
+                            <a class="dropdown-item" th:onclick="'performAction(\'ableDownload\', ' + ${folder.id} + ')'">Enable</a>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="borrowDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Borrow
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="borrowDropdown">
+                            <a class="dropdown-item" th:onclick="'performAction(\'cancelBorrow\', ' + ${folder.id} + ')'">Disable</a>
+                            <a class="dropdown-item" th:onclick="'performAction(\'ableBorrow\', ' + ${folder.id} + ')'">Enable</a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <!-- Add Folder Modal -->
 <div class="modal fade" id="addFolderModal" tabindex="-1" role="dialog" aria-labelledby="addFolderModalLabel" aria-hidden="true">
@@ -139,26 +220,44 @@
         <div class="modal-content">
             <form th:action="@{/rename-folder}" method="post">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="renameFolderModalLabel">Rename Folder</h5>
+                    <h5 class="modal-title" id="renameFolderModalLabel">Edit Folder Details</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="input-group1">
+                    <div class="form-group">
                         <label for="newFolderName">New Folder Name</label>
                         <input type="text" class="form-control" id="newFolderName" name="newName" required>
-                        <input type="hidden" id="renameFolderId" name="folderId">
                     </div>
+                    <div class="form-group">
+                        <label for="newAlternateNames">New Alternate Names</label>
+                        <input type="text" class="form-control" id="newAlternateNames" name="newAlternateNames" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newType">New Type</label>
+                        <select class="form-control" id="newType" name="newType" required>
+                            <option value="" disabled selected>Select a type</option>
+                            <option value="Digitized eBook">Digitized eBook</option>
+                            <option value="Raw eBook">Raw eBook</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="newDescription">New Description</label>
+                        <textarea class="form-control" id="newDescription" name="newDescription" required></textarea>
+                    </div>
+                    <input type="hidden" id="renameFolderId" name="folderId">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Rename Folder</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
 
 <!-- Upload Marc Modal -->
 <div class="modal fade" id="uploadMarcModal" tabindex="-1" role="dialog" aria-labelledby="uploadMarcModalLabel" aria-hidden="true">
@@ -243,9 +342,19 @@
         $('#renameFolderModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var folderId = button.data('id');
+            var folderName = button.data('name'); // Assuming data-name attribute contains the current folder name
+            var alternateNames = button.data('alternate-names'); // Assuming data-alternate-names attribute contains the current alternate names
+            var type = button.data('type'); // Assuming data-type attribute contains the current type
+            var description = button.data('description'); // Assuming data-description attribute contains the current description
             var modal = $(this);
+
             modal.find('#renameFolderId').val(folderId);
+            modal.find('#newFolderName').val(folderName);
+            modal.find('#newAlternateNames').val(alternateNames);
+            modal.find('#newType').val(type);
+            modal.find('#newDescription').val(description);
         });
+
 
         $('#uploadPdfModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
