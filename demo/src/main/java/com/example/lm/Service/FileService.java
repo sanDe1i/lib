@@ -610,5 +610,11 @@ public class FileService {
         return fl.getBorrowPeriod();
     }
 
+    public int getMarcNum(int folderId) {
+        return fileInfoDao.findByResourcesId(folderId).size();
+    }
 
+    public int getPDFNum(int folderId) {
+        return fileInfoDao.getPDFNum(folderId).size();
+    }
 }

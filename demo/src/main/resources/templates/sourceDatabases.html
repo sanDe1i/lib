@@ -45,8 +45,32 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h3 id="metadata" class="text-center">Source Databases</h3>
-    <button class="btn btn-sm btn-primary mb-3" data-toggle="modal" data-target="#addFolderModal">Add Databases</button>
+    <h3 id="metadata" class="text">Source Databases</h3>
+    <div class="row">
+        <div class="col">
+            <a href="/adminHome" class="btn btn-secondary mb-4">Back to Home</a>
+        </div>
+        <div class="col text-right">
+            <button class="btn btn-sm btn-primary mb-4" data-toggle="modal" data-target="#addFolderModal">Add Databases</button>
+        </div>
+    </div>
+    <!-- 搜索表单 -->
+    <form th:action="@{/search}" method="get" class="row mb-4">
+        <div class="col">
+            <input type="text" name="query" class="form-control" placeholder="Search by Database Name, Alternate Name, or Description">
+        </div>
+        <div class="col">
+            <select name="type" class="form-control">
+                <option value="" selected>All Types</option>
+                <option value="Digitized eBook">Digitized eBook</option>
+                <option value="Raw eBook">Raw eBook</option>
+                <option value="Others">Others</option>
+            </select>
+        </div>
+        <div class="col text-right">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
     <div class="table-container">
         <table class="table">
             <thead class="thead-light">
@@ -64,7 +88,7 @@
                 <th>View Online</th>
                 <th>Download</th>
                 <th>Borrow</th>
-                <th></th>
+                <th>Delete</th>
             </tr>
             </thead>
             <tbody>
@@ -73,13 +97,16 @@
                 <td th:text="${folder.alternateName}">Alternate Names</td>
                 <td th:text="${folder.description}">Description</td>
                 <td>
-                    <a th:href="@{/test/search2(databaseId=${folder.id})}" class="btn btn-sm btn-primary">Edit
-                        Book Info</a>
+                    <a th:href="@{/test/search2(databaseId=${folder.id})}" th:text="${folder.marcCount}">Marc Count</a>
                 </td>
+                <td th:text="${folder.pdfCount}">PDF Count</td>
                 <td></td>
-                <td></td>
-                <td><a href="#" class="btn btn-sm btn-primary" data-toggle="modal"
-                       data-target="#renameFolderModal" th:attr="data-id=${folder.id}">Edit Details</a></td>
+
+                <td><a class="btn btn-sm btn-primary" data-toggle="modal" data-target="#renameFolderModal"
+                       th:data-id="${folder.id}" th:data-name="${folder.name}" th:data-alternate-names="${folder.alternateName}"
+                       th:data-description="${folder.description}" th:data-type="${folder.type}">Edit Details</a>
+
+                </td>
                 <td>
                     <a th:href="@{/table(folderId=${folder.id})}"
                        class="btn btn-sm btn-primary edit-marc-info">Edit Marc Info</a>
@@ -140,6 +167,8 @@
                         </div>
                     </div>
                 </td>
+                <td><a th:href="@{/deleteFolder(folderId=${folder.id})}"
+                       class="btn btn-sm btn-danger edit-marc-info">Delete</a></td>
             </tr>
             </tbody>
         </table>
@@ -254,6 +283,7 @@
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
+
         </div>
     </div>
 </div>
@@ -342,18 +372,19 @@
         $('#renameFolderModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var folderId = button.data('id');
-            var folderName = button.data('name'); // Assuming data-name attribute contains the current folder name
-            var alternateNames = button.data('alternate-names'); // Assuming data-alternate-names attribute contains the current alternate names
-            var type = button.data('type'); // Assuming data-type attribute contains the current type
-            var description = button.data('description'); // Assuming data-description attribute contains the current description
-            var modal = $(this);
+            var folderName = button.data('name');
+            var alternateNames = button.data('alternate-names');
+            var description = button.data('description');
+            var type = button.data('type');
 
+            var modal = $(this);
             modal.find('#renameFolderId').val(folderId);
             modal.find('#newFolderName').val(folderName);
             modal.find('#newAlternateNames').val(alternateNames);
             modal.find('#newType').val(type);
             modal.find('#newDescription').val(description);
         });
+
 
 
         $('#uploadPdfModal').on('show.bs.modal', function (event) {
@@ -385,6 +416,7 @@
                 }
             });
         });
+
     });
 </script>
 <script>
@@ -436,6 +468,7 @@
             });
     }
 </script>
+
 
 </body>
 </html>

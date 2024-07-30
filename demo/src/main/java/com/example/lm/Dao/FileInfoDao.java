@@ -1,6 +1,7 @@
 package com.example.lm.Dao;
 
 import com.example.lm.Model.FileInfo;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -79,5 +80,11 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
 
     void deleteById(int id);
 
+    @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.downloadLink IS NOT NULL")
+    List<FileInfo> getPDFNum(int folderId);
 
+
+    @Modifying
+    @Transactional
+    void deleteFileInfoByResourcesId(int folderId);
 }

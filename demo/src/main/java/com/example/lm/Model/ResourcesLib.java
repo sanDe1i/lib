@@ -26,6 +26,10 @@ public class ResourcesLib {
     @Column(name="display")
     private String display;
 
+    @Column(name = "marc_count")
+    private int marcCount;
+    @Column(name = "pdf_count")
+    private int pdfCount;
     public int getId() {
         return id;
     }
@@ -72,6 +76,26 @@ public class ResourcesLib {
 
     public void setDisplay(String display) {
         this.display = display;
+    }
+
+    public String getDisplay() {
+        return display;
+    }
+
+    public int getMarcCount() {
+        return marcCount;
+    }
+
+    public void setMarcCount(int marcCount) {
+        this.marcCount = marcCount;
+    }
+
+    public int getPdfCount() {
+        return pdfCount;
+    }
+
+    public void setPdfCount(int pdfCount) {
+        this.pdfCount = pdfCount;
     }
 }
 
