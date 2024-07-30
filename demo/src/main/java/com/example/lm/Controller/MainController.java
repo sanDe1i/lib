@@ -87,6 +87,10 @@ public class MainController {
         Map<Integer, List<File>> folderPDFMap = new HashMap<>();
         for (ResourcesLib folder : folders) {
             List<File> PDFs = fileService.getPDFsByLib(folder.getId());
+            int marcCount = fileService.getMarcNum(folder.getId());
+            int pdfCount = fileService.getPDFNum(folder.getId());
+            folder.setMarcCount(marcCount);
+            folder.setPdfCount(pdfCount);
             folderPDFMap.put(folder.getId(), PDFs);
         }
         model.addAttribute("folders", folders);
@@ -126,11 +130,10 @@ public class MainController {
     @PostMapping("/rename-folder")
     @ResponseBody
     public String renameFolder(@RequestParam("folderId") int folderId,
-                               @RequestParam("newName") String newName,
-                               @RequestParam("newAlternateNames") String newAlternateNames,
-                               @RequestParam("newType") String newType,
-                               @RequestParam("newDescription") String newDescription,
-                               Model model) {
+                               @RequestParam(value = "newName", required = false) String newName,
+                               @RequestParam(value = "newAlternateNames", required = false) String newAlternateNames,
+                               @RequestParam(value = "newType", required = false) String newType,
+                               @RequestParam(value = "newDescription", required = false) String newDescription) {
         try {
             resourcesLibService.updateFolderDetails(folderId, newName, newAlternateNames, newType, newDescription);
             return "redirect:/resourcesLib";
@@ -505,6 +508,43 @@ public class MainController {
         return "pdf";  // 返回 pdf.html 视图
     }
 
+    @GetMapping("/getMarcNum")
+    public ResponseEntity<?> checkNumOfMarc(@RequestParam("folderId") int folderId) {
+        int numOfMarc = fileService.getMarcNum(folderId);
+        return ResponseEntity.ok(numOfMarc);
+    }
 
+    @GetMapping("/getPDFNum")
+    public ResponseEntity<?> checkNumOfPDF(@RequestParam("folderId") int folderId) {
+        int pdfNum = fileService.getPDFNum(folderId);
+        return ResponseEntity.ok(pdfNum);
+    }
+
+
+    @GetMapping("/deleteFolder")
+    public String deleteFolder(@RequestParam("folderId") int folderId) {
+        resourcesLibService.deleteFolder(folderId);
+        return "redirect:/resourcesLib";
+    }
+
+    @GetMapping("/search")
+    public String search(@RequestParam(name = "query", required = false, defaultValue = "") String query,
+                         @RequestParam(name = "type", required = false, defaultValue = "") String type,
+                         Model model) {
+        List<ResourcesLib> folders = resourcesLibService.searchFolders(query, type);
+        Map<Integer, List<File>> folderPDFMap = new HashMap<>();
+        for (ResourcesLib folder : folders) {
+            List<File> PDFs = fileService.getPDFsByLib(folder.getId());
+            int marcCount = fileService.getMarcNum(folder.getId());
+            int pdfCount = fileService.getPDFNum(folder.getId());
+            folder.setMarcCount(marcCount);
+            folder.setPdfCount(pdfCount);
+            folderPDFMap.put(folder.getId(), PDFs);
+        }
+        model.addAttribute("folders", folders);
+        model.addAttribute("folderPDFMap", folderPDFMap);
+        model.addAttribute("folders", folders);
+        return "sourceDatabases"; // 返回的模板名称
+    }
 }
 

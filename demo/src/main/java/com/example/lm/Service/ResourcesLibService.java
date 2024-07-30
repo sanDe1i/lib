@@ -1,10 +1,10 @@
 package com.example.lm.Service;
 
+import com.example.lm.Dao.FileInfoDao;
 import com.example.lm.Dao.ResourcesLibDao;
 import com.example.lm.Model.ResourcesLib;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +16,9 @@ import java.util.stream.Collectors;
 public class ResourcesLibService {
     @Autowired
     private ResourcesLibDao resourcesLibDao;
+
+    @Autowired
+    private FileInfoDao fileInfoDao;
 
     /**
      *
@@ -74,10 +77,33 @@ public class ResourcesLibService {
 
     public void updateFolderDetails(int folderId, String newName, String newAlternateNames, String newType, String newDescription) {
         ResourcesLib folder = resourcesLibDao.findById(folderId).orElseThrow(() -> new IllegalArgumentException("Invalid folder ID"));
-        folder.setName(newName);
-        folder.setAlternateName(newAlternateNames);
-        folder.setType(newType);
-        folder.setDescription(newDescription);
+        if (newName != null && !newName.isEmpty()) {
+            folder.setName(newName);
+        }
+        if (newAlternateNames != null && !newAlternateNames.isEmpty()) {
+            folder.setAlternateName(newAlternateNames);
+        }
+        if (newType != null && !newType.isEmpty()) {
+            folder.setType(newType);
+        }
+        if (newDescription != null && !newDescription.isEmpty()) {
+            folder.setDescription(newDescription);
+        }
+
         resourcesLibDao.save(folder);
+    }
+
+    public void deleteFolder(int folderId) {
+        resourcesLibDao.deleteResourcesLibById(folderId);
+        fileInfoDao.deleteFileInfoByResourcesId(folderId);
+    }
+
+    public List<ResourcesLib> searchFolders(String query, String type) {
+        if (type != null && !type.isEmpty()) {
+            return resourcesLibDao.searchResources(query, type);
+        } else {
+            return resourcesLibDao.findByNameContainingIgnoreCaseOrAlternateNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+                    query, query, query);
+        }
     }
 }
