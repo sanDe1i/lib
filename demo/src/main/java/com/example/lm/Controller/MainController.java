@@ -5,6 +5,7 @@ import com.example.lm.Service.BorrowService;
 import com.example.lm.Service.FileService;
 import com.example.lm.Service.ResourcesLibService;
 
+import com.example.lm.utils.FilterData;
 import com.example.lm.utils.SearchResult;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -282,49 +283,61 @@ public class MainController {
         return ResponseEntity.ok(marcDetails);
     }
 
-    @GetMapping("/keyword/{keyword}")
+    @PostMapping("/search")
     @ResponseBody
-    public SearchResult<FileInfo> getPDFByKeyword(@PathVariable String keyword,
-                                                  @RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page - 1, 5);
-        Page<FileInfo> files = fileService.keywordSearch(keyword, pageable);
-        System.out.println(page);
-        if (files.isEmpty()) {
-            System.out.println("No files found for the given keyword.");
-        } else {
-            files.forEach(file -> System.out.println("Found file: " + file.getId()));
+    public Map<String, Object> searchFiles(@RequestBody FilterData filterData) {
+        // 检查参数是否为 "undefined" 字符串并将其设为 null
+        if (filterData.getSeries() != null && filterData.getSeries().size() == 1 && "undefined".equals(filterData.getSeries().get(0))) {
+            filterData.setSeries(null);
+        }
+        if (filterData.getPublisher() != null && filterData.getPublisher().size() == 1 && "undefined".equals(filterData.getPublisher().get(0))) {
+            filterData.setPublisher(null);
+        }
+        if (filterData.getSubject() != null && filterData.getSubject().size() == 1 && "undefined".equals(filterData.getSubject().get(0))) {
+            filterData.setSubject(null);
+        }
+        if (filterData.getDatabase() != null && filterData.getDatabase().size() == 1 && "undefined".equals(filterData.getDatabase().get(0))) {
+            filterData.setDatabase(null);
         }
 
-        return new SearchResult<>(files.getContent(), files.getTotalElements());
+        Pageable pageable = PageRequest.of(filterData.getPage() - 1, filterData.getSize());
+        Page<FileInfo> files = fileService.advancedSearch(
+                filterData.getKeyword(),
+                filterData.getSeries(),
+                filterData.getPublisher(),
+                filterData.getSubject(),
+                filterData.getDatabase(),
+                filterData.getPublishedFrom(),
+                filterData.getPublishedTo(),
+                filterData.getPublishedYear(),
+                pageable
+        );
+        System.out.println("没有吗");
+        for (FileInfo file : files) {
+            System.out.println(file.getId());
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", files.getContent());
+        response.put("totalElements", files.getTotalElements());
+
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("keyword", filterData.getKeyword());
+        filters.put("series", filterData.getSeries());
+        filters.put("publisher", filterData.getPublisher());
+        filters.put("subject", filterData.getSubject());
+        filters.put("database", filterData.getDatabase());
+        filters.put("publishedFrom", filterData.getPublishedFrom());
+        filters.put("publishedTo", filterData.getPublishedTo());
+        filters.put("publishedYear", filterData.getPublishedYear());
+
+        response.put("filters", filters);
+
+        return response;
     }
 
-    @GetMapping("/keyword/test/{keyword}")
-    @ResponseBody
-    public SearchResult<FileInfo> searchFiles(
-            @PathVariable String keyword,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(required = false) String originalSource,
-            @RequestParam(required = false) String language) {
-        if ("undefined".equals(originalSource)) {
-            originalSource = null;
-        }
-        if ("undefined".equals(language)) {
-            language = null;
-        }
 
-        System.out.println("page: " + page);
 
-        Pageable pageable = PageRequest.of(page - 1, 5);
-        Page<FileInfo> files = fileService.keywordSearch(keyword, originalSource, language, pageable);
-        System.out.println(page);
-        if (files.isEmpty()) {
-            System.out.println("No files found for the given keyword.");
-        } else {
-            files.forEach(file -> System.out.println("Found file: " + file.getId()));
-        }
-
-        return new SearchResult<>(files.getContent(), files.getTotalElements());
-    }
 
     @GetMapping("/getBookPeriod")
     public ResponseEntity<?> getBookPeriod(@RequestParam("bookID") int bookId) {

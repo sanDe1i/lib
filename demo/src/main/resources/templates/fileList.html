@@ -169,6 +169,105 @@
         .footer button:hover {
             background-color: #0056b3;
         }
+        #results-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        #results-count {
+            flex: 1;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        #active-filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-badge {
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            background-color: #e0e0e0;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .filter-badge button {
+            background: none;
+            border: none;
+            margin-left: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #007bff;
+        }
+
+        .filter-badge button:hover {
+            text-decoration: underline;
+        }
+
+        .refine-section {
+            margin: 10px 0;
+        }
+
+        .refine-list {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .refine-list label {
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .refine-list input[type="number"] {
+            width: 80px;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        .refine-list button {
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .refine-section.active .refine-list {
+            display: block;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 10px; /* 按钮之间的间距 */
+            margin-top: 20px; /* 与上方内容的间距，可以根据需要调整 */
+        }
+
+        .button-container button {
+            width: auto; /* 根据需要调整按钮宽度 */
+        }
+
+        .button-container button[disabled] {
+            background-color: grey;
+            color: white;
+        }
+
+        .item-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* 元素之间的间距，可以根据需要调整 */
+        }
+
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -182,43 +281,104 @@
             <div class="refine-results">
                 <h2>Refine Results</h2>
                 <div class="refine-section">
-                    <h3 onclick="toggleList(this)">Source Types</h3>
+                    <h3 onclick="toggleList(this)">Series</h3>
                     <ul class="refine-list">
                         <li>
-                            <input type="checkbox" id="sourceType1" value="Digitized eBook" onclick="applyFilter('sourceType', this.value)">
-                            <label for="sourceType1">Digitized eBook</label>
+                            <input type="checkbox" id="series1" value="series1" onclick="applyFilter('series', this.value)">
+                            <label for="series1">Series 1</label>
                         </li>
                         <li>
-                            <input type="checkbox" id="sourceType2" value="Raw eBook" onclick="applyFilter('sourceType', this.value)">
-                            <label for="sourceType2">Raw eBook</label>
+                            <input type="checkbox" id="series2" value="series2" onclick="applyFilter('series', this.value)">
+                            <label for="series2">Series 2</label>
                         </li>
                         <li>
-                            <input type="checkbox" id="sourceType3" value="Others" onclick="applyFilter('sourceType', this.value)">
-                            <label for="sourceType3">Others</label>
+                            <input type="checkbox" id="series3" value="Others" onclick="applyFilter('series', this.value)">
+                            <label for="series3">Others</label>
                         </li>
                     </ul>
                 </div>
                 <div class="refine-section">
-                    <h3 onclick="toggleList(this)">Language</h3>
+                    <h3 onclick="toggleList(this)">Publisher</h3>
                     <ul class="refine-list">
                         <li>
-                            <input type="checkbox" id="language1" value="english" onclick="applyFilter('language', this.value)">
-                            <label for="language1">English</label>
+                            <input type="checkbox" id="publisher1" value="IGI Global" onclick="applyFilter('publisher', this.value)">
+                            <label for="publisher1">IGI Global</label>
                         </li>
                         <li>
-                            <input type="checkbox" id="language2" value="chinese" onclick="applyFilter('language', this.value)">
-                            <label for="language2">Chinese</label>
+                            <input type="checkbox" id="publisher2" value="IGI Global (701 E. Chocolate Avenue Hershey Pennsylvania 17033 USA)" onclick="applyFilter('publisher', this.value)">
+                            <label for="publisher2">IGI Global (701 E. Chocolate Avenue Hershey Pennsylvania 17033 USA)</label>
                         </li>
                         <li>
-                            <input type="checkbox" id="language3" value="Others" onclick="applyFilter('language', this.value)">
-                            <label for="language3">Others</label>
+                            <input type="checkbox" id="publisher3" value="Others" onclick="applyFilter('publisher', this.value)">
+                            <label for="publisher3">Others</label>
                         </li>
                     </ul>
                 </div>
+                <div class="refine-section">
+                    <h3 onclick="toggleList(this)">Year</h3>
+                    <div class="refine-list">
+                        <label>
+                            <input type="radio" name="yearType" value="range" checked onclick="toggleYearInputs(this.value)"> Range
+                        </label>
+                        <label>
+                            <input type="radio" name="yearType" value="single" onclick="toggleYearInputs(this.value)"> Single Year
+                        </label>
+                        <div id="rangeInputs">
+                            <input type="number" id="publishedFrom" placeholder="Year" min="1893" max="2024" step="1">
+                            <input type="number" id="publishedTo" placeholder="Year" min="1893" max="2024" step="1">
+                        </div>
+                        <div id="singleInput" style="display: none;">
+                            <label for="publishedYear">Year:</label>
+                            <input type="number" id="publishedYear" placeholder="Year" min="1893" max="2024" step="1">
+                        </div>
+                        <button onclick="applyPublishedFilter()">Apply</button>
+                        <button onclick="clearPublishedFilter()">Clear</button>
+                    </div>
+                </div>
+                <div class="refine-section">
+                    <h3 onclick="toggleList(this)">Subjects</h3>
+                    <ul class="refine-list">
+                        <li>
+                            <input type="checkbox" id="subject1" value="Government information Data protection Computer networks" onclick="applyFilter('subject', this.value)">
+                            <label for="subject1">Government information Data protection Computer networks</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="subject2" value="Network performance (Telecommunication) Big data." onclick="applyFilter('subject', this.value)">
+                            <label for="subject2">Network performance (Telecommunication) Big data.</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="subject3" value="Others" onclick="applyFilter('subject', this.value)">
+                            <label for="subject3">Others</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="refine-section">
+                    <h3 onclick="toggleList(this)">Databases</h3>
+                    <ul class="refine-list">
+                        <li>
+                            <input type="checkbox" id="database1" value="test" onclick="applyFilter('database', this.value)">
+                            <label for="database1">test</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="database2" value="database2" onclick="applyFilter('database', this.value)">
+                            <label for="database2">Database 2</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="database3" value="Others" onclick="applyFilter('database', this.value)">
+                            <label for="database3">Others</label>
+                        </li>
+                    </ul>
+                </div>
+
+
             </div>
         </div>
         <div class="main">
             <div id="results">
+                <div id="results-info">
+                    <p id="results-count"></p>
+                    <div id="active-filters"></div>
+                </div>
                 <div id="no-files" style="display: none;">
                     <p>No files found for the given keyword.</p>
                 </div>
@@ -226,12 +386,16 @@
                 <ul id="pagination" class="pagination"></ul>
             </div>
         </div>
+
     </div>
     <div class="footer">
         <button onclick="window.location.href='/userhome'">Go to User Home</button>
     </div>
 </div>
 <script>
+    window.onload = function() {
+        searchFiles(1, 10); // 设置默认的page和size值
+    };
     const sourceTypeImages = {
         'Digitized eBook': '../static/images/book.png',
         'Academic Journal': '../static/images/book.png',
@@ -239,74 +403,167 @@
 
     const API_BASE_URL = "localhost:8088";
     let currentPage = 1;
-    const pageSize = 5;
+    const pageSize = 10;
     let filters = {};
 
     function searchFiles(page, size) {
+        console.log('searchFiles function called');
+        console.log(filters);
+
         const keyword = document.getElementById('keyword').value;
-        const sourceType = filters['sourceType'] || '';
-        const language = filters['language'] || '';
+        const series = filters['series'] || [];
+        const publisher = filters['publisher'] || [];
+        const subject = filters['subject'] || [];
+        const database = filters['database'] || [];
+        const publishedFrom = filters['publishedFrom'] || null;
+        const publishedTo = filters['publishedTo'] || null;
+        const publishedYear = filters['publishedYear'] || null;
 
-        if (keyword) {
-            console.log(`Searching for keyword: ${keyword}, sourceType: ${sourceType}, language: ${language}, page: ${page}, size: ${size}`);
+        const filterData = {
+            keyword: keyword,
+            series: series,
+            publisher: publisher,
+            subject: subject,
+            database: database,
+            publishedFrom: publishedFrom,
+            publishedTo: publishedTo,
+            publishedYear: publishedYear,
+            page: page,
+            size: size
+        };
 
-            fetch(`http://${API_BASE_URL}/keyword/test/${encodeURIComponent(keyword)}?page=${page}&originalSource=${sourceType}&language=${language}`)
-                .then(response => {
-                    console.log('Received response:', response);
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Received data:', data);
-                    const itemList = document.getElementById('item-list');
-                    itemList.innerHTML = ''; // Clear previous results
+        console.log('Filter data being sent:', filterData);
 
-                    if (data.content.length > 0) {
-                        data.content.forEach(file => {
-                            const item = document.createElement('div');
-                            item.className = 'item';
-                            const sourceImage = sourceTypeImages[file.sourceType] || '../static/images/book.png';
-                            item.innerHTML = `
-                            <div class="item-details">
-                                <img src="${sourceImage}" alt="${file.sourceType}" class="source-type-image">
-                                <div class="item-content">
-                                    <h3><strong>Title:</strong> <a href="/bookDetail?id=${file.id}" target="_blank">${file.title}</a></h3>
-                                    <p><strong>Alternate Title:</strong> ${file.alternativeTitle}</p>
-                                    <p><strong>Source Type:</strong> ${file.sourceType}</p>
-                                    <p><strong>Authors:</strong> ${file.authors}</p>
-                                    <p><strong>ISBN:</strong> ${file.isbn}</p>
-                                    <p><strong>Publisher:</strong> ${file.publisher}</p>
-                                    <p><strong>Published:</strong> ${file.published}</p>
-                                    <p><strong>Status:</strong> ${file.status}</p>
-                                    <p><strong>Loan Period:</strong> ${file.loanLabel}</p>
-                                    <p>${file.description || ''}</p>
-                                    <div class="item-meta">
-                                        <p><strong>Subjects:</strong> ${file.subjects || 'N/A'}</p>
-                                        <a href="${file.url || '#'}" target="_blank">URL: ${file.url || 'N/A'}</a>
-                                        <button onclick="viewPDF('${file.id}', ${file.display})">View PDF</button>
-                                        <button onclick="borrowBook('${file.id}')">Borrow</button>
-                                        <button onclick="toggleDownloadOptions('${file.id}', this)">Download</button>
-                                    </div>
+        fetch(`http://${API_BASE_URL}/search`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(filterData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                const itemList = document.getElementById('item-list');
+                itemList.innerHTML = ''; // 清空之前的结果
+
+                if (data.content.length > 0) {
+                    data.content.forEach(file => {
+                        const item = document.createElement('div');
+                        item.className = 'item';
+                        const sourceImage = sourceTypeImages[file.sourceType] || '../static/images/book.png';
+                        const viewButton = file.view !== "Disable" ? `<button onclick="viewPDF('${file.id}', ${file.display})" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>View Online</button>` : '';
+                        const downloadButton = file.download !== "Disable" ? `<button onclick="toggleDownloadOptions('${file.id}', this)">Download</button>` : '';
+
+                        // 默认的 loanPeriod 文本
+                        let loanPeriod = file.loanLabel === 'Borrowed' ? `Borrowed (Return by ${file.returnDate || 'Loading...'})` : file.loanLabel || 'N/A';
+
+                        item.innerHTML = `
+                    <div class="item-details">
+                        <img src="${sourceImage}" alt="${file.sourceType}" class="source-type-image">
+                        <div class="item-content">
+                            <h3><strong>Title:</strong> <a href="/bookDetail?id=${file.id}" target="_blank">${file.title}</a></h3>
+                            <p><strong>Alternate Title:</strong> ${file.alternativeTitle || 'N/A'}</p>
+                            <p><strong>Source Type:</strong> ${file.sourceType || 'N/A'}</p>
+                            <p><strong>Authors:</strong> ${file.authors || 'N/A'}</p>
+                            <p><strong>ISBN:</strong> ${file.isbn || 'N/A'}</p>
+                            <p><strong>Publisher:</strong> ${file.publisher || 'N/A'}</p>
+                            <p><strong>Published:</strong> ${file.published || 'N/A'}</p>
+                            <p><strong>Status:</strong> ${file.status || 'N/A'}</p>
+                            <p id="loan-period-${file.id}"><strong>Loan Period:</strong> ${loanPeriod}</p>
+                            <p>${file.description || ''}</p>
+                            <div class="item-meta">
+                                <p><strong>Subjects:</strong> ${file.subjects || 'N/A'}</p>
+                                <a href="${file.url || '#'}" target="_blank">URL: ${file.url || 'N/A'}</a>
+                                <div class="button-container">
+                                    ${viewButton}
+                                    <button onclick="borrowBook('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>
+                                    ${downloadButton}
                                 </div>
                             </div>
-                        `;
-                            itemList.appendChild(item);
-                        });
-                        document.getElementById('no-files').style.display = 'none';
-                        createPagination(data.totalElements, page, size);
-                    } else {
-                        document.getElementById('no-files').style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching files:', error);
-                });
-        } else {
-            alert('Please enter a search query.');
-        }
+                        </div>
+                    </div>
+                `;
+                        itemList.appendChild(item);
+
+                        // 如果 loanLabel 为 Borrowed，则发送另一个请求以获取归还日期
+                        if (file.loanLabel === 'Borrowed') {
+                            console.log("Borrowed")
+                            fetch(`http://${API_BASE_URL}/borrow/${file.id}`, {
+                                method: 'GET',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
+                                })
+                                .then(borrowData => {
+                                    console.log(borrowData)
+                                    const returnDate = borrowData.loanEndTime  || 'N/A';
+                                    document.getElementById(`loan-period-${file.id}`).innerHTML = `<strong>Loan Period:</strong> Borrowed (Return by ${returnDate})`;
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching borrow details:', error);
+                                });
+                        }
+                    });
+
+                    document.getElementById('no-files').style.display = 'none';
+
+                    // 更新结果信息
+                    const resultsCount = document.getElementById('results-count');
+                    resultsCount.innerText = `You are looking at ${(page-1) * size + 1} - ${Math.min((page-1) * size + size, data.totalElements)} of ${data.totalElements} items`;
+
+                    const activeFilters = document.getElementById('active-filters');
+                    activeFilters.innerHTML = '';
+                    Object.entries(data.filters).forEach(([key, value]) => {
+                        if (value) {
+                            const filterBadge = document.createElement('div');
+                            filterBadge.className = 'filter-badge';
+                            filterBadge.innerHTML = `${key}: ${value} <button onclick="removeFilter('${key}')">&minus;</button>`;
+                            activeFilters.appendChild(filterBadge);
+                        }
+                    });
+
+                    createPagination(data.totalElements, page, size);
+                } else {
+                    document.getElementById('no-files').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching files:', error);
+            });
     }
+
+
+
+
+
+
+
+
+    function removeFilter(filterType) {
+        delete filters[filterType];
+        searchFiles(currentPage, pageSize);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('search-button').addEventListener('click', () => {
+            currentPage = 1;
+            searchFiles(currentPage, pageSize);
+        });
+    });
+
+
 
     function viewPDF(id, view) {
         if (view == null) {
@@ -469,8 +726,64 @@
 
     function toggleList(header) {
         const list = header.nextElementSibling;
-        list.style.display = list.style.display === 'none' ? 'block' : 'none';
+        if (list.style.display === '' || list.style.display === 'none') {
+            list.style.display = 'block';
+        } else {
+            list.style.display = 'none';
+        }
     }
+    function toggleYearInputs(value) {
+        if (value === 'range') {
+            document.getElementById('rangeInputs').style.display = 'block';
+            document.getElementById('singleInput').style.display = 'none';
+        } else {
+            document.getElementById('rangeInputs').style.display = 'none';
+            document.getElementById('singleInput').style.display = 'block';
+        }
+    }
+
+    function applyPublishedFilter() {
+        const yearType = document.querySelector('input[name="yearType"]:checked').value;
+
+        if (yearType === 'range') {
+            const fromYear = document.getElementById('publishedFrom').value;
+            const toYear = document.getElementById('publishedTo').value;
+
+            if (fromYear >= 1893 && toYear <= 2024 && fromYear <= toYear) {
+                filters['publishedFrom'] = fromYear;
+                filters['publishedTo'] = toYear;
+                filters['publishedYear'] = null; // 清空单年值
+            } else {
+                alert('Please enter a valid year range: From year >= 1893, To year <= 2024, and From year <= To year.');
+                return;
+            }
+        } else if (yearType === 'single') {
+            const year = document.getElementById('publishedYear').value;
+
+            if (year >= 1893 && year <= 2024) {
+                filters['publishedYear'] = year;
+                filters['publishedFrom'] = null; // 清空范围年值
+                filters['publishedTo'] = null;
+            } else {
+                alert('Please enter a valid year: between 1893 and 2024.');
+                return;
+            }
+        }
+        searchFiles(1,10)
+    }
+
+
+    function clearPublishedFilter() {
+        delete filters['publishedFrom'];
+        delete filters['publishedTo'];
+        delete filters['publishedYear'];
+        document.getElementById('publishedFrom').value = '';
+        document.getElementById('publishedTo').value = '';
+        document.getElementById('publishedYear').value = '';
+        searchFiles(1, 10);
+    }
+
+
 
     function applyFilter(filterType, value) {
         if (!filters[filterType]) {
@@ -482,7 +795,7 @@
         } else {
             filters[filterType].push(value);
         }
-        searchFiles(currentPage, 20);
+        searchFiles(currentPage, 10);
     }
 
     function createPagination(totalElements, currentPage, size) {

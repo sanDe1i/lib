@@ -345,40 +345,122 @@ public class FileService {
         return new PageImpl<>(fileList, pageable, total);
     }
 
-    public Page<FileInfo> keywordSearch(String keyword, String sourceType, String language, Pageable pageable) {
-        System.out.println(sourceType);
-        String searchPattern = "%" + keyword + "%"; // 在关键字前后加上百分号
-        String jpql = "SELECT f FROM FileInfo f WHERE f.title LIKE :keyword AND f.status = 'published'";
-        String countJpql = "SELECT COUNT(f) FROM FileInfo f WHERE f.title LIKE :keyword AND f.status = 'published'";
 
-        if (sourceType != null && !sourceType.isEmpty()) {
-            jpql += " AND f.sourceType = :sourceType";
-            countJpql += " AND f.sourceType = :sourceType";
+
+    public Page<FileInfo> advancedSearch(String keyword, List<String> series, List<String> publisher, List<String> subjects, List<String> database, Integer publishedFrom, Integer publishedTo, Integer publishedYear, Pageable pageable) {
+        String searchPattern = "%" + keyword + "%"; // 在关键字前后加上百分号
+        String jpql = "SELECT f FROM FileInfo f WHERE f.status = 'published'";
+        String countJpql = "SELECT COUNT(f) FROM FileInfo f WHERE f.status = 'published'";
+        List<Integer> databaseIds = null;
+
+        if (database != null && !database.isEmpty()) {
+            // 查询 resources_lib 表，获取对应的 name 列值
+            String resourcesJpql = "SELECT r.id FROM ResourcesLib r WHERE r.name IN :databaseNames";
+            TypedQuery<Integer> resourcesQuery = entityManager.createQuery(resourcesJpql, Integer.class);
+            resourcesQuery.setParameter("databaseNames", database);
+            databaseIds = resourcesQuery.getResultList();
+            System.out.println(databaseIds);
+
+            // 将获取到的 id 列值存储到 database 数组中
+            if (databaseIds != null && !databaseIds.isEmpty()) {
+                jpql += " AND f.resourcesId IN :databaseIds";
+                countJpql += " AND f.resourcesId IN :databaseIds";
+            }
         }
 
-        if (language != null && !language.isEmpty()) {
-            jpql += " AND f.language = :language";
-            countJpql += " AND f.language = :language";
+        if (keyword != null && !keyword.isEmpty()) {
+            jpql += " AND f.title LIKE :keyword";
+            countJpql += " AND f.title LIKE :keyword";
+        }
+
+        if (series != null && !series.isEmpty()) {
+            jpql += " AND f.series IN :series";
+            countJpql += " AND f.series IN :series";
+        }
+
+        if (publisher != null && !publisher.isEmpty()) {
+            jpql += " AND f.publisher IN :publisher";
+            countJpql += " AND f.publisher IN :publisher";
+        }
+
+        if (subjects != null && !subjects.isEmpty()) {
+            jpql += " AND f.subjects IN :subjects";
+            countJpql += " AND f.subjects IN :subjects";
+        }
+
+        if (publishedFrom != null) {
+            jpql += " AND f.published >= :publishedFrom";
+            countJpql += " AND f.published >= :publishedFrom";
+        }
+
+        if (publishedTo != null) {
+            jpql += " AND f.published <= :publishedTo";
+            countJpql += " AND f.published <= :publishedTo";
+        }
+
+        if (publishedYear != null) {
+            jpql += " AND f.published = :publishedYear";
+            countJpql += " AND f.published = :publishedYear";
         }
 
         TypedQuery<FileInfo> query = entityManager.createQuery(jpql, FileInfo.class);
-        query.setParameter("keyword", searchPattern);
-
         TypedQuery<Long> countQuery = entityManager.createQuery(countJpql, Long.class);
-        countQuery.setParameter("keyword", searchPattern);
 
-        if (sourceType != null && !sourceType.isEmpty()) {
-            query.setParameter("sourceType", sourceType);
-            countQuery.setParameter("sourceType", sourceType);
+        if (keyword != null && !keyword.isEmpty()) {
+            query.setParameter("keyword", searchPattern);
+            countQuery.setParameter("keyword", searchPattern);
         }
 
-        if (language != null && !language.isEmpty()) {
-            query.setParameter("language", language);
-            countQuery.setParameter("language", language);
+        if (series != null && !series.isEmpty()) {
+            query.setParameter("series", series);
+            countQuery.setParameter("series", series);
         }
+
+        if (publisher != null && !publisher.isEmpty()) {
+            query.setParameter("publisher", publisher);
+            countQuery.setParameter("publisher", publisher);
+        }
+
+        if (subjects != null && !subjects.isEmpty()) {
+            query.setParameter("subjects", subjects);
+            countQuery.setParameter("subjects", subjects);
+        }
+
+        if (database != null && !database.isEmpty()) {
+            System.out.println(databaseIds);
+            query.setParameter("databaseIds", databaseIds);
+            countQuery.setParameter("databaseIds", databaseIds);
+        }
+
+        if (publishedFrom != null) {
+            query.setParameter("publishedFrom", String.valueOf(publishedFrom));
+            countQuery.setParameter("publishedFrom", String.valueOf(publishedFrom));
+        }
+
+        if (publishedTo != null) {
+            query.setParameter("publishedTo", String.valueOf(publishedTo));
+            countQuery.setParameter("publishedTo", String.valueOf(publishedTo));
+        }
+
+        if (publishedYear != null) {
+            query.setParameter("publishedYear", String.valueOf(publishedYear));
+            countQuery.setParameter("publishedYear", String.valueOf(publishedYear));
+        }
+
+        // 打印调试信息
+        System.out.println("JPQL Query: " + jpql);
+        System.out.println("Keyword: " + searchPattern);
+        System.out.println("Series: " + series);
+        System.out.println("Publisher: " + publisher);
+        System.out.println("Subjects: " + subjects);
+        System.out.println("Database: " + database);
+        System.out.println("PublishedFrom: " + publishedFrom);
+        System.out.println("PublishedTo: " + publishedTo);
+        System.out.println("PublishedYear: " + publishedYear);
 
         // 获取总记录数
         long total = countQuery.getSingleResult();
+        System.out.println(total);
 
         // 设置分页
         query.setFirstResult((int) pageable.getOffset());
@@ -388,7 +470,6 @@ public class FileService {
 
         return new PageImpl<>(fileList, pageable, total);
     }
-
 
 
 
