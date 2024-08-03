@@ -18,6 +18,11 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.marc4j.MarcReader;
 import org.marc4j.MarcStreamReader;
 import org.marc4j.marc.DataField;
@@ -36,12 +41,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -70,6 +75,9 @@ public class FileService {
 
     @Value("${PDFUploadPath}")
     private String PDFUploadPath;
+
+    @Value("${EPUBUploadPath}")
+    private String EPUBUploadPath;
 
     @Autowired
     private EntityManager entityManager;
@@ -162,7 +170,46 @@ public class FileService {
         return invalidFiles;
     }
 
+    public List<String> saveEPUBs(int folderId, List<MultipartFile> files) throws IOException {
+        List<String> invalidFiles = new ArrayList<>();
 
+        for (MultipartFile file : files) {
+            String PDFName = file.getOriginalFilename();
+            if (PDFName != null && PDFName.toLowerCase().endsWith(".epub")) {
+                PDFName = PDFName.substring(0, PDFName.length() - 4);
+            }
+
+            if (fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName).size() > 0) {
+                String uploadPDFPath = EPUBUploadPath;
+                System.out.println(uploadPDFPath);
+                java.io.File uploadFile = new java.io.File(uploadPDFPath);
+                if (!uploadFile.exists()) {
+                    uploadFile.mkdirs();
+                }
+                java.io.File targetFile = new java.io.File(uploadFile.getAbsolutePath() + "/" + PDFName + ".epub");
+                try {
+                    file.transferTo(targetFile);
+                    PDFs pdf = new PDFs();
+                    pdf.setName(file.getOriginalFilename());
+                    pdf.setAddress(targetFile.getAbsolutePath());
+                    pdf.setResourcesId(folderId);
+                    pdfDao.save(pdf);
+
+                    // Update the FileInfo table with the download link
+                    List<FileInfo> fileInfos = fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName);
+                    for (FileInfo fileInfo : fileInfos) {
+                        fileInfo.setDownloadLink(targetFile.getAbsolutePath());
+                        fileInfoDao.save(fileInfo);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                invalidFiles.add(PDFName);
+            }
+        }
+        return invalidFiles;
+    }
 
 
     private String extractPdfText(InputStream inputStream) throws IOException {
@@ -617,4 +664,153 @@ public class FileService {
     public int getPDFNum(int folderId) {
         return fileInfoDao.getPDFNum(folderId).size();
     }
+
+    public void saveExcel(int folderId, MultipartFile excel) throws IOException {
+        try (InputStream inputStream = excel.getInputStream()) {
+            XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
+            int sheetNum = xssfWorkbook.getNumberOfSheets();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+
+            for (int i = 0; i < sheetNum; i++) {
+                XSSFSheet sheet = xssfWorkbook.getSheetAt(i);
+                int maxRow = sheet.getLastRowNum();
+
+                // 读取表头行
+                Map<String, Integer> headerMap = new HashMap<>();
+                for (int col = 0; col < sheet.getRow(0).getLastCellNum(); col++) {
+                    headerMap.put(sheet.getRow(0).getCell(col).getStringCellValue(), col);
+                }
+
+                // 遍历数据行
+                for (int row = 1; row <= maxRow; row++) {
+                    if (sheet.getRow(row) == null) {
+                        continue; // 跳过空行
+                    }
+
+                    FileInfo bookMetadata = new FileInfo();
+
+                    for (Map.Entry<String, Integer> entry : headerMap.entrySet()) {
+                        String columnName = entry.getKey();
+                        int colIndex = entry.getValue();
+                        Cell cell = sheet.getRow(row).getCell(colIndex);
+
+                        if (cell != null) {
+                            bookMetadata.setStatus("Unpublished");
+                            bookMetadata.setView("Disable");
+                            bookMetadata.setDownload("Disable");
+                            bookMetadata.setBorrowPeriod(0);
+                            bookMetadata.setResourcesId(folderId);
+
+                            String cellValue;
+                            if (cell.getCellType() == CellType.NUMERIC) {
+                                if (DateUtil.isCellDateFormatted(cell)) {
+                                    cellValue = dateFormat.format(cell.getDateCellValue());
+                                } else {
+                                    cellValue = BigDecimal.valueOf(cell.getNumericCellValue()).toPlainString();
+                                }
+                            } else {
+                                cellValue = cell.toString();
+                            }
+
+                            switch (columnName) {
+                                case "Title":
+                                    bookMetadata.setTitle(cellValue);
+                                    break;
+                                case "Alternate Title":
+                                    bookMetadata.setAlternativeTitle(cellValue);
+                                    break;
+                                case "Source Type":
+                                    bookMetadata.setSourceType(cellValue);
+                                    break;
+                                case "Authors":
+                                    bookMetadata.setAuthors(cellValue);
+                                    break;
+                                case "Editors":
+                                    bookMetadata.setEditors(cellValue);
+                                    break;
+                                case "Series":
+                                    bookMetadata.setSeries(cellValue);
+                                    break;
+                                case "Language":
+                                    bookMetadata.setLanguage(cellValue);
+                                    break;
+                                case "ISBN":
+                                    bookMetadata.setIsbn(cellValue);
+                                    break;
+                                case "Publisher":
+                                    bookMetadata.setPublisher(cellValue);
+                                    break;
+                                case "Published":
+                                    bookMetadata.setPublished(cellValue);
+                                    break;
+                                case "Edition":
+                                    bookMetadata.setEdition(cellValue);
+                                    break;
+                                case "Copyright Year":
+                                    bookMetadata.setCopyrightYear(cellValue);
+                                    break;
+                                case "Copyright Declaration":
+                                    bookMetadata.setCopyrightDeclaration(cellValue);
+                                    break;
+                                case "status":
+                                    bookMetadata.setStatus(cellValue);
+                                    break;
+                                case "URL":
+                                    bookMetadata.setUrl(cellValue);
+                                    break;
+                                case "Pages":
+                                    bookMetadata.setPages(cellValue);
+                                    break;
+                                case "Subjects":
+                                    bookMetadata.setSubjects(cellValue);
+                                    break;
+                                case "Description":
+                                    bookMetadata.setDescription(cellValue);
+                                    break;
+                                case "Chapters":
+                                    bookMetadata.setChapters(cellValue);
+                                    break;
+                                case "Original Source":
+                                    bookMetadata.setOriginalSource(cellValue);
+                                    break;
+                                case "Contributing Institution":
+                                    bookMetadata.setContributingInstitution(cellValue);
+                                    break;
+                                case "Digitization Explanation":
+                                    bookMetadata.setDigitizationExplanation(cellValue);
+                                    break;
+                                case "borrow_period":
+                                    if (cell.getCellType() == CellType.NUMERIC) {
+                                        bookMetadata.setBorrowPeriod((int) cell.getNumericCellValue());
+                                    } else {
+                                        bookMetadata.setBorrowPeriod(Integer.parseInt(cellValue));
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                    // 保存到数据库
+                    fileInfoDao.save(bookMetadata);
+                }
+            }
+        }
+    }
+
+    private String getCellValueAsString(Cell cell) {
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.toString();
+            case NUMERIC:
+                return String.valueOf(cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                return cell.getCellFormula();
+            case BLANK:
+                return "";
+            default:
+                return cell.toString();
+        }
+    }
+
 }

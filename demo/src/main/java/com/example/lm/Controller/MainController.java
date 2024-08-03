@@ -559,5 +559,21 @@ public class MainController {
         model.addAttribute("folders", folders);
         return "sourceDatabases"; // 返回的模板名称
     }
+
+    @PostMapping("/saveExcel")
+    public ResponseEntity<?> saveExcel(@RequestParam("folderId") int folderId, @RequestParam("file") MultipartFile excel) throws IOException {
+        fileService.saveExcel(folderId, excel);
+        return ResponseEntity.ok('E');
+    }
+
+    @PostMapping("/uploadEPUB")
+    public String handleEPUBUpload(@RequestParam int folderId, @RequestParam("files") List<MultipartFile> files, RedirectAttributes redirectAttributes) throws IOException {
+        List<String> invalidFiles = fileService.saveEPUBs(folderId, files);
+        if (!invalidFiles.isEmpty()) {
+            redirectAttributes.addFlashAttribute("invalidFiles", invalidFiles);
+            redirectAttributes.addFlashAttribute("folderIdWithInvalidFiles", folderId);
+        }
+        return "redirect:/resourcesLib";
+    }
 }
 
