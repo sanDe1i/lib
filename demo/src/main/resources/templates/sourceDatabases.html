@@ -51,13 +51,16 @@
             <a href="/adminHome" class="btn btn-secondary mb-4">Back to Home</a>
         </div>
         <div class="col text-right">
-            <button class="btn btn-sm btn-primary mb-4" data-toggle="modal" data-target="#addFolderModal">Add Databases</button>
+            <button class="btn btn-sm btn-primary mb-4" data-toggle="modal" data-target="#addFolderModal">Add
+                Databases
+            </button>
         </div>
     </div>
     <!-- 搜索表单 -->
-    <form th:action="@{/search}" method="get" class="row mb-4">
+    <form th:action="@{/resourcesLib}" method="get" class="row mb-4">
         <div class="col">
-            <input type="text" name="query" class="form-control" placeholder="Search by Database Name, Alternate Name, or Description">
+            <input type="text" name="query" class="form-control"
+                   placeholder="Search by Database Name, Alternate Name, or Description">
         </div>
         <div class="col">
             <select name="type" class="form-control">
@@ -65,6 +68,13 @@
                 <option value="Digitized eBook">Digitized eBook</option>
                 <option value="Raw eBook">Raw eBook</option>
                 <option value="Others">Others</option>
+            </select>
+        </div>
+        <div class="col">
+            <select name="display" class="form-control">
+                <option value="" selected>All Status</option>
+                <option value="Unpublished">Unpublished</option>
+                <option value="Published">Published</option>
             </select>
         </div>
         <div class="col text-right">
@@ -100,10 +110,11 @@
                     <a th:href="@{/test/search2(databaseId=${folder.id})}" th:text="${folder.marcCount}">Marc Count</a>
                 </td>
                 <td th:text="${folder.pdfCount}">PDF Count</td>
-                <td></td>
+                <td th:text="${folder.epubCount}">EPUB Count</td>
 
                 <td><a class="btn btn-sm btn-primary" data-toggle="modal" data-target="#renameFolderModal"
-                       th:data-id="${folder.id}" th:data-name="${folder.name}" th:data-alternate-names="${folder.alternateName}"
+                       th:data-id="${folder.id}" th:data-name="${folder.name}"
+                       th:data-alternate-names="${folder.alternateName}"
                        th:data-description="${folder.description}" th:data-type="${folder.type}">Edit Details</a>
 
                 </td>
@@ -112,10 +123,25 @@
                        class="btn btn-sm btn-primary edit-marc-info">Edit Marc Info</a>
                 </td>
                 <td>
-                    <a href="#" class="btn btn-sm btn-primary" data-toggle="modal"
-                       data-target="#uploadMarcModal" th:attr="data-id=${folder.id}">Upload Marc</a>
-                    <a href="#" class="btn btn-sm btn-primary" data-toggle="modal"
-                       data-target="#uploadPdfModal" th:attr="data-id=${folder.id}">Upload PDF</a>
+
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="fileDropdown"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Upload New
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="fileDropdown">
+                            <a class="dropdown-item" data-toggle="modal"
+                               data-target="#uploadMarcModal" th:attr="data-id=${folder.id}">Upload Marc</a>
+                            <a class="dropdown-item" data-toggle="modal"
+                               data-target="#uploadPdfModal" th:attr="data-id=${folder.id}">Upload PDF</a>
+                            <a class="dropdown-item" data-toggle="modal"
+                               data-target="#uploadEXCELModal" th:attr="data-id=${folder.id}">Upload EXCEL</a>
+                            <a class="dropdown-item" data-toggle="modal"
+                               data-target="#uploadEPUBModal" th:attr="data-id=${folder.id}">Upload EPUB</a>
+                        </div>
+                    </div>
+
+
                     <div th:if="${invalidFiles != null and folderIdWithInvalidFiles != null and folderIdWithInvalidFiles == folder.id}">
                         <h6 class="text-danger">Invalid Files:</h6>
                         <ul>
@@ -125,7 +151,8 @@
                 </td>
                 <td>
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="statusDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="statusDropdown"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Status
                         </button>
                         <div class="dropdown-menu" aria-labelledby="statusDropdown">
@@ -136,7 +163,8 @@
                 </td>
                 <td>
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="viewOnlineDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="viewOnlineDropdown"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             View Online
                         </button>
                         <div class="dropdown-menu" aria-labelledby="viewOnlineDropdown">
@@ -147,22 +175,27 @@
                 </td>
                 <td>
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="downloadDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="downloadDropdown"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Download
                         </button>
                         <div class="dropdown-menu" aria-labelledby="downloadDropdown">
-                            <a class="dropdown-item" th:onclick="'performAction(\'cancelDownload\', ' + ${folder.id} + ')'">Disable</a>
-                            <a class="dropdown-item" th:onclick="'performAction(\'ableDownload\', ' + ${folder.id} + ')'">Enable</a>
+                            <a class="dropdown-item"
+                               th:onclick="'performAction(\'cancelDownload\', ' + ${folder.id} + ')'">Disable</a>
+                            <a class="dropdown-item"
+                               th:onclick="'performAction(\'ableDownload\', ' + ${folder.id} + ')'">Enable</a>
                         </div>
                     </div>
                 </td>
                 <td>
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="borrowDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="borrowDropdown"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Borrow
                         </button>
                         <div class="dropdown-menu" aria-labelledby="borrowDropdown">
-                            <a class="dropdown-item" th:onclick="'performAction(\'cancelBorrow\', ' + ${folder.id} + ')'">Disable</a>
+                            <a class="dropdown-item"
+                               th:onclick="'performAction(\'cancelBorrow\', ' + ${folder.id} + ')'">Disable</a>
                             <a class="dropdown-item" th:onclick="'performAction(\'ableBorrow\', ' + ${folder.id} + ')'">Enable</a>
                         </div>
                     </div>
@@ -176,7 +209,8 @@
 </div>
 
 <!-- Add Folder Modal -->
-<div class="modal fade" id="addFolderModal" tabindex="-1" role="dialog" aria-labelledby="addFolderModalLabel" aria-hidden="true">
+<div class="modal fade" id="addFolderModal" tabindex="-1" role="dialog" aria-labelledby="addFolderModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form id="addFolderForm" th:action="@{/addDatabases}" method="post" enctype="multipart/form-data">
@@ -190,11 +224,11 @@
                     <div class="form-step form-step-active">
                         <div class="form-group">
                             <label for="databaseName">Database Name</label>
-                            <input type="text" class="form-control" id="databaseName" name="databaseName" required />
+                            <input type="text" class="form-control" id="databaseName" name="databaseName" required/>
                         </div>
                         <div class="form-group">
                             <label for="alternateNames">Alternate Names</label>
-                            <input type="text" class="form-control" id="alternateNames" name="alternateNames" required />
+                            <input type="text" class="form-control" id="alternateNames" name="alternateNames" required/>
                         </div>
                         <div class="form-group">
                             <label for="typeSelection">Database Type</label>
@@ -207,7 +241,8 @@
                         </div>
                         <div class="form-group">
                             <label for="databaseDescription">Database Description</label>
-                            <textarea class="form-control" id="databaseDescription" name="databaseDescription" required></textarea>
+                            <textarea class="form-control" id="databaseDescription" name="databaseDescription"
+                                      required></textarea>
                         </div>
                         <div class="form-group">
                             <label for="status">Status (Published or Hidden)</label>
@@ -221,15 +256,15 @@
                     <div class="form-step">
                         <div class="form-group">
                             <label for="marcFile">Choose Marc File</label>
-                            <input type="file" class="form-control" id="marcFile" name="file" required />
-                            <input type="hidden" id="uploadMarcFolderId" name="folderId" />
+                            <input type="file" class="form-control" id="marcFile" name="file" required/>
+                            <input type="hidden" id="uploadMarcFolderId" name="folderId"/>
                         </div>
                     </div>
                     <div class="form-step">
                         <div class="form-group">
                             <label for="pdfFiles">Choose PDF File(s)</label>
-                            <input type="file" class="form-control" id="pdfFiles" name="files" multiple required />
-                            <input type="hidden" id="uploadPdfFolderId" name="folderId" />
+                            <input type="file" class="form-control" id="pdfFiles" name="files" multiple required/>
+                            <input type="hidden" id="uploadPdfFolderId" name="folderId"/>
                         </div>
                     </div>
                 </div>
@@ -242,9 +277,9 @@
 </div>
 
 
-
 <!-- Rename Folder Modal -->
-<div class="modal fade" id="renameFolderModal" tabindex="-1" role="dialog" aria-labelledby="renameFolderModalLabel" aria-hidden="true">
+<div class="modal fade" id="renameFolderModal" tabindex="-1" role="dialog" aria-labelledby="renameFolderModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form th:action="@{/rename-folder}" method="post">
@@ -261,7 +296,8 @@
                     </div>
                     <div class="form-group">
                         <label for="newAlternateNames">New Alternate Names</label>
-                        <input type="text" class="form-control" id="newAlternateNames" name="newAlternateNames" required>
+                        <input type="text" class="form-control" id="newAlternateNames" name="newAlternateNames"
+                               required>
                     </div>
                     <div class="form-group">
                         <label for="newType">New Type</label>
@@ -290,7 +326,8 @@
 
 
 <!-- Upload Marc Modal -->
-<div class="modal fade" id="uploadMarcModal" tabindex="-1" role="dialog" aria-labelledby="uploadMarcModalLabel" aria-hidden="true">
+<div class="modal fade" id="uploadMarcModal" tabindex="-1" role="dialog" aria-labelledby="uploadMarcModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form th:action="@{/uploadMARC}" method="post" enctype="multipart/form-data">
@@ -316,8 +353,37 @@
     </div>
 </div>
 
+<!-- Upload EXCEL Modal -->
+<div class="modal fade" id="uploadEXCELModal" tabindex="-1" role="dialog" aria-labelledby="uploadEXCELModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/saveExcel}" method="post" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadEXCELModalLabel">Upload EXCEL File</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group1">
+                        <label for="marcFile1">Choose EXCEL File</label>
+                        <input type="file" class="form-control" id="excelFile" name="file" required>
+                        <input type="hidden" id="uploadEXCELFolderId" name="folderId">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Upload PDF Modal -->
-<div class="modal fade" id="uploadPdfModal" tabindex="-1" role="dialog" aria-labelledby="uploadPdfModalLabel" aria-hidden="true">
+<div class="modal fade" id="uploadPdfModal" tabindex="-1" role="dialog" aria-labelledby="uploadPdfModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form th:action="@{/uploadPDF}" method="post" enctype="multipart/form-data">
@@ -343,6 +409,33 @@
     </div>
 </div>
 
+<!-- Upload EPUB Modal -->
+<div class="modal fade" id="uploadEPUBModal" tabindex="-1" role="dialog" aria-labelledby="uploadEXCELModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/uploadEPUB}" method="post" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadEPUBModalLabel">Upload EPUB File</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group1">
+                        <label for="epubFile">Choose EPUB File</label>
+                        <input type="file" class="form-control" id="epubFile" name="file" required>
+                        <input type="hidden" id="uploadEPUBFolderId" name="folderId">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <!-- Core -->
 <script src="../static/vendor/jquery/jquery.min.js"></script>
 <script src="../static/vendor/popper/popper.min.js"></script>
@@ -369,6 +462,20 @@
             modal.find('#uploadMarcFolderId1').val(folderId);
         });
 
+        $('#uploadEXCELModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var folderId = button.data('id');
+            var modal = $(this);
+            modal.find('#uploadEXCELFolderId').val(folderId);
+        });
+
+        $('#uploadEPUBModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var folderId = button.data('id');
+            var modal = $(this);
+            modal.find('#uploadEPUBFolderId').val(folderId);
+        });
+
         $('#renameFolderModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var folderId = button.data('id');
@@ -384,7 +491,6 @@
             modal.find('#newType').val(type);
             modal.find('#newDescription').val(description);
         });
-
 
 
         $('#uploadPdfModal').on('show.bs.modal', function (event) {

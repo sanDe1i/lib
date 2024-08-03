@@ -83,20 +83,26 @@ public class MainController {
     }
 
     @GetMapping("/resourcesLib")
-    public String getFileExplorer(Model model) {
-        List<ResourcesLib> folders = resourcesLibService.getAllPackages();
+    public String getFileExplorer(@RequestParam(name = "query", required = false, defaultValue = "") String query,
+                         @RequestParam(name = "type", required = false, defaultValue = "") String type,
+                         @RequestParam(name = "display", required = false, defaultValue = "") String status,
+                         Model model) {
+        List<ResourcesLib> folders = resourcesLibService.searchFolders(query, type, status);
         Map<Integer, List<File>> folderPDFMap = new HashMap<>();
         for (ResourcesLib folder : folders) {
             List<File> PDFs = fileService.getPDFsByLib(folder.getId());
             int marcCount = fileService.getMarcNum(folder.getId());
             int pdfCount = fileService.getPDFNum(folder.getId());
+            int epubCount = fileService.getEPUBNum(folder.getId());
             folder.setMarcCount(marcCount);
             folder.setPdfCount(pdfCount);
+            folder.setEpubCount(epubCount);
             folderPDFMap.put(folder.getId(), PDFs);
         }
         model.addAttribute("folders", folders);
         model.addAttribute("folderPDFMap", folderPDFMap);
-        return "sourceDatabases";
+        model.addAttribute("folders", folders);
+        return "sourceDatabases"; // 返回的模板名称
     }
 
     @PostMapping("/addDatabases")
@@ -116,6 +122,9 @@ public class MainController {
         resourcesLib.setDescription(databaseDescription);
         resourcesLib.setType(typeSelection);
         resourcesLib.setDisplay(status);
+        resourcesLib.setView("Disable");
+        resourcesLib.setDownload("Disable");
+        resourcesLib.setBorrow(0);
         resourcesLibService.saveNewDatabases(resourcesLib);
         fileService.uploadMARCFile(resourcesLib.getId(), marcFile);
         List<String> invalidFiles = fileService.savePDFs(resourcesLib.getId(), pdfFiles);
@@ -533,6 +542,11 @@ public class MainController {
         return ResponseEntity.ok(pdfNum);
     }
 
+    @GetMapping("/getEPUBNum")
+    public ResponseEntity<?> checkNumOfEPUB(@RequestParam("folderId") int folderId) {
+        int epubNum = fileService.getEPUBNum(folderId);
+        return ResponseEntity.ok(epubNum);
+    }
 
     @GetMapping("/deleteFolder")
     public String deleteFolder(@RequestParam("folderId") int folderId) {
@@ -540,30 +554,10 @@ public class MainController {
         return "redirect:/resourcesLib";
     }
 
-    @GetMapping("/search")
-    public String search(@RequestParam(name = "query", required = false, defaultValue = "") String query,
-                         @RequestParam(name = "type", required = false, defaultValue = "") String type,
-                         Model model) {
-        List<ResourcesLib> folders = resourcesLibService.searchFolders(query, type);
-        Map<Integer, List<File>> folderPDFMap = new HashMap<>();
-        for (ResourcesLib folder : folders) {
-            List<File> PDFs = fileService.getPDFsByLib(folder.getId());
-            int marcCount = fileService.getMarcNum(folder.getId());
-            int pdfCount = fileService.getPDFNum(folder.getId());
-            folder.setMarcCount(marcCount);
-            folder.setPdfCount(pdfCount);
-            folderPDFMap.put(folder.getId(), PDFs);
-        }
-        model.addAttribute("folders", folders);
-        model.addAttribute("folderPDFMap", folderPDFMap);
-        model.addAttribute("folders", folders);
-        return "sourceDatabases"; // 返回的模板名称
-    }
-
     @PostMapping("/saveExcel")
     public ResponseEntity<?> saveExcel(@RequestParam("folderId") int folderId, @RequestParam("file") MultipartFile excel) throws IOException {
         fileService.saveExcel(folderId, excel);
-        return ResponseEntity.ok('E');
+        return ResponseEntity.ok("Successfully save the info");
     }
 
     @PostMapping("/uploadEPUB")

@@ -98,12 +98,18 @@ public class ResourcesLibService {
         fileInfoDao.deleteFileInfoByResourcesId(folderId);
     }
 
-    public List<ResourcesLib> searchFolders(String query, String type) {
-        if (type != null && !type.isEmpty()) {
+    public List<ResourcesLib> searchFolders(String query, String type, String status) {
+        if ((type != null && !type.isEmpty()) && (status == null || status.isEmpty())) {
             return resourcesLibDao.searchResources(query, type);
-        } else {
-            return resourcesLibDao.findByNameContainingIgnoreCaseOrAlternateNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-                    query, query, query);
         }
+        if ((status != null && !status.isEmpty()) && (type == null || type.isEmpty())) {
+            return resourcesLibDao.searchResourcesByStatus(query, status);
+        }
+        if ((status != null && !status.isEmpty()) && (type != null && !type.isEmpty())) {
+            return resourcesLibDao.searchResourcesByStatusAndType(query, status, type);
+        }
+        return resourcesLibDao.findByNameContainingIgnoreCaseOrAlternateNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+                query, query, query);
     }
+
 }

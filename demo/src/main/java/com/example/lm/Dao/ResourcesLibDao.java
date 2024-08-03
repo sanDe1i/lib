@@ -30,6 +30,21 @@ public interface ResourcesLibDao extends JpaRepository<ResourcesLib, Integer> {
            "LOWER(r.alternateName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(r.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
            "r.type = :type")
-   List<ResourcesLib> searchResources(
-           String searchTerm, String type);
+   List<ResourcesLib> searchResources(String searchTerm, String type);
+
+   @Query("SELECT r FROM ResourcesLib r WHERE " +
+           "(LOWER(r.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(r.alternateName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(r.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
+           "r.display = :status")
+   List<ResourcesLib> searchResourcesByStatus(String searchTerm, String status);
+
+   @Query("SELECT r FROM ResourcesLib r WHERE " +
+           "(LOWER(r.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(r.alternateName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(r.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
+           "r.display = :status AND " +
+           "r.type = :type")
+   List<ResourcesLib> searchResourcesByStatusAndType(String searchTerm, String status, String type);
+
 }
