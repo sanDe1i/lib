@@ -83,6 +83,9 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
     @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.downloadLink IS NOT NULL")
     List<FileInfo> getPDFNum(int folderId);
 
+    @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.epubPath IS NOT NULL")
+    List<FileInfo> getEPUBNum(int folderId);
+
 
     @Modifying
     @Transactional

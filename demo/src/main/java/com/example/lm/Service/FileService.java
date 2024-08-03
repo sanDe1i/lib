@@ -665,6 +665,10 @@ public class FileService {
         return fileInfoDao.getPDFNum(folderId).size();
     }
 
+    public int getEPUBNum(int folderId) {
+        return fileInfoDao.getEPUBNum(folderId).size();
+    }
+
     public void saveExcel(int folderId, MultipartFile excel) throws IOException {
         try (InputStream inputStream = excel.getInputStream()) {
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
@@ -793,23 +797,6 @@ public class FileService {
                     fileInfoDao.save(bookMetadata);
                 }
             }
-        }
-    }
-
-    private String getCellValueAsString(Cell cell) {
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.toString();
-            case NUMERIC:
-                return String.valueOf(cell.getNumericCellValue());
-            case BOOLEAN:
-                return String.valueOf(cell.getBooleanCellValue());
-            case FORMULA:
-                return cell.getCellFormula();
-            case BLANK:
-                return "";
-            default:
-                return cell.toString();
         }
     }
 

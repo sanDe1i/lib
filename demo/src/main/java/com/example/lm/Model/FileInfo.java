@@ -6,17 +6,17 @@ import jakarta.persistence.*;
 @Table(name = "books")
 public class FileInfo {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private int id;
 
-    @Column(name="title")
+    @Column(name = "title")
     private String title;
 
-    @Column(name="alternative_title")
+    @Column(name = "alternative_title")
     private String alternativeTitle;
 
-    @Column(name="source_type")
+    @Column(name = "source_type")
     private String sourceType;
 
     @Column(name = "book_databases_id")
@@ -49,10 +49,10 @@ public class FileInfo {
     @Column(name = "copyright_year")
     private String copyrightYear;
 
-    @Column(name="copyright_declaration")
+    @Column(name = "copyright_declaration")
     private String copyrightDeclaration;
 
-    @Column(name="status")
+    @Column(name = "status")
     private String status;
 
     @Column(name = "url")
@@ -93,6 +93,9 @@ public class FileInfo {
 
     @Column(name = "downloadLink")
     private String downloadLink;
+
+    @Column(name = "epub_path")
+    private String epubPath;
 
     public String getDownloadLink() {
         return downloadLink;
@@ -324,6 +327,14 @@ public class FileInfo {
 
     public void setBorrowPeriod(int borrowPeriod) {
         this.borrowPeriod = borrowPeriod;
+    }
+
+    public String getEpubPath() {
+        return epubPath;
+    }
+
+    public void setEpubPath(String epubPath) {
+        this.epubPath = epubPath;
     }
 
     @Override

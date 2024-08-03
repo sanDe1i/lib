@@ -30,6 +30,19 @@ public class ResourcesLib {
     private int marcCount;
     @Column(name = "pdf_count")
     private int pdfCount;
+
+    @Column(name = "epub_count")
+    private int epubCount;
+
+    @Column(name = "view")
+    private String view;
+
+    @Column(name = "download")
+    private String download;
+
+    @Column(name = "borrow")
+    private int borrow;
+
     public int getId() {
         return id;
     }
@@ -96,6 +109,38 @@ public class ResourcesLib {
 
     public void setPdfCount(int pdfCount) {
         this.pdfCount = pdfCount;
+    }
+
+    public int getEpubCount() {
+        return epubCount;
+    }
+
+    public void setEpubCount(int epubCount) {
+        this.epubCount = epubCount;
+    }
+
+    public String getView() {
+        return view;
+    }
+
+    public void setView(String view) {
+        this.view = view;
+    }
+
+    public String getDownload() {
+        return download;
+    }
+
+    public void setDownload(String download) {
+        this.download = download;
+    }
+
+    public int getBorrow() {
+        return borrow;
+    }
+
+    public void setBorrow(int borrow) {
+        this.borrow = borrow;
     }
 }
 
