@@ -99,7 +99,6 @@ public class MainController {
             folder.setEpubCount(epubCount);
             folderPDFMap.put(folder.getId(), PDFs);
         }
-        model.addAttribute("folders", folders);
         model.addAttribute("folderPDFMap", folderPDFMap);
         model.addAttribute("folders", folders);
         return "sourceDatabases"; // 返回的模板名称
@@ -113,6 +112,8 @@ public class MainController {
             @RequestParam("databaseDescription") String databaseDescription,
             @RequestParam("status") String status,
             @RequestParam("file") MultipartFile marcFile,
+            @RequestParam("excel") MultipartFile excel,
+            @RequestParam("epub") MultipartFile epub,
             @RequestParam("files") List<MultipartFile> pdfFiles,
             RedirectAttributes redirectAttributes) throws IOException {
 
@@ -170,6 +171,9 @@ public class MainController {
 
     @PostMapping("/hideBook")
     public ResponseEntity<?> hideBooks(@RequestParam("folderId") int libId) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setDisplay("Unpublished");
+        resourcesLibService.save(rl);
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setStatus("Unpublished");
@@ -180,6 +184,9 @@ public class MainController {
 
     @PostMapping("/showBook")
     public ResponseEntity<?> showBooks(@RequestParam("folderId") int libId) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setDisplay("Published");
+        resourcesLibService.save(rl);
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setStatus("Published");

@@ -153,7 +153,7 @@
                     <div class="dropdown">
                         <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="statusDropdown"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Status
+                            <span th:text="${folder.display}">Status</span>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="statusDropdown">
                             <a class="dropdown-item" th:onclick="'performAction(\'hideBook\', ' + ${folder.id} + ')'">Unpublished</a>
@@ -165,7 +165,7 @@
                     <div class="dropdown">
                         <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="viewOnlineDropdown"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            View Online
+                            <span th:text="${folder.view}">View Online</span>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="viewOnlineDropdown">
                             <a class="dropdown-item" th:onclick="'performAction(\'cancelView\', ' + ${folder.id} + ')'">Disable</a>
@@ -177,7 +177,7 @@
                     <div class="dropdown">
                         <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="downloadDropdown"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Download
+                            <span th:text="${folder.download}">Download</span>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="downloadDropdown">
                             <a class="dropdown-item"
@@ -191,7 +191,7 @@
                     <div class="dropdown">
                         <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="borrowDropdown"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Borrow
+                            <span th:text="${folder.borrow > 0 ? 'Enable' : 'Disable'}"></span>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="borrowDropdown">
                             <a class="dropdown-item"
@@ -215,7 +215,7 @@
         <div class="modal-content">
             <form id="addFolderForm" th:action="@{/addDatabases}" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addFolderModalLabel">Add New Folder</h5>
+                    <h5 class="modal-title" id="addFolderModalLabel">Add a New Database</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -262,9 +262,23 @@
                     </div>
                     <div class="form-step">
                         <div class="form-group">
+                            <label for="excelFile1">Choose EXCEL File</label>
+                            <input type="file" class="form-control" id="excelFile1" name="excel" required>
+                            <input type="hidden" id="uploadEXCELFolderIdWhenAddNewFolder" name="folderId">
+                        </div>
+                    </div>
+                    <div class="form-step">
+                        <div class="form-group">
                             <label for="pdfFiles">Choose PDF File(s)</label>
                             <input type="file" class="form-control" id="pdfFiles" name="files" multiple required/>
                             <input type="hidden" id="uploadPdfFolderId" name="folderId"/>
+                        </div>
+                    </div>
+                    <div class="form-step">
+                        <div class="form-group">
+                            <label for="epubFile1">Choose EPUB File</label>
+                            <input type="file" class="form-control" id="epubFile1" name="epub" required>
+                            <input type="hidden" id="uploadEPUBFolderIdWhenAddNewFolder" name="folderId">
                         </div>
                     </div>
                 </div>
@@ -367,7 +381,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="input-group1">
-                        <label for="marcFile1">Choose EXCEL File</label>
+                        <label for="excelFile">Choose EXCEL File</label>
                         <input type="file" class="form-control" id="excelFile" name="file" required>
                         <input type="hidden" id="uploadEXCELFolderId" name="folderId">
                     </div>
@@ -566,6 +580,7 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
+                location.reload();
                 alert('Operation successful');
             })
             .catch((error) => {
