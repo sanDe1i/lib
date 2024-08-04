@@ -112,4 +112,7 @@ public class ResourcesLibService {
                 query, query, query);
     }
 
+    public void save(ResourcesLib rl){
+        resourcesLibDao.save(rl);
+    }
 }
