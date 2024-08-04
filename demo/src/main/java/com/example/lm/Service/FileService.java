@@ -243,7 +243,7 @@ public class FileService {
         }
     }
 
-    public void uploadMARCFile(int folderId, MultipartFile marc){
+    public void uploadMARCFile(int folderId, MultipartFile marc, String status, String view, String download, int borrow_period){
         if(marc != null) {
             String fileName = marc.getOriginalFilename();
             String uploadMarcPath = MarcUploadPath;
@@ -255,7 +255,7 @@ public class FileService {
             try {
                 marc.transferTo(targetFile);
                 System.out.println(targetFile.getAbsoluteFile());
-                saveMarcData(folderId, targetFile);
+                saveMarcData(folderId, targetFile, status, view, download, borrow_period);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -267,7 +267,7 @@ public class FileService {
      *
      *
      */
-    private void saveMarcData(int folderId, java.io.File marc) {
+    private void saveMarcData(int folderId, java.io.File marc, String status, String view, String download, int borrow_period) {
         try {
             String marcFilePath = marc.getAbsolutePath();
             InputStream inputStream = new FileInputStream(marcFilePath);
@@ -298,10 +298,10 @@ public class FileService {
                 fileInfo.setDescription(getFieldData(record, "520", 'a'));
                 fileInfo.setChapters(getFieldData(record, "505", 'a'));
                 fileInfo.setResourcesId(folderId);
-                fileInfo.setStatus("Unpublished");
-                fileInfo.setView("Disable");
-                fileInfo.setDownload("Disable");
-                fileInfo.setBorrowPeriod(0);
+                fileInfo.setStatus(status);
+                fileInfo.setView(view);
+                fileInfo.setDownload(download);
+                fileInfo.setBorrowPeriod(borrow_period);
                 fileInfoDao.save(fileInfo);
             }
         } catch (Exception e) {
@@ -669,11 +669,11 @@ public class FileService {
         return fileInfoDao.getEPUBNum(folderId).size();
     }
 
-    public void saveExcel(int folderId, MultipartFile excel) throws IOException {
+    public void saveExcel(int folderId, MultipartFile excel, String status, String view, String download, int borrow_period) throws IOException {
         try (InputStream inputStream = excel.getInputStream()) {
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
             int sheetNum = xssfWorkbook.getNumberOfSheets();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
             for (int i = 0; i < sheetNum; i++) {
                 XSSFSheet sheet = xssfWorkbook.getSheetAt(i);
@@ -699,18 +699,24 @@ public class FileService {
                         Cell cell = sheet.getRow(row).getCell(colIndex);
 
                         if (cell != null) {
-                            bookMetadata.setStatus("Unpublished");
-                            bookMetadata.setView("Disable");
-                            bookMetadata.setDownload("Disable");
-                            bookMetadata.setBorrowPeriod(0);
+                            bookMetadata.setStatus(status);
+                            bookMetadata.setView(view);
+                            bookMetadata.setDownload(download);
+                            bookMetadata.setBorrowPeriod(borrow_period);
                             bookMetadata.setResourcesId(folderId);
 
-                            String cellValue;
+                            String cellValue = null;
                             if (cell.getCellType() == CellType.NUMERIC) {
                                 if (DateUtil.isCellDateFormatted(cell)) {
                                     cellValue = dateFormat.format(cell.getDateCellValue());
                                 } else {
-                                    cellValue = BigDecimal.valueOf(cell.getNumericCellValue()).toPlainString();
+                                    // 检查是否为整数
+                                    double numericValue = cell.getNumericCellValue();
+                                    if (numericValue == (int) numericValue) {
+                                        cellValue = Integer.toString((int) numericValue);
+                                    } else {
+                                        cellValue = BigDecimal.valueOf(numericValue).toPlainString();
+                                    }
                                 }
                             } else {
                                 cellValue = cell.toString();

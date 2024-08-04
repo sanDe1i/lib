@@ -213,7 +213,7 @@
      aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form id="addFolderForm" th:action="@{/addDatabases}" method="post" enctype="multipart/form-data">
+            <form id="addFolderForm" th:action="@{/addDatabases}" method="post" enctype="multipart/form-data" onsubmit="updateBorrowField()">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addFolderModalLabel">Add a New Database</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -251,6 +251,31 @@
                                 <option value="Published">Published</option>
                                 <option value="Hidden">Hidden</option>
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="view">View</label>
+                            <select class="form-control" id="view" name="view" required>
+                                <option value="" disabled selected>Select the option</option>
+                                <option value="Disable">Disable</option>
+                                <option value="Enable">Enable</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="download">Download</label>
+                            <select class="form-control" id="download" name="download" required>
+                                <option value="" disabled selected>Select the option</option>
+                                <option value="Disable">Disable</option>
+                                <option value="Enable">Enable</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="borrow">Borrow</label>
+                            <select class="form-control" id="borrow" name="borrow" required onchange="handleBorrowChange(this)">
+                                <option value="" disabled selected>Select the option</option>
+                                <option value="0">Disable</option>
+                                <option value="Enable">Enable</option>
+                            </select>
+                            <input type="hidden" id="borrowHidden" name="borrowHidden">
                         </div>
                     </div>
                     <div class="form-step">
@@ -587,6 +612,32 @@
                 console.error('Error:', error);
                 alert('Operation failed');
             });
+    }
+
+    function handleBorrowChange(selectElement) {
+        if (selectElement.value === 'Enable') {
+            let period = prompt("Please enter the borrow period (days):", "30");
+            if (period != null && !isNaN(period)) {
+                document.getElementById('borrowHidden').value = period;
+                selectElement.options[selectElement.selectedIndex].text = 'Enable (' + period + ' days)';
+            } else {
+                selectElement.value = ""; // Reset to default if invalid input
+                document.getElementById('borrowHidden').value = "";
+                alert("Please enter a valid number.");
+            }
+        } else {
+            document.getElementById('borrowHidden').value = selectElement.value;
+        }
+    }
+
+    function updateBorrowField() {
+        const borrowSelect = document.getElementById('borrow');
+        const borrowHidden = document.getElementById('borrowHidden');
+        if (borrowSelect.value === 'Enable') {
+            borrowHidden.name = 'borrow'; // Change the name to ensure it's sent as 'borrow'
+        } else {
+            borrowHidden.name = ''; // Reset name to avoid sending it
+        }
     }
 </script>
 

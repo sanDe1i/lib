@@ -97,6 +97,7 @@ public class MainController {
             folder.setMarcCount(marcCount);
             folder.setPdfCount(pdfCount);
             folder.setEpubCount(epubCount);
+            resourcesLibService.save(folder);
             folderPDFMap.put(folder.getId(), PDFs);
         }
         model.addAttribute("folderPDFMap", folderPDFMap);
@@ -111,26 +112,33 @@ public class MainController {
             @RequestParam("typeSelection") String typeSelection,
             @RequestParam("databaseDescription") String databaseDescription,
             @RequestParam("status") String status,
+            @RequestParam("view") String view,
+            @RequestParam("download") String download,
+            @RequestParam("borrow") String borrow,
             @RequestParam("file") MultipartFile marcFile,
             @RequestParam("excel") MultipartFile excel,
-            @RequestParam("epub") MultipartFile epub,
+            @RequestParam("epub") List<MultipartFile> epub,
             @RequestParam("files") List<MultipartFile> pdfFiles,
             RedirectAttributes redirectAttributes) throws IOException {
 
+        int borrow_period = Integer.parseInt(borrow.replaceAll("[^0-9]", ""));
         ResourcesLib resourcesLib = new ResourcesLib();
         resourcesLib.setName(databaseName);
         resourcesLib.setAlternateName(alternateNames);
         resourcesLib.setDescription(databaseDescription);
         resourcesLib.setType(typeSelection);
         resourcesLib.setDisplay(status);
-        resourcesLib.setView("Disable");
-        resourcesLib.setDownload("Disable");
-        resourcesLib.setBorrow(0);
+        resourcesLib.setView(view);
+        resourcesLib.setDownload(download);
+        resourcesLib.setBorrow(borrow_period);
         resourcesLibService.saveNewDatabases(resourcesLib);
-        fileService.uploadMARCFile(resourcesLib.getId(), marcFile);
+        fileService.uploadMARCFile(resourcesLib.getId(), marcFile, status, view, download, borrow_period);
+        fileService.saveExcel(resourcesLib.getId(), excel, status, view, download, borrow_period);
         List<String> invalidFiles = fileService.savePDFs(resourcesLib.getId(), pdfFiles);
+        List<String> invalidFiles1 = fileService.saveEPUBs(resourcesLib.getId(), epub);
         if (!invalidFiles.isEmpty()) {
             redirectAttributes.addFlashAttribute("invalidFiles", invalidFiles);
+            redirectAttributes.addFlashAttribute("invalidFiles1", invalidFiles1);
             redirectAttributes.addFlashAttribute("folderIdWithInvalidFiles", resourcesLib.getId());
         }
 
@@ -154,8 +162,9 @@ public class MainController {
     }
 
     @PostMapping("/uploadMARC")
-    public String uploadMarcFile(@RequestParam("folderId") int folderId, @RequestParam("file") MultipartFile marc) {
-        fileService.uploadMARCFile(folderId, marc);
+    public String uploadMarcFile(@RequestParam("folderId") int folderId, @RequestParam("file") MultipartFile marc, String status, String view, String download, String borrow) {
+        int borrow_period = Integer.parseInt(borrow.replaceAll("[^0-9]", ""));
+        fileService.uploadMARCFile(folderId, marc, status, view, download, borrow_period);
         return "redirect:/resourcesLib";
     }
 
@@ -562,8 +571,9 @@ public class MainController {
     }
 
     @PostMapping("/saveExcel")
-    public ResponseEntity<?> saveExcel(@RequestParam("folderId") int folderId, @RequestParam("file") MultipartFile excel) throws IOException {
-        fileService.saveExcel(folderId, excel);
+    public ResponseEntity<?> saveExcel(@RequestParam("folderId") int folderId, @RequestParam("file") MultipartFile excel, String status, String view, String download, String borrow) throws IOException {
+        int borrow_period = Integer.parseInt(borrow.replaceAll("[^0-9]", ""));
+        fileService.saveExcel(folderId, excel, status, view, download, borrow_period);
         return ResponseEntity.ok("Successfully save the info");
     }
 
