@@ -7,14 +7,12 @@ import com.example.lm.Dao.PDFDao;
 import com.example.lm.Model.File;
 import com.example.lm.Model.FileInfo;
 import com.example.lm.Model.PDFs;
-import com.example.lm.Model.ResourcesLib;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -41,14 +39,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Service
 public class FileService {
@@ -174,19 +170,19 @@ public class FileService {
         List<String> invalidFiles = new ArrayList<>();
 
         for (MultipartFile file : files) {
-            String PDFName = file.getOriginalFilename();
-            if (PDFName != null && PDFName.toLowerCase().endsWith(".epub")) {
-                PDFName = PDFName.substring(0, PDFName.length() - 4);
+            String EPUBName = file.getOriginalFilename();
+            if (EPUBName != null && EPUBName.toLowerCase().endsWith(".epub")) {
+                EPUBName = EPUBName.substring(0, EPUBName.length() - 5);
             }
 
-            if (fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName).size() > 0) {
+            if (fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, EPUBName).size() > 0) {
                 String uploadPDFPath = EPUBUploadPath;
                 System.out.println(uploadPDFPath);
                 java.io.File uploadFile = new java.io.File(uploadPDFPath);
                 if (!uploadFile.exists()) {
                     uploadFile.mkdirs();
                 }
-                java.io.File targetFile = new java.io.File(uploadFile.getAbsolutePath() + "/" + PDFName + ".epub");
+                java.io.File targetFile = new java.io.File(uploadFile.getAbsolutePath() + "/" + EPUBName + ".epub");
                 try {
                     file.transferTo(targetFile);
                     PDFs pdf = new PDFs();
@@ -196,16 +192,16 @@ public class FileService {
                     pdfDao.save(pdf);
 
                     // Update the FileInfo table with the download link
-                    List<FileInfo> fileInfos = fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName);
+                    List<FileInfo> fileInfos = fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, EPUBName);
                     for (FileInfo fileInfo : fileInfos) {
-                        fileInfo.setDownloadLink(targetFile.getAbsolutePath());
+                        fileInfo.setEpubPath(targetFile.getAbsolutePath());
                         fileInfoDao.save(fileInfo);
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             } else {
-                invalidFiles.add(PDFName);
+                invalidFiles.add(EPUBName);
             }
         }
         return invalidFiles;
