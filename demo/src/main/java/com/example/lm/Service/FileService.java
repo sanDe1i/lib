@@ -7,14 +7,12 @@ import com.example.lm.Dao.PDFDao;
 import com.example.lm.Model.File;
 import com.example.lm.Model.FileInfo;
 import com.example.lm.Model.PDFs;
-import com.example.lm.Model.ResourcesLib;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -41,14 +39,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Service
 public class FileService {
@@ -83,54 +82,15 @@ public class FileService {
     private EntityManager entityManager;
 
 
-//    public List<String> savePDFs(int folderId, List<MultipartFile> files) throws IOException {
-//        List<String> invalidFiles = new ArrayList<>();
-//
-//        for (MultipartFile file : files) {
-//
-//            String PDFName = file.getOriginalFilename();
-//            if (PDFName != null && PDFName.toLowerCase().endsWith(".pdf")) {
-//                PDFName = PDFName.substring(0, PDFName.length() - 4);
-//            }
-//
-//            if (fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName).size() > 0) {
-//                /*ObjectId gridFsId = gridFsTemplate.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
-//                String content = extractPdfText(file.getInputStream());
-//
-//                File newFile = new File();
-//                newFile.setFilename(file.getOriginalFilename());
-//                newFile.setContentType(file.getContentType());
-//                newFile.setSize(file.getSize());
-//                newFile.setGridFsId(gridFsId.toString());
-//                newFile.setContent(content);
-//                newFile.setResourcesId(folderId);
-//                fileDao.save(newFile);*/
-//                String uploadPDFPath = PDFUploadPath;
-//                java.io.File uploadFile = new java.io.File(uploadPDFPath);
-//                if (!uploadFile.exists()) {
-//                    uploadFile.mkdirs();
-//                }
-//                java.io.File targetFile = new java.io.File(uploadFile.getAbsolutePath() + "/" + PDFName);
-//                try {
-//                    file.transferTo(targetFile);
-//                    PDFs pdf = new PDFs();
-//                    pdf.setName(file.getOriginalFilename());
-//                    pdf.setAddress(targetFile.getAbsolutePath());
-//                    pdf.setResourcesId(folderId);
-//                    pdfDao.save(pdf);
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            } else {
-//                invalidFiles.add(PDFName);
-//            }
-//        }
-//
-//        return invalidFiles;
-//    }
-
     public List<String> savePDFs(int folderId, List<MultipartFile> files) throws IOException {
         List<String> invalidFiles = new ArrayList<>();
+
+        String uploadPDFPath = PDFUploadPath + folderId;
+
+        java.io.File uploadDir = new java.io.File(uploadPDFPath);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
 
         for (MultipartFile file : files) {
             String PDFName = file.getOriginalFilename();
@@ -139,13 +99,7 @@ public class FileService {
             }
 
             if (fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName).size() > 0) {
-                String uploadPDFPath = PDFUploadPath;
-                System.out.println(uploadPDFPath);
-                java.io.File uploadFile = new java.io.File(uploadPDFPath);
-                if (!uploadFile.exists()) {
-                    uploadFile.mkdirs();
-                }
-                java.io.File targetFile = new java.io.File(uploadFile.getAbsolutePath() + "/" + PDFName + ".pdf");
+                java.io.File targetFile = new java.io.File(uploadDir.getAbsolutePath() + "/" + PDFName + ".pdf");
                 try {
                     file.transferTo(targetFile);
                     PDFs pdf = new PDFs();
@@ -154,10 +108,9 @@ public class FileService {
                     pdf.setResourcesId(folderId);
                     pdfDao.save(pdf);
 
-                    // Update the FileInfo table with the download link
                     List<FileInfo> fileInfos = fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName);
                     for (FileInfo fileInfo : fileInfos) {
-                        fileInfo.setDownloadLink(targetFile.getAbsolutePath());
+                        fileInfo.setDownloadLink(Integer.toString(pdf.getId()));
                         fileInfoDao.save(fileInfo);
                     }
                 } catch (IOException e) {
@@ -198,7 +151,9 @@ public class FileService {
                     // Update the FileInfo table with the download link
                     List<FileInfo> fileInfos = fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName);
                     for (FileInfo fileInfo : fileInfos) {
-                        fileInfo.setDownloadLink(targetFile.getAbsolutePath());
+                        //数据库等会儿再改
+                        fileInfo.setDownloadLink(Integer.toString(pdf.getId()));
+//                        System.out.println(fileInfo.getDownloadLink());
                         fileInfoDao.save(fileInfo);
                     }
                 } catch (IOException e) {
@@ -378,6 +333,8 @@ public class FileService {
     public FileInfo getFileById(int bookID) {
         return fileInfoDao.findById(bookID);
     }
+
+    public List<FileInfo> getListPDFs(Integer databaseId) {return fileInfoDao.findPDFs(databaseId);}
 
 
     public Page<FileInfo> keywordSearch(String keyword, Pageable pageable) {
@@ -600,7 +557,7 @@ public class FileService {
             if ("status".equals(editType)) {
                 book.setStatus(editField);
             } else if ("loan".equals(editType)) {
-                book.setLoanLabel(editField);
+                book.setBorrowPeriod(Integer.parseInt(editField));
             }else if ("download".equals(editType)) {
                 book.setDownload(editField);
             }else if ("view".equals(editType)) {
@@ -806,4 +763,41 @@ public class FileService {
         }
     }
 
+    public List<FileInfo> findByAllKinds(String title, String isbn, String alternativeTitle, String author, String status, String publisher, String sourceType, String language, String published, Integer databaseId) {
+        title = (title != null && title.isEmpty()) ? null : title;
+        isbn = (isbn != null && isbn.isEmpty()) ? null : isbn;
+        alternativeTitle = (alternativeTitle != null && alternativeTitle.isEmpty()) ? null : alternativeTitle;
+        author = (author != null && author.isEmpty()) ? null : author;
+        status = (status != null && status.isEmpty()) ? null : status;
+        publisher = (publisher != null && publisher.isEmpty()) ? null : publisher;
+        sourceType = (sourceType != null && sourceType.isEmpty()) ? null : sourceType;
+        language = (language != null && language.isEmpty()) ? null : language;
+        published = (published != null && published.isEmpty()) ? null : published;
+
+        return fileInfoDao.findByAllKinds(title, isbn, alternativeTitle, author, status, publisher, sourceType, language, published, databaseId);
+
+    }
+
+    @Transactional
+    public boolean deletePdfById(String pdfID, Integer databaseId) {
+        Optional<PDFs> fileOptional = pdfDao.findById(Integer.valueOf(pdfID));
+        if (fileOptional.isPresent()) {
+            PDFs pdf = fileOptional.get();
+            String fileName = pdf.getName();
+            pdfDao.delete(pdf);
+            // 更新 book 表中相应的 downloadLink 字段为空
+            fileInfoDao.updateDownloadLinkToNull(pdfID);
+
+            // 删除文件系统中的文件
+            try {
+                Path filePath = Paths.get(PDFUploadPath+ databaseId +"/" + fileName);
+                Files.deleteIfExists(filePath);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
 }

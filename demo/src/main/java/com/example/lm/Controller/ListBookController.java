@@ -40,101 +40,6 @@ public class ListBookController {
     @Value("${PDFUploadPath}")
     private String PDFUploadPath;
 
-
-    //private final Path fileStorageLocation = Paths.get("pdf").toAbsolutePath().normalize();
-
-
-    // 显示查询页面
-//    @GetMapping("/test/searchPage")
-//    public String showSearchPage() {
-//        return "search2";
-//    }
-
-//    @GetMapping("test/search2")
-//    public String searchBooks(@RequestParam(required = false) String title,
-//                              @RequestParam(required = false) String publisher,
-//                              @RequestParam(required = false) String sourceType,
-//                              @RequestParam(required = false) String language,
-//                              @RequestParam(required = false) String published,
-//                              @RequestParam(required = false) String status,
-//                              @RequestParam(required = false) Integer databaseId,
-//                              Model model) {
-//        List<FileInfo> fileInfos = fileService.searchBooks(title, status, publisher, sourceType, language, published, databaseId);
-//
-//        List<Map<String, Object>> resultSet = fileInfos.stream()
-//                .map(fileInfo -> {
-//                    Map<String, Object> result = new HashMap<>();
-//                    result.put("title", fileInfo.getTitle());
-//                    result.put("alternativeTitle", fileInfo.getAlternativeTitle());
-//                    result.put("sourceType", fileInfo.getSourceType());
-//                    result.put("author", fileInfo.getAuthors());
-//                    result.put("isbn", fileInfo.getIsbn());
-//                    result.put("publisher", fileInfo.getPublisher());
-//                    result.put("published", fileInfo.getPublished());
-//                    result.put("status", fileInfo.getStatus());
-//                    result.put("view", fileInfo.getView());
-//                    result.put("download", fileInfo.getDownload());
-//                    result.put("downloadLink", fileInfo.getDownloadLink());
-//
-//                    // 获取 ResourcesLib 对象
-//                    ResourcesLib resourcesLib = resourcesLibService.findResourcesLibById(fileInfo.getResourcesId());
-//                    String resourcesLibName = (resourcesLib != null) ? resourcesLib.getName() : "";
-//                    result.put("resourcesId", resourcesLibName);
-////                    ResourcesLib resourcesLib = resourcesLibService.findResourcesLibById(fileInfo.getResourcesId());
-////                    result.put("resourcesId", fileInfo.getResourcesId());
-//
-//
-//                    result.put("loanLabel", fileInfo.getLoanLabel());
-//                    int id = fileInfo.getId();
-//                    result.put("loaned", fileService.isBookBorrowed(id));
-////                    result.put("url", fileInfo.getUrl());
-//                    result.put("id", id);
-//                    return result;
-//                }).toList();  // Collect into a Set to remove duplicates
-//        List<Map<String, Object>> resultList = new ArrayList<>(resultSet);
-//        int resultCount = resultList.size();
-//        model.addAttribute("books", new ArrayList<>(resultSet));
-//        model.addAttribute("resultCount", resultCount);
-//        // 同时将搜索参数传递给视图
-//        model.addAttribute("title", title);
-//        model.addAttribute("publisher", publisher);
-//        model.addAttribute("sourceType", sourceType);
-//        model.addAttribute("language", language);
-//        model.addAttribute("published", published);
-//        model.addAttribute("status", status);
-//        model.addAttribute("databaseId", databaseId);
-//        // 将出版社列表传递到视图
-//        List<String> publishers = fileService.getAllDistinctPublishers();
-//        List<String> publisheds = fileService.getAllDistinctPublished();
-//        List<String> SourceTypes = fileService.getAllDistinctSourceType();
-//        List<String> languages = fileService.getAllDistinctLanguage();
-//        List<String> statuses = fileService.getAllDistinctStatus();
-//        List<Integer> databaseIds = fileService.getAllDistinctDatabaseId();
-//        Map<Integer, String> databaseInfoMap = new HashMap<>();
-//
-//        for (Integer id : databaseIds) {
-//            ResourcesLib resourcesLib = resourcesLibService.findResourcesLibById(id);
-//
-//            if (resourcesLib != null) {
-//                databaseInfoMap.put(id, resourcesLib.getName());
-//            } else {
-//                databaseInfoMap.put(id, "Unknown Database");
-//            }
-//        }
-//
-//        model.addAttribute("databaseInfoMap", databaseInfoMap);
-//        model.addAttribute("publishers", publishers);
-//        model.addAttribute("publisheds", publisheds);
-//        model.addAttribute("SourceTypes", SourceTypes);
-//        model.addAttribute("languages", languages);
-//        model.addAttribute("statuses", statuses);
-////        model.addAttribute("databaseIds", databaseIds);
-////        model.addAttribute("databaseNames", databaseNames);
-//        model.addAttribute("databaseMap", databaseInfoMap);
-//
-//        return "searchresults";  // 返回视图名称
-//    }
-
     @GetMapping("test/search2")
     public String searchBooks(@RequestParam(required = false) String searchValue,
                               @RequestParam(required = false) String searchType,
@@ -150,19 +55,22 @@ public class ListBookController {
         String isbn = null;
         String alternativeTitle = null;
         String author = null;
-
-        if ("title".equals(searchType)) {
-            title = searchValue;
-        } else if ("isbn".equals(searchType)) {
-            isbn = searchValue;
-        } else if ("alternativeTitle".equals(searchType)) {
-            alternativeTitle = searchValue;
-        }else if ("author".equals(searchType)) {
-            author = searchValue;
+        List<FileInfo> fileInfos;
+        if ("allkinds".equalsIgnoreCase(searchType) && searchValue != null) {
+            fileInfos = fileService.findByAllKinds(searchValue, searchValue, searchValue, searchValue, status, publisher, sourceType, language, published, databaseId);
+//            System.out.println(fileInfos);
+        } else {
+            if ("title".equals(searchType)) {
+                title = searchValue;
+            } else if ("isbn".equals(searchType)) {
+                isbn = searchValue;
+            } else if ("alternativeTitle".equals(searchType)) {
+                alternativeTitle = searchValue;
+            } else if ("author".equals(searchType)) {
+                author = searchValue;
+            }
+            fileInfos = fileService.searchBooks(title, isbn, alternativeTitle, author, status, publisher, sourceType, language, published, databaseId);
         }
-        List<FileInfo> fileInfos = fileService.searchBooks(title, isbn, alternativeTitle, author, status, publisher, sourceType, language, published, databaseId);
-
-        //List<FileInfo> fileInfos = fileService.searchBooks(title, status, publisher, sourceType, language, published, databaseId);
 
         // Collect all resource IDs
         Set<Integer> resourceIds = fileInfos.stream()
@@ -194,7 +102,7 @@ public class ListBookController {
 
                     result.put("loanLabel", fileInfo.getLoanLabel());
                     int id = fileInfo.getId();
-                    result.put("loaned", fileService.isBookBorrowed(id));
+                    result.put("loaned", fileInfo.getBorrowPeriod());
                     result.put("id", id);
                     return result;
                 }).toList();  // Collect into a Set to remove duplicates
@@ -353,7 +261,6 @@ public class ListBookController {
                 try {
                     Path filePath = Paths.get(PDFUploadPath).resolve(fileName).normalize();
                     Resource resource = new UrlResource(filePath.toUri());
-//                    System.out.println(filePath);
 
                     if (resource.exists()) {
                         return ResponseEntity.ok()
@@ -371,6 +278,54 @@ public class ListBookController {
 
         return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/listPDFs")
+    public String getDistinctDownloadLinkBooks(@RequestParam Integer databaseId, Model model) {
+        List<FileInfo> pdfList = fileService.getListPDFs(databaseId);
+        Map<String, List<FileInfo>> groupedByDownloadLink = pdfList.stream()
+                .collect(Collectors.groupingBy(FileInfo::getDownloadLink));
+        model.addAttribute("pdfs", groupedByDownloadLink);
+        model.addAttribute("database", databaseId);
+        //System.out.println(groupedByDownloadLink.get("135").size());
+        return "pdfList";
+    }
+
+    @PostMapping("/deletePdf/{pdfID}")
+    public String deletePdf(@PathVariable String pdfID, @RequestParam Integer databaseId, Model model) {
+        boolean isDeleted = fileService.deletePdfById(pdfID,databaseId);
+        if (isDeleted) {
+            model.addAttribute("message", "PDF deleted successfully.");
+        } else {
+            model.addAttribute("message", "Failed to delete PDF.");
+        }
+        // Optionally, add logic to refresh the list of PDFs or redirect to another page
+
+        return String.format("redirect:/listPDFs?databaseId=%s",databaseId);
+    }
+
+//    @GetMapping("/listEpubs")
+//    public String getDistinctEpubBooks(@RequestParam Integer databaseId, Model model) {
+//        List<FileInfo> pdfList = fileService.getListEpubs(databaseId);
+//        Map<String, List<FileInfo>> groupedByDownloadLink = pdfList.stream()
+//                .collect(Collectors.groupingBy(FileInfo::getDownloadLink));
+//        model.addAttribute("epubs", groupedByDownloadLink);
+//        model.addAttribute("database", databaseId);
+//        //System.out.println(groupedByDownloadLink.get("135").size());
+//        return "pdfList";
+//    }
+//
+//    @PostMapping("/deletePdf/{pdfID}")
+//    public String deleteEpub(@PathVariable String pdfID, @RequestParam Integer databaseId, Model model) {
+//        boolean isDeleted = fileService.deletePdfById(pdfID,databaseId);
+//        if (isDeleted) {
+//            model.addAttribute("message", "PDF deleted successfully.");
+//        } else {
+//            model.addAttribute("message", "Failed to delete PDF.");
+//        }
+//        // Optionally, add logic to refresh the list of PDFs or redirect to another page
+//
+//        return String.format("redirect:/listPDFs?databaseId=%s",databaseId);
+//    }
 
     @GetMapping("/files-view")
     public String fileList() {

@@ -5,14 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改下拉选框及在线浏览">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_7_19_15_40_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_7_19_15_40__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/5656e9b0-aadb-413e-923d-60d1e8b6b7d1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/5656e9b0-aadb-413e-923d-60d1e8b6b7d1.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/ListBookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/ListBookController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/MainController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/FileInfoDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/FileInfoDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Model/FileInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Model/FileInfo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/FileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/FileService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/searchresults.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/searchresults.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/sourceDatabases.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/sourceDatabases.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,8 +24,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Interface" />
-        <option value="HTML File" />
         <option value="Class" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -37,8 +38,8 @@
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
-        <option name="localRepository" value="D:\Download\apache-maven-3.9.6-bin\local" />
-        <option name="mavenHome" value="$PROJECT_DIR$/../../../../Download/apache-maven-3.9.6-bin/apache-maven-3.9.6" />
+        <option name="mavenHome" value="$PROJECT_DIR$/../../../../../Download/apache-maven-3.9.6-bin/apache-maven-3.9.6" />
+        <option name="useMavenConfig" value="true" />
         <option name="userSettingsFile" value="D:\Download\apache-maven-3.9.6-bin\apache-maven-3.9.6\conf\settings.xml" />
       </MavenGeneralSettings>
     </option>
@@ -59,7 +60,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/code/git/Lib_Project/demo&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/code/git/new/lib/demo&quot;,
     &quot;service.view.auto.scroll.to.source&quot;: &quot;true&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
     &quot;spring.configuration.checksum&quot;: &quot;fe01ce2a7fbac8fafaed7c982a04e229&quot;,
@@ -112,6 +113,7 @@
       <workItem from="1720718923829" duration="17000" />
       <workItem from="1720719112378" duration="807000" />
       <workItem from="1720870032459" duration="129621000" />
+      <workItem from="1722608338537" duration="25911000" />
     </task>
     <task id="LOCAL-00001" summary="拦截+搜索访问@GetMapping(&quot;test/search2&quot;)">
       <created>1720963712259</created>

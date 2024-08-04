@@ -109,7 +109,10 @@
                 <td>
                     <a th:href="@{/test/search2(databaseId=${folder.id})}" th:text="${folder.marcCount}">Marc Count</a>
                 </td>
-                <td th:text="${folder.pdfCount}">PDF Count</td>
+                <td>
+                    <a th:href="@{/listPDFs(databaseId=${folder.id})}" th:text="${folder.pdfCount}">PDF Count</a>
+                </td>
+<!--                <td th:text="${folder.pdfCount}">PDF Count</td>-->
                 <td th:text="${folder.epubCount}">EPUB Count</td>
 
                 <td><a class="btn btn-sm btn-primary" data-toggle="modal" data-target="#renameFolderModal"
