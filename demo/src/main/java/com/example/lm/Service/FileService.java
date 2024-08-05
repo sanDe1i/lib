@@ -127,19 +127,19 @@ public class FileService {
         List<String> invalidFiles = new ArrayList<>();
 
         for (MultipartFile file : files) {
-            String PDFName = file.getOriginalFilename();
-            if (PDFName != null && PDFName.toLowerCase().endsWith(".epub")) {
-                PDFName = PDFName.substring(0, PDFName.length() - 4);
+            String EPUBName = file.getOriginalFilename();
+            if (EPUBName != null && EPUBName.toLowerCase().endsWith(".epub")) {
+                EPUBName = EPUBName.substring(0, EPUBName.length() - 5);
             }
 
-            if (fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName).size() > 0) {
+            if (fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, EPUBName).size() > 0) {
                 String uploadPDFPath = EPUBUploadPath;
                 System.out.println(uploadPDFPath);
                 java.io.File uploadFile = new java.io.File(uploadPDFPath);
                 if (!uploadFile.exists()) {
                     uploadFile.mkdirs();
                 }
-                java.io.File targetFile = new java.io.File(uploadFile.getAbsolutePath() + "/" + PDFName + ".epub");
+                java.io.File targetFile = new java.io.File(uploadFile.getAbsolutePath() + "/" + EPUBName + ".epub");
                 try {
                     file.transferTo(targetFile);
                     PDFs pdf = new PDFs();
@@ -149,18 +149,22 @@ public class FileService {
                     pdfDao.save(pdf);
 
                     // Update the FileInfo table with the download link
-                    List<FileInfo> fileInfos = fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, PDFName);
+                    List<FileInfo> fileInfos = fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, EPUBName);
                     for (FileInfo fileInfo : fileInfos) {
+                      
+                        fileInfo.setEpubPath(Integer.toString(pdf.getId()));
+
                         //数据库等会儿再改
                         fileInfo.setDownloadLink(Integer.toString(pdf.getId()));
 //                        System.out.println(fileInfo.getDownloadLink());
+
                         fileInfoDao.save(fileInfo);
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             } else {
-                invalidFiles.add(PDFName);
+                invalidFiles.add(EPUBName);
             }
         }
         return invalidFiles;

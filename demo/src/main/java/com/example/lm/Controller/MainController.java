@@ -132,13 +132,19 @@ public class MainController {
         resourcesLib.setDownload(download);
         resourcesLib.setBorrow(borrow_period);
         resourcesLibService.saveNewDatabases(resourcesLib);
+
         fileService.uploadMARCFile(resourcesLib.getId(), marcFile, status, view, download, borrow_period);
         fileService.saveExcel(resourcesLib.getId(), excel, status, view, download, borrow_period);
-        List<String> invalidFiles = fileService.savePDFs(resourcesLib.getId(), pdfFiles);
-        List<String> invalidFiles1 = fileService.saveEPUBs(resourcesLib.getId(), epub);
+
+        List<String> invalidPDF = fileService.savePDFs(resourcesLib.getId(), pdfFiles);
+        List<String> invalidEPUB = fileService.saveEPUBs(resourcesLib.getId(), epub);
+
+        List<String> invalidFiles = new ArrayList<>();
+        invalidFiles.addAll(invalidPDF);
+        invalidFiles.addAll(invalidEPUB);
+
         if (!invalidFiles.isEmpty()) {
             redirectAttributes.addFlashAttribute("invalidFiles", invalidFiles);
-            redirectAttributes.addFlashAttribute("invalidFiles1", invalidFiles1);
             redirectAttributes.addFlashAttribute("folderIdWithInvalidFiles", resourcesLib.getId());
         }
 
@@ -571,10 +577,10 @@ public class MainController {
     }
 
     @PostMapping("/saveExcel")
-    public ResponseEntity<?> saveExcel(@RequestParam("folderId") int folderId, @RequestParam("file") MultipartFile excel, String status, String view, String download, String borrow) throws IOException {
+    public String saveExcel(@RequestParam("folderId") int folderId, @RequestParam("file") MultipartFile excel, String status, String view, String download, String borrow) throws IOException {
         int borrow_period = Integer.parseInt(borrow.replaceAll("[^0-9]", ""));
         fileService.saveExcel(folderId, excel, status, view, download, borrow_period);
-        return ResponseEntity.ok("Successfully save the info");
+        return "redirect:/resourcesLib";
     }
 
     @PostMapping("/uploadEPUB")

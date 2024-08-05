@@ -136,9 +136,9 @@
                             <a class="dropdown-item" data-toggle="modal"
                                data-target="#uploadMarcModal" th:attr="data-id=${folder.id}">Upload Marc</a>
                             <a class="dropdown-item" data-toggle="modal"
-                               data-target="#uploadPdfModal" th:attr="data-id=${folder.id}">Upload PDF</a>
-                            <a class="dropdown-item" data-toggle="modal"
                                data-target="#uploadEXCELModal" th:attr="data-id=${folder.id}">Upload EXCEL</a>
+                            <a class="dropdown-item" data-toggle="modal"
+                               data-target="#uploadPdfModal" th:attr="data-id=${folder.id}">Upload PDF</a>
                             <a class="dropdown-item" data-toggle="modal"
                                data-target="#uploadEPUBModal" th:attr="data-id=${folder.id}">Upload EPUB</a>
                         </div>
@@ -248,11 +248,11 @@
                                       required></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="status">Status (Published or Hidden)</label>
+                            <label for="status">Status (Published or Unpublished)</label>
                             <select class="form-control" id="status" name="status" required>
                                 <option value="" disabled selected>Select the status</option>
                                 <option value="Published">Published</option>
-                                <option value="Hidden">Hidden</option>
+                                <option value="Unpublished">Unpublished</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -372,7 +372,7 @@
      aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form th:action="@{/uploadMARC}" method="post" enctype="multipart/form-data">
+            <form th:action="@{/uploadMARC}" method="post" enctype="multipart/form-data" onsubmit="updateBorrowField1()">
                 <div class="modal-header">
                     <h5 class="modal-title" id="uploadMarcModalLabel">Upload Marc File</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -384,6 +384,39 @@
                         <label for="marcFile1">Choose Marc File</label>
                         <input type="file" class="form-control" id="marcFile1" name="file" required>
                         <input type="hidden" id="uploadMarcFolderId1" name="folderId">
+                    </div>
+                    <div class="form-group">
+                        <label for="status1">Status (Published or Unpublished)</label>
+                        <select class="form-control" id="status1" name="status" required>
+                            <option value="" disabled selected>Select the status</option>
+                            <option value="Published">Published</option>
+                            <option value="Unpublished">Unpublished</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="view1">View</label>
+                        <select class="form-control" id="view1" name="view" required>
+                            <option value="" disabled selected>Select the option</option>
+                            <option value="Disable">Disable</option>
+                            <option value="Enable">Enable</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="download1">Download</label>
+                        <select class="form-control" id="download1" name="download" required>
+                            <option value="" disabled selected>Select the option</option>
+                            <option value="Disable">Disable</option>
+                            <option value="Enable">Enable</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="borrow1">Borrow</label>
+                        <select class="form-control" id="borrow1" name="borrow" required onchange="handleBorrowChange1(this)">
+                            <option value="" disabled selected>Select the option</option>
+                            <option value="0">Disable</option>
+                            <option value="Enable">Enable</option>
+                        </select>
+                        <input type="hidden" id="borrowHidden1" name="borrowHidden1">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -400,7 +433,7 @@
      aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form th:action="@{/saveExcel}" method="post" enctype="multipart/form-data">
+            <form th:action="@{/saveExcel}" method="post" enctype="multipart/form-data" onsubmit="updateBorrowField2()">
                 <div class="modal-header">
                     <h5 class="modal-title" id="uploadEXCELModalLabel">Upload EXCEL File</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -412,6 +445,39 @@
                         <label for="excelFile">Choose EXCEL File</label>
                         <input type="file" class="form-control" id="excelFile" name="file" required>
                         <input type="hidden" id="uploadEXCELFolderId" name="folderId">
+                    </div>
+                    <div class="form-group">
+                        <label for="status2">Status (Published or Unpublished)</label>
+                        <select class="form-control" id="status2" name="status" required>
+                            <option value="" disabled selected>Select the status</option>
+                            <option value="Published">Published</option>
+                            <option value="Unpublished">Unpublished</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="view2">View</label>
+                        <select class="form-control" id="view2" name="view" required>
+                            <option value="" disabled selected>Select the option</option>
+                            <option value="Disable">Disable</option>
+                            <option value="Enable">Enable</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="download2">Download</label>
+                        <select class="form-control" id="download2" name="download" required>
+                            <option value="" disabled selected>Select the option</option>
+                            <option value="Disable">Disable</option>
+                            <option value="Enable">Enable</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="borrow2">Borrow</label>
+                        <select class="form-control" id="borrow2" name="borrow" required onchange="handleBorrowChange2(this)">
+                            <option value="" disabled selected>Select the option</option>
+                            <option value="0">Disable</option>
+                            <option value="Enable">Enable</option>
+                        </select>
+                        <input type="hidden" id="borrowHidden2" name="borrowHidden2">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -466,7 +532,7 @@
                 <div class="modal-body">
                     <div class="input-group1">
                         <label for="epubFile">Choose EPUB File</label>
-                        <input type="file" class="form-control" id="epubFile" name="file" required>
+                        <input type="file" class="form-control" id="epubFile" name="files" required>
                         <input type="hidden" id="uploadEPUBFolderId" name="folderId">
                     </div>
                 </div>
@@ -640,6 +706,58 @@
             borrowHidden.name = 'borrow'; // Change the name to ensure it's sent as 'borrow'
         } else {
             borrowHidden.name = ''; // Reset name to avoid sending it
+        }
+    }
+
+    function handleBorrowChange1(selectElement) {
+        if (selectElement.value === 'Enable') {
+            let period = prompt("Please enter the borrow period (days):", "30");
+            if (period != null && !isNaN(period)) {
+                document.getElementById('borrowHidden1').value = period;
+                selectElement.options[selectElement.selectedIndex].text = 'Enable (' + period + ' days)';
+            } else {
+                selectElement.value = ""; // Reset to default if invalid input
+                document.getElementById('borrowHidden1').value = "";
+                alert("Please enter a valid number.");
+            }
+        } else {
+            document.getElementById('borrowHidden1').value = selectElement.value;
+        }
+    }
+
+    function updateBorrowField1() {
+        const borrowSelect1 = document.getElementById('borrow1');
+        const borrowHidden1 = document.getElementById('borrowHidden1');
+        if (borrowSelect1.value === 'Enable') {
+            borrowHidden1.name = 'borrow'; // Change the name to ensure it's sent as 'borrow'
+        } else {
+            borrowHidden1.name = ''; // Reset name to avoid sending it
+        }
+    }
+
+    function handleBorrowChange2(selectElement) {
+        if (selectElement.value === 'Enable') {
+            let period = prompt("Please enter the borrow period (days):", "30");
+            if (period != null && !isNaN(period)) {
+                document.getElementById('borrowHidden2').value = period;
+                selectElement.options[selectElement.selectedIndex].text = 'Enable (' + period + ' days)';
+            } else {
+                selectElement.value = ""; // Reset to default if invalid input
+                document.getElementById('borrowHidden2').value = "";
+                alert("Please enter a valid number.");
+            }
+        } else {
+            document.getElementById('borrowHidden2').value = selectElement.value;
+        }
+    }
+
+    function updateBorrowField2() {
+        const borrowSelect2 = document.getElementById('borrow2');
+        const borrowHidden2 = document.getElementById('borrowHidden2');
+        if (borrowSelect2.value === 'Enable') {
+            borrowHidden2.name = 'borrow'; // Change the name to ensure it's sent as 'borrow'
+        } else {
+            borrowHidden2.name = ''; // Reset name to avoid sending it
         }
     }
 </script>
