@@ -153,11 +153,6 @@ public class FileService {
                     for (FileInfo fileInfo : fileInfos) {
                       
                         fileInfo.setEpubPath(Integer.toString(pdf.getId()));
-
-                        //数据库等会儿再改
-                        fileInfo.setDownloadLink(Integer.toString(pdf.getId()));
-//                        System.out.println(fileInfo.getDownloadLink());
-
                         fileInfoDao.save(fileInfo);
                     }
                 } catch (IOException e) {

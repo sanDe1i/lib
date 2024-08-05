@@ -84,9 +84,9 @@ public class MainController {
 
     @GetMapping("/resourcesLib")
     public String getFileExplorer(@RequestParam(name = "query", required = false, defaultValue = "") String query,
-                         @RequestParam(name = "type", required = false, defaultValue = "") String type,
-                         @RequestParam(name = "display", required = false, defaultValue = "") String status,
-                         Model model) {
+                                  @RequestParam(name = "type", required = false, defaultValue = "") String type,
+                                  @RequestParam(name = "display", required = false, defaultValue = "") String status,
+                                  Model model) {
         List<ResourcesLib> folders = resourcesLibService.searchFolders(query, type, status);
         Map<Integer, List<File>> folderPDFMap = new HashMap<>();
         for (ResourcesLib folder : folders) {
@@ -115,10 +115,10 @@ public class MainController {
             @RequestParam("view") String view,
             @RequestParam("download") String download,
             @RequestParam("borrow") String borrow,
-            @RequestParam("file") MultipartFile marcFile,
-            @RequestParam("excel") MultipartFile excel,
-            @RequestParam("epub") List<MultipartFile> epub,
-            @RequestParam("files") List<MultipartFile> pdfFiles,
+            @RequestParam(value = "file", required = false) MultipartFile marcFile,
+            @RequestParam(value = "excel", required = false) MultipartFile excel,
+            @RequestParam(value = "epub", required = false) List<MultipartFile> epub,
+            @RequestParam(value = "files", required = false) List<MultipartFile> pdfFiles,
             RedirectAttributes redirectAttributes) throws IOException {
 
         int borrow_period = Integer.parseInt(borrow.replaceAll("[^0-9]", ""));
@@ -133,11 +133,23 @@ public class MainController {
         resourcesLib.setBorrow(borrow_period);
         resourcesLibService.saveNewDatabases(resourcesLib);
 
-        fileService.uploadMARCFile(resourcesLib.getId(), marcFile, status, view, download, borrow_period);
-        fileService.saveExcel(resourcesLib.getId(), excel, status, view, download, borrow_period);
+        if (marcFile != null && !marcFile.isEmpty()) {
+            fileService.uploadMARCFile(resourcesLib.getId(), marcFile, status, view, download, borrow_period);
+        }
 
-        List<String> invalidPDF = fileService.savePDFs(resourcesLib.getId(), pdfFiles);
-        List<String> invalidEPUB = fileService.saveEPUBs(resourcesLib.getId(), epub);
+        if (excel != null && !excel.isEmpty()) {
+            fileService.saveExcel(resourcesLib.getId(), excel, status, view, download, borrow_period);
+        }
+
+        List<String> invalidPDF = new ArrayList<>();
+        if (pdfFiles != null && !pdfFiles.isEmpty()) {
+            invalidPDF = fileService.savePDFs(resourcesLib.getId(), pdfFiles);
+        }
+
+        List<String> invalidEPUB = new ArrayList<>();
+        if (epub != null && !epub.isEmpty()) {
+            invalidEPUB = fileService.saveEPUBs(resourcesLib.getId(), epub);
+        }
 
         List<String> invalidFiles = new ArrayList<>();
         invalidFiles.addAll(invalidPDF);
@@ -150,6 +162,7 @@ public class MainController {
 
         return "redirect:/resourcesLib";
     }
+
 
 
     @PostMapping("/rename-folder")
@@ -295,7 +308,7 @@ public class MainController {
         borrow.setUsername("admin");
         borrow.setLoanStartTime(String.valueOf(System.currentTimeMillis()));
         borrow.setLoanEndTime(String.valueOf(System.currentTimeMillis() + period * 24 * 60 * 60 * 1000));
-        borrowService.saveBorrow(borrow,period);
+        borrowService.saveBorrow(borrow, period);
         return ResponseEntity.ok(pdf);
     }
 
@@ -380,11 +393,9 @@ public class MainController {
     }
 
 
-
-
     @GetMapping("/getBookPeriod")
     public ResponseEntity<?> getBookPeriod(@RequestParam("bookID") int bookId) {
-       return ResponseEntity.ok(fileService.getBookPeriod(bookId));
+        return ResponseEntity.ok(fileService.getBookPeriod(bookId));
     }
 
     @GetMapping("/book/{id}")
@@ -491,7 +502,7 @@ public class MainController {
             List<String> isbns = extractIsbnNumbers(isbnString);
 
             for (String isbn : isbns) {
-                String possiblePath = fileInfo.getResourcesId()+"/"+ isbn + ".pdf";
+                String possiblePath = fileInfo.getResourcesId() + "/" + isbn + ".pdf";
                 Path filePath = Paths.get(directory).resolve(possiblePath).normalize();
                 java.io.File file = filePath.toFile();
                 System.out.println(filePath);
