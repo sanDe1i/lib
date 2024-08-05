@@ -427,7 +427,7 @@ public class MainController {
 
         // 构造并检查每个 ISBN 的文件路径
         for (String isbn : isbns) {
-            String possiblePath = isbn + ".pdf";
+            String possiblePath = fileInfo.getResourcesId() + "/" + isbn + ".pdf";
             try {
                 Path filePath = this.fileStorageLocation.resolve(possiblePath).normalize();
                 System.out.println("Checking path: " + filePath.toString());
@@ -491,7 +491,7 @@ public class MainController {
             List<String> isbns = extractIsbnNumbers(isbnString);
 
             for (String isbn : isbns) {
-                String possiblePath = isbn + ".pdf";
+                String possiblePath = fileInfo.getResourcesId()+"/"+ isbn + ".pdf";
                 Path filePath = Paths.get(directory).resolve(possiblePath).normalize();
                 java.io.File file = filePath.toFile();
                 System.out.println(filePath);

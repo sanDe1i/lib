@@ -90,4 +90,37 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
     @Modifying
     @Transactional
     void deleteFileInfoByResourcesId(int folderId);
+
+    @Query("SELECT DISTINCT b FROM FileInfo b WHERE b.downloadLink IS NOT NULL " +
+            "AND b.downloadLink <> '' " +
+            "AND (:databaseId IS NULL OR b.resourcesId = :databaseId)")
+    List<FileInfo> findPDFs(@Param("databaseId") Integer databaseId);
+
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE FileInfo b SET b.downloadLink = NULL WHERE b.downloadLink = :pdfID")
+    void updateDownloadLinkToNull(String pdfID);
+
+    @Query("SELECT f FROM FileInfo f WHERE " +
+            "(:title IS NULL OR f.title LIKE %:title%) " +
+            "OR (:isbn IS NULL OR f.isbn LIKE %:isbn%) " +
+            "OR (:alternativeTitle IS NULL OR f.alternativeTitle LIKE %:alternativeTitle%) " +
+            "OR (:author IS NULL OR f.authors LIKE %:author%) " +
+            "AND (:status IS NULL OR f.status = :status) " +
+            "AND (:publisher IS NULL OR f.publisher = :publisher) " +
+            "AND (:sourceType IS NULL OR f.sourceType = :sourceType) " +
+            "AND (:language IS NULL OR f.language = :language) " +
+            "AND (:published IS NULL OR f.published = :published) " +
+            "AND (:databaseId IS NULL OR f.resourcesId = :databaseId)")
+    List<FileInfo> findByAllKinds(@Param("title") String title,
+                                  @Param("isbn") String isbn,
+                                  @Param("alternativeTitle") String alternativeTitle,
+                                  @Param("author") String author,
+                                  @Param("status") String status,
+                                  @Param("publisher") String publisher,
+                                  @Param("sourceType") String sourceType,
+                                  @Param("language") String language,
+                                  @Param("published") String published,
+                                  @Param("databaseId") Integer databaseId);
 }
