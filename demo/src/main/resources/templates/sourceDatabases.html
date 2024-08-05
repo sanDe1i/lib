@@ -284,28 +284,28 @@
                     <div class="form-step">
                         <div class="form-group">
                             <label for="marcFile">Choose Marc File</label>
-                            <input type="file" class="form-control" id="marcFile" name="file" required/>
+                            <input type="file" class="form-control" id="marcFile" name="file"/>
                             <input type="hidden" id="uploadMarcFolderId" name="folderId"/>
                         </div>
                     </div>
                     <div class="form-step">
                         <div class="form-group">
                             <label for="excelFile1">Choose EXCEL File</label>
-                            <input type="file" class="form-control" id="excelFile1" name="excel" required>
+                            <input type="file" class="form-control" id="excelFile1" name="excel">
                             <input type="hidden" id="uploadEXCELFolderIdWhenAddNewFolder" name="folderId">
                         </div>
                     </div>
                     <div class="form-step">
                         <div class="form-group">
                             <label for="pdfFiles">Choose PDF File(s)</label>
-                            <input type="file" class="form-control" id="pdfFiles" name="files" multiple required/>
+                            <input type="file" class="form-control" id="pdfFiles" name="files" multiple/>
                             <input type="hidden" id="uploadPdfFolderId" name="folderId"/>
                         </div>
                     </div>
                     <div class="form-step">
                         <div class="form-group">
                             <label for="epubFile1">Choose EPUB File</label>
-                            <input type="file" class="form-control" id="epubFile1" name="epub" required>
+                            <input type="file" class="form-control" id="epubFile1" name="epub" multiple>
                             <input type="hidden" id="uploadEPUBFolderIdWhenAddNewFolder" name="folderId">
                         </div>
                     </div>
@@ -615,6 +615,20 @@
             var form = $(this);
             var formData = new FormData(this);
 
+            // Remove file inputs from FormData if they are empty
+            if (!$('#marcFile')[0].files.length) {
+                formData.delete('file');
+            }
+            if (!$('#excelFile1')[0].files.length) {
+                formData.delete('excel');
+            }
+            if (!$('#pdfFiles')[0].files.length) {
+                formData.delete('files');
+            }
+            if (!$('#epubFile1')[0].files.length) {
+                formData.delete('epub');
+            }
+            console.log(formData);
             $.ajax({
                 url: form.attr('action'),
                 type: form.attr('method'),
@@ -630,6 +644,7 @@
                 }
             });
         });
+
 
     });
 </script>
