@@ -4,14 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改下拉选框及在线浏览">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/5656e9b0-aadb-413e-923d-60d1e8b6b7d1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/5656e9b0-aadb-413e-923d-60d1e8b6b7d1.xml" afterDir="false" />
+    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改查询增加pdflist">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/ListBookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/ListBookController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/MainController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/FileInfoDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/FileInfoDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/PDFDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/PDFDao.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/FileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/FileService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/ResourcesLibService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/ResourcesLibService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/pdfList.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/pdfList.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/searchresults.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/searchresults.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/sourceDatabases.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/sourceDatabases.html" afterDir="false" />
     </list>
@@ -113,7 +114,7 @@
       <workItem from="1720718923829" duration="17000" />
       <workItem from="1720719112378" duration="807000" />
       <workItem from="1720870032459" duration="129621000" />
-      <workItem from="1722608338537" duration="25911000" />
+      <workItem from="1722608338537" duration="47669000" />
     </task>
     <task id="LOCAL-00001" summary="拦截+搜索访问@GetMapping(&quot;test/search2&quot;)">
       <created>1720963712259</created>
@@ -157,7 +158,14 @@
       <option name="project" value="LOCAL" />
       <updated>1722052640819</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="修改查询增加pdflist">
+      <created>1722779288260</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1722779288260</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -180,7 +188,8 @@
     <MESSAGE value="联调了databaseID，name，连接了资源库管理界面，等。性能暂不考虑。" />
     <MESSAGE value="新接口下载能匹配bookid@(&quot;/downloadFromList/{bookId}&quot;)；更新功能：察看是否上传pdf" />
     <MESSAGE value="修改下拉选框及在线浏览" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改下拉选框及在线浏览" />
+    <MESSAGE value="修改查询增加pdflist" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改查询增加pdflist" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
